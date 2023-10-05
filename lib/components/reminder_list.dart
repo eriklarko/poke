@@ -3,10 +3,14 @@ import 'package:poke/models/reminder.dart';
 
 class ReminderList extends StatelessWidget {
   final List<Reminder> reminders;
+  final Function(Reminder) onTap;
+  final Function(Reminder) onSnooze;
 
   const ReminderList({
     super.key,
     required this.reminders,
+    required this.onTap,
+    required this.onSnooze,
   });
 
   @override
@@ -14,11 +18,10 @@ class ReminderList extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
         itemCount: reminders.length,
-        itemBuilder: (context, position) => GestureDetector(
-          onTap: () {
-            print('Tap!');
-          },
-          child: ReminderListItem(reminders[position]),
+        itemBuilder: (context, position) => ReminderListItem(
+          reminders[position],
+          onTap: onTap,
+          onSnooze: onSnooze,
         ),
       ),
     );
@@ -27,24 +30,38 @@ class ReminderList extends StatelessWidget {
 
 class ReminderListItem extends StatelessWidget {
   final Reminder reminder;
+  final Function(Reminder) onTap;
+  final Function(Reminder) onSnooze;
 
-  const ReminderListItem(this.reminder, {super.key});
+  const ReminderListItem(
+    this.reminder, {
+    super.key,
+    required this.onTap,
+    required this.onSnooze,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-        key: ObjectKey(reminder),
+    return GestureDetector(
+      onTap: () {
+        print('Tap!');
+        onTap(reminder);
+      },
+      child: Dismissible(
+          key: ObjectKey(reminder),
 
-        // only allow swiping right-to-left
-        direction: DismissDirection.endToStart,
-        //
+          // only allow swiping right-to-left
+          direction: DismissDirection.endToStart,
+          //
 
-        background: const SnoozeAction(),
-        onDismissed: (direction) {
-          // TODO: Log action
-          print('dismissed');
-        },
-        child: reminder.buildReminderListItem(context));
+          background: const SnoozeAction(),
+          onDismissed: (direction) {
+            // TODO: Log action
+            print('dismissed!');
+            onSnooze(reminder);
+          },
+          child: reminder.buildReminderListItem(context)),
+    );
   }
 }
 

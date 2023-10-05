@@ -14,16 +14,20 @@ class HomeScreen extends StatelessWidget {
       appBar: PokeAppBar(context, title: 'hiyo'),
       body: Column(children: [
         Text('hi'),
-        ReminderList(reminders: [
-          Reminder(
-            action: WaterPlant(
-              plant: Plant(name: 'Frank'),
-              addedFertilizer: false,
+        ReminderList(
+          reminders: [
+            Reminder(
+              action: WaterPlant(
+                plant: Plant(name: 'Frank'),
+                addedFertilizer: false,
+              ),
+              dueDate: DateTime.now(),
+              lastEventAt: DateTime.now(),
             ),
-            dueDate: DateTime.now(),
-            lastEventAt: DateTime.now(),
-          ),
-        ])
+          ],
+          onTap: (reminder) => print('Tapped $reminder'),
+          onSnooze: (reminder) => print('Snoozed $reminder'),
+        ),
       ]),
     );
   }
