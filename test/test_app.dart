@@ -13,9 +13,11 @@ import 'package:flutter_test/flutter_test.dart';
 Widget wrapInTestApp(Widget widgetUnderTest) {
   return MaterialApp(
     title: 'foo',
-    home: Flex(
-      direction: Axis.vertical,
-      children: [widgetUnderTest],
+    home: Material(
+      child: Flex(
+        direction: Axis.vertical,
+        children: [widgetUnderTest],
+      ),
     ),
   );
 }
