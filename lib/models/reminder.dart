@@ -4,14 +4,10 @@ import 'package:poke/models/action.dart';
 class Reminder {
   final Action action;
   final DateTime dueDate;
-  final DateTime? lastEventAt;
 
-  Reminder({required this.action, required this.dueDate, this.lastEventAt});
+  Reminder({required this.action, required this.dueDate});
 
   Widget buildReminderListItem(BuildContext context) {
-    return action.buildReminderListItem(
-      context,
-      lastEventAt: lastEventAt,
-    );
+    return action.buildReminderListItem(context);
   }
 }

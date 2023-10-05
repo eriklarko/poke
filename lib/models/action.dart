@@ -4,13 +4,17 @@
 import 'package:flutter/material.dart';
 
 abstract interface class Action {
-  Widget buildReminderListItem(BuildContext context, {DateTime? lastEventAt});
+  // Creates the UI used to show this action in the reminder list
+  Widget buildReminderListItem(BuildContext context);
 }
 
-class ReplacedACFilter extends Action {
+class ReplaceACFilter extends Action {
   @override
-  Widget buildReminderListItem(BuildContext context, {DateTime? lastEventAt}) {
-    // TODO: implement buildReminderListItem
+  Widget buildReminderListItem(BuildContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
     throw UnimplementedError();
   }
 }

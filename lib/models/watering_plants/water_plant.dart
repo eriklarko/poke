@@ -5,11 +5,13 @@ import 'package:poke/utils/date_formatter.dart';
 class WaterPlant implements Action {
   final Plant plant;
   final bool addedFertilizer;
+  final DateTime? lastEventAt;
 
-  WaterPlant({required this.plant, required this.addedFertilizer});
+  WaterPlant(
+      {required this.plant, required this.addedFertilizer, this.lastEventAt});
 
   @override
-  Widget buildReminderListItem(BuildContext context, {DateTime? lastEventAt}) {
+  Widget buildReminderListItem(BuildContext context) {
     return Row(
       children: [
         Image.network('https://placekitten.com/40/40'),
@@ -17,7 +19,7 @@ class WaterPlant implements Action {
           children: [
             Text(plant.name),
             if (lastEventAt != null)
-              Text('Last watered on ' + formatDate(lastEventAt)),
+              Text('Last watered on ${formatDate(lastEventAt!)}'),
           ],
         ),
         const Icon(Icons.chevron_right),

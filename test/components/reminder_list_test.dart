@@ -9,13 +9,12 @@ import '../drag_directions.dart';
 import '../mock_callback.dart';
 import '../test_app.dart';
 
-final reminderWithLastEventAt = Reminder(
-  action: TestAction('test-action-with-lastEventAt'),
+final reminder1 = Reminder(
+  action: TestAction('test-action-1'),
   dueDate: DateTime.now(),
-  lastEventAt: DateTime.parse('1963-11-23 01:02:03'),
 );
-final reminderWithoutLastEventAt = Reminder(
-  action: TestAction('test-action-without-lastEventAt'),
+final reminder2 = Reminder(
+  action: TestAction('test-action-2'),
   dueDate: DateTime.now(),
 );
 
@@ -27,8 +26,8 @@ void main() {
       tester,
       ReminderList(
         reminders: [
-          reminderWithLastEventAt,
-          reminderWithoutLastEventAt,
+          reminder1,
+          reminder2,
         ],
         onTap: ignoreCallback,
         onSnooze: ignoreCallback,
@@ -47,7 +46,7 @@ void main() {
       tester,
       ReminderList(
         reminders: [
-          reminderWithLastEventAt,
+          reminder1,
         ],
         onTap: onTapCallback,
         onSnooze: ignoreCallback,
@@ -56,7 +55,7 @@ void main() {
 
     await tester.tap(find.byType(ReminderListItem));
 
-    verify(onTapCallback(reminderWithLastEventAt)).called(1);
+    verify(onTapCallback(reminder1)).called(1);
   });
 
   testWidgets('endToStart swipe snoozes reminder', (tester) async {
@@ -66,7 +65,7 @@ void main() {
       tester,
       ReminderList(
         reminders: [
-          reminderWithLastEventAt,
+          reminder1,
         ],
         onTap: ignoreCallback,
         onSnooze: onSnoozeCallback,
@@ -76,7 +75,7 @@ void main() {
     await tester.drag(find.byType(ReminderListItem), endToStart);
     await tester.pumpAndSettle();
 
-    verify(onSnoozeCallback(reminderWithLastEventAt)).called(1);
+    verify(onSnoozeCallback(reminder1)).called(1);
   });
 }
 
@@ -86,7 +85,7 @@ class TestAction implements Action {
   TestAction(this.id);
 
   @override
-  Widget buildReminderListItem(BuildContext context, {DateTime? lastEventAt}) {
+  Widget buildReminderListItem(BuildContext context) {
     return Column(
       key: Key(id),
       children: [

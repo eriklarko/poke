@@ -20,9 +20,9 @@ class HomeScreen extends StatelessWidget {
               action: WaterPlant(
                 plant: Plant(name: 'Frank'),
                 addedFertilizer: false,
+                lastEventAt: DateTime.now(),
               ),
               dueDate: DateTime.now(),
-              lastEventAt: DateTime.now(),
             ),
           ],
           onTap: (reminder) => print('Tapped $reminder'),
