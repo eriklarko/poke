@@ -93,4 +93,10 @@ class TestAction implements Action {
       ],
     );
   }
+
+  @override
+  buildAddEventWidget(BuildContext context) {
+    // TODO: implement buildAddEventWidget
+    throw UnimplementedError();
+  }
 }

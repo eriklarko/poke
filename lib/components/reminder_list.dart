@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/models/reminder.dart';
 
 class ReminderList extends StatelessWidget {
@@ -42,7 +43,7 @@ class ReminderListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PokeTappable(
       onTap: () {
         print('Tap!');
         onTap(reminder);
