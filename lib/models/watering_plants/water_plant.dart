@@ -2,15 +2,21 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/models/event.dart';
+import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
 
-class WaterPlant implements Action {
-  final Plant plant;
+class WateredPlant extends Event {
   final bool addedFertilizer;
-  final DateTime? lastEventAt;
 
-  WaterPlant(
-      {required this.plant, required this.addedFertilizer, this.lastEventAt});
+  WateredPlant({required super.when, required this.addedFertilizer});
+}
+
+class WaterPlantAction extends Action<WateredPlant> {
+  final Plant plant;
+
+  WaterPlantAction({required this.plant, WateredPlant? lastEvent})
+      : super(lastEvent: lastEvent);
 
   @override
   Widget buildReminderListItem(BuildContext context) {
@@ -20,8 +26,14 @@ class WaterPlant implements Action {
         Column(
           children: [
             Text(plant.name),
-            if (lastEventAt != null)
-              Text('Last watered on ${formatDate(lastEventAt!)}'),
+            if (lastEvent != null)
+              Column(
+                children: [
+                  Text('Last watered on ${formatDate(lastEvent!.when)}'),
+                  if (lastEvent!.addedFertilizer)
+                    const Text('included fertilizer'),
+                ],
+              ),
           ],
         ),
         const Icon(Icons.chevron_right),
@@ -36,8 +48,8 @@ class WaterPlant implements Action {
       children: [
         plant.image,
         Text(plant.name),
-        if (lastEventAt != null)
-          Text('Last watered on ${formatDate(lastEventAt!)}'),
+        if (lastEvent != null)
+          Text('Last watered on ${formatDate(lastEvent!.when)}'),
         Row(
           children: [
             Text('Added fertilizer'),
@@ -46,26 +58,14 @@ class WaterPlant implements Action {
         ),
         PokeButton(
           onPressed: () {
+            final event = WateredPlant(
+                when: DateTime.now(),
+                addedFertilizer: fertilizerCheckbox.isChecked);
             print('pressed btnn ${fertilizerCheckbox.isChecked}');
           },
           child: Text('Watered!'),
         ),
       ],
     );
-  }
-}
-
-final defaultImage = Image.network('https://placekitten.com/40/40');
-
-class Plant {
-  final String name;
-  late final Image? _image;
-
-  Plant({required this.name, image}) {
-    _image = image;
-  }
-
-  Image get image {
-    return _image ?? defaultImage;
   }
 }

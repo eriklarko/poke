@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
 import 'components/reminder_list.dart';
@@ -18,10 +19,12 @@ class HomeScreen extends StatelessWidget {
         ReminderList(
           reminders: [
             Reminder(
-              action: WaterPlant(
+              action: WaterPlantAction(
                 plant: Plant(name: 'Frank'),
-                addedFertilizer: false,
-                lastEventAt: DateTime.now(),
+                lastEvent: WateredPlant(
+                  when: DateTime.now(),
+                  addedFertilizer: false,
+                ),
               ),
               dueDate: DateTime.now(),
             ),

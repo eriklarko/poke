@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/models/event.dart';
 import 'package:poke/models/reminder.dart';
 
 import '../drag_directions.dart';
@@ -79,7 +80,7 @@ void main() {
   });
 }
 
-class TestAction implements Action {
+class TestAction extends Action<Event> {
   final String id;
 
   TestAction(this.id);
