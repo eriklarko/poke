@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_tappable.dart';
+import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 
 class ReminderList extends StatelessWidget {
@@ -78,7 +79,7 @@ class SnoozeAction extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('Snooze'),
+            PokeText('Snooze'),
             Icon(Icons.snooze),
           ],
         ),

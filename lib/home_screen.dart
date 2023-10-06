@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_modal.dart';
+import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
@@ -15,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: PokeAppBar(context, title: 'hiyo'),
       body: Column(children: [
-        Text('hi'),
+        PokeHeader('hi'),
         ReminderList(
           reminders: [
             Reminder(
