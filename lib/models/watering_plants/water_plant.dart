@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/event.dart';
 import 'package:poke/models/watering_plants/plant.dart';
@@ -44,7 +45,7 @@ class WaterPlantAction extends Action<WateredPlant> {
   }
 
   @override
-  buildAddEventWidget(BuildContext context) {
+  buildAddEventWidget(BuildContext context, EventStorage eventStorage) {
     final fertilizerCheckbox = PokeCheckbox();
 
     return Column(
@@ -66,6 +67,9 @@ class WaterPlantAction extends Action<WateredPlant> {
               addedFertilizer: fertilizerCheckbox.isChecked,
             );
             print('pressed btnn ${fertilizerCheckbox.isChecked}');
+
+            // TODO: add spinner and retry and stuff
+            eventStorage.addEvent(event);
           },
           text: 'Watered!',
         ),

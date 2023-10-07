@@ -7,6 +7,7 @@ class InMemoryStorage implements EventStorage {
 
   @override
   Future<void> addEvent(Event e) {
+    print('Adding event $e aaw yeh');
     jiggers.add(e);
     return Future.value(null);
   }

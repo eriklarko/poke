@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/home_screen.dart';
 
+GetIt getIt = GetIt.instance;
+
 void main() {
+  getIt.registerSingleton<EventStorage>(InMemoryStorage());
+
   runApp(const MyApp());
 }
 
@@ -17,7 +24,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
         ),
-        home: const HomeScreen());
+        home: HomeScreen());
   }
 }
 
