@@ -73,7 +73,27 @@ class PokeAsyncWidget<ErrorType> extends StatefulWidget {
   });
 
   @override
-  State<PokeAsyncWidget> createState() => controller;
+  State<PokeAsyncWidget<ErrorType>> createState() => _PokeAsyncWidgetState();
+}
+
+class PokeAsyncWidgetController<ErrorType> {
+  _PokeAsyncWidgetState<ErrorType>? _state;
+
+  _setState(_PokeAsyncWidgetState<ErrorType> state) {
+    _state = state;
+  }
+
+  setLoading() {
+    _state!.setLoading();
+  }
+
+  setSuccessful() {
+    _state!.setSuccessful();
+  }
+
+  setErrored(ErrorType error) {
+    _state!.setErrored(error);
+  }
 }
 
 enum _State {
@@ -83,10 +103,16 @@ enum _State {
   error,
 }
 
-class PokeAsyncWidgetController<ErrorType>
+class _PokeAsyncWidgetState<ErrorType>
     extends State<PokeAsyncWidget<ErrorType>> {
   _State _state = _State.idle;
   ErrorType? _error = null;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller._setState(this);
+  }
 
   setLoading() {
     setState(() {
