@@ -63,7 +63,7 @@ class WaterPlantAction extends Action<WateredPlant> {
           PokeText('Last watered on ${formatDate(lastEvent!.when)}'),
         Row(
           children: [
-            PokeText('Added fertilizer'),
+            const PokeText('Added fertilizer'),
             fertilizerCheckbox,
           ],
         ),
