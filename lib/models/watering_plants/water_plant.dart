@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Action;
+import 'package:poke/design_system/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_text.dart';
@@ -16,6 +17,7 @@ class WateredPlant extends Event {
 
 class WaterPlantAction extends Action<WateredPlant> {
   final Plant plant;
+  final _addEventController = PokeAsyncWidgetController();
 
   WaterPlantAction({required this.plant, WateredPlant? lastEvent})
       : super(lastEvent: lastEvent);
@@ -60,18 +62,35 @@ class WaterPlantAction extends Action<WateredPlant> {
             fertilizerCheckbox,
           ],
         ),
-        PokeButton(
-          onPressed: () {
-            final event = WateredPlant(
-              when: DateTime.now(),
-              addedFertilizer: fertilizerCheckbox.isChecked,
-            );
-            print('pressed btnn ${fertilizerCheckbox.isChecked}');
+        PokeAsyncWidget(
+          controller: _addEventController,
+          idle: PokeButton(
+            onPressed: () {
+              _addEventController.setLoading();
 
-            // TODO: add spinner and retry and stuff
-            eventStorage.addEvent(event);
+              final event = WateredPlant(
+                when: DateTime.now(),
+                addedFertilizer: fertilizerCheckbox.isChecked,
+              );
+              print('pressed btnn ${fertilizerCheckbox.isChecked}');
+
+              eventStorage.addEvent(event).then((_) {
+                _addEventController.setSuccessful();
+              }).catchError((err) {
+                _addEventController.setErrored(err);
+              });
+            },
+            text: 'Watered!',
+          ),
+          success: const Text('done!'),
+          loading: const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(),
+          ),
+          error: (error) {
+            return Text(error.toString());
           },
-          text: 'Watered!',
         ),
       ],
     );
