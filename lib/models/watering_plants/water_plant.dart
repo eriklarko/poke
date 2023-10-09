@@ -10,9 +10,14 @@ import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
 
 class WateredPlant extends Event {
+  final Plant plant;
   final bool addedFertilizer;
 
-  WateredPlant({required super.when, required this.addedFertilizer});
+  WateredPlant({
+    required super.when,
+    required this.plant,
+    required this.addedFertilizer,
+  });
 }
 
 class WaterPlantAction extends Action<WateredPlant> {
@@ -70,6 +75,7 @@ class WaterPlantAction extends Action<WateredPlant> {
 
               final event = WateredPlant(
                 when: DateTime.now(),
+                plant: plant,
                 addedFertilizer: fertilizerCheckbox.isChecked,
               );
               print('pressed btnn ${fertilizerCheckbox.isChecked}');

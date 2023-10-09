@@ -28,6 +28,7 @@ class HomeScreen extends StatelessWidget {
                 plant: Plant(name: 'Frank'),
                 lastEvent: WateredPlant(
                   when: DateTime.now(),
+                  plant: Plant(name: 'Frank'),
                   addedFertilizer: false,
                 ),
               ),
