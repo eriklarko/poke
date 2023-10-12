@@ -10,6 +10,8 @@ abstract class Event {
 
   Event({required this.when});
 
+  Object getKey();
+
   // The event type together with the time the event occured (`this.when`) is
   // used to uniquely identify an event.
   String get id => "${runtimeType}_${formatter.format(when)}";

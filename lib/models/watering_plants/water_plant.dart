@@ -18,6 +18,16 @@ class WateredPlant extends Event {
     required this.plant,
     required this.addedFertilizer,
   });
+
+  @override
+  Object getKey() {
+    return plant;
+  }
+
+  @override
+  String toString() {
+    return "$plant watered at ${formatDate(when)}";
+  }
 }
 
 class WaterPlantAction extends Action<WateredPlant> {

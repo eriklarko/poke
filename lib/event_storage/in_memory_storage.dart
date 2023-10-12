@@ -9,6 +9,7 @@ class InMemoryStorage implements EventStorage {
   Future<void> addEvent(Event e) {
     print('Adding event $e aaw yeh');
     jiggers.add(e);
+    //return Future.delayed(const Duration(seconds: 2), () => 'foo');
     return Future.value(null);
   }
 

@@ -14,4 +14,9 @@ class Plant {
   Image get image {
     return _image ?? defaultImage;
   }
+
+  @override
+  String toString() {
+    return name;
+  }
 }

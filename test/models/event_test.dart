@@ -11,4 +11,9 @@ void main() {
 
 class TestEvent extends Event {
   TestEvent({required super.when});
+
+  @override
+  Object getKey() {
+    return this;
+  }
 }
