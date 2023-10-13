@@ -5,37 +5,22 @@ import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/models/event.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
 
-class WateredPlant extends Event {
+class WaterPlantAction extends Action {
   final Plant plant;
   final bool addedFertilizer;
 
-  WateredPlant({
-    required super.when,
+  // create controller used to set loading/success states of the button that
+  // logs the action in `buildLogActionWidget`
+  final _logActionController = PokeAsyncWidgetController();
+
+  WaterPlantAction({
     required this.plant,
     required this.addedFertilizer,
+    super.lastEvent,
   });
-
-  @override
-  Object getKey() {
-    return plant;
-  }
-
-  @override
-  String toString() {
-    return "$plant watered at ${formatDate(when)}";
-  }
-}
-
-class WaterPlantAction extends Action<WateredPlant> {
-  final Plant plant;
-  final _addEventController = PokeAsyncWidgetController();
-
-  WaterPlantAction({required this.plant, WateredPlant? lastEvent})
-      : super(lastEvent: lastEvent);
 
   @override
   Widget buildReminderListItem(BuildContext context) {
@@ -48,9 +33,8 @@ class WaterPlantAction extends Action<WateredPlant> {
             if (lastEvent != null)
               Column(
                 children: [
-                  PokeFinePrint(
-                      'Last watered on ${formatDate(lastEvent!.when)}'),
-                  if (lastEvent!.addedFertilizer)
+                  PokeFinePrint('Last watered on ${formatDate(lastEvent!)}'),
+                  if (addedFertilizer)
                     const PokeFinePrint('included fertilizer'),
                 ],
               ),
@@ -62,7 +46,7 @@ class WaterPlantAction extends Action<WateredPlant> {
   }
 
   @override
-  buildAddEventWidget(BuildContext context, EventStorage eventStorage) {
+  buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
     final fertilizerCheckbox = PokeCheckbox();
 
     return Column(
@@ -70,7 +54,7 @@ class WaterPlantAction extends Action<WateredPlant> {
         plant.image,
         PokeText(plant.name),
         if (lastEvent != null)
-          PokeText('Last watered on ${formatDate(lastEvent!.when)}'),
+          PokeText('Last watered on ${formatDate(lastEvent!)}'),
         Row(
           children: [
             const PokeText('Added fertilizer'),
@@ -78,22 +62,18 @@ class WaterPlantAction extends Action<WateredPlant> {
           ],
         ),
         PokeAsyncWidget(
-          controller: _addEventController,
+          controller: _logActionController,
           idle: PokeButton(
             onPressed: () {
-              _addEventController.setLoading();
+              _logActionController.setLoading();
 
-              final event = WateredPlant(
-                when: DateTime.now(),
-                plant: plant,
-                addedFertilizer: fertilizerCheckbox.isChecked,
-              );
               print('pressed btnn ${fertilizerCheckbox.isChecked}');
 
-              eventStorage.addEvent(event).then((_) {
-                _addEventController.setSuccessful();
+              // TODO: replace DateTime.now() with something testable
+              eventStorage.logAction(this, DateTime.now()).then((_) {
+                _logActionController.setSuccessful();
               }).catchError((err) {
-                _addEventController.setErrored(err);
+                _logActionController.setErrored(err);
               });
             },
             text: 'Watered!',
@@ -110,5 +90,10 @@ class WaterPlantAction extends Action<WateredPlant> {
         ),
       ],
     );
+  }
+
+  @override
+  String toString() {
+    return "water ${plant.name} ${addedFertilizer ? "with fertilizer" : "without fertilizer"}";
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/event_storage/reminder_builder.dart';
+import 'package:poke/models/event.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
+import '../mock_callback.dart';
 import '../utils/clock.dart';
 
 final plant1 = Plant(name: 'Plant 1');
@@ -15,31 +17,35 @@ void main() {
   test('Groups plant events based on which plant was watered', () async {
     final eventStorage = InMemoryStorage();
 
-    final e1 = WateredPlant(
-      when: clock.next(),
+    // create two different actions to be logged at different timestamps further
+    // down
+    final a1 = WaterPlantAction(
       plant: plant1,
       addedFertilizer: false,
     );
-    final e2 = WateredPlant(
-      when: clock.next(),
+    final a2 = WaterPlantAction(
       plant: plant2,
       addedFertilizer: false,
     );
-    final e3 = WateredPlant(
-      when: clock.next(),
-      plant: plant1,
-      addedFertilizer: false,
-    );
 
-    await eventStorage.addEvent(e1);
-    await eventStorage.addEvent(e2);
-    await eventStorage.addEvent(e3);
+    // get references to the timestamps we're logging the actions at so that we
+    // can check them later
+    final ts1 = clock.next();
+    final ts2 = clock.next();
+    final ts3 = clock.next();
+
+    // log the actions at their corresponding timestamps
+    await eventStorage.logAction(a1, ts1);
+    await eventStorage.logAction(a2, ts2);
+    await eventStorage.logAction(a1, ts3);
 
     final expected = {
-      plant1: [e1, e3],
-      plant2: [e2],
+      a1: [ts1, ts3],
+      a2: [ts2],
     };
-
-    expect(grouper([e1, e2, e3]), equals(expected));
+    expect(
+      groupByAction(await eventStorage.getAll()),
+      equals(expected),
+    );
   });
 }

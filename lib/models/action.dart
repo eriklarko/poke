@@ -3,10 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/models/event.dart';
 
-abstract class Action<T extends Event> {
-  final T? lastEvent;
+abstract class Action {
+  DateTime? lastEvent;
 
   Action({this.lastEvent});
 
@@ -15,7 +14,7 @@ abstract class Action<T extends Event> {
 
   // Creates the UI to use when executing this action, or adding an event of
   // this action. An event in Poke is when an action was performed.
-  buildAddEventWidget(BuildContext context, EventStorage eventStorage) {}
+  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage);
 }
 
 class ReplaceACFilter extends Action {
@@ -25,7 +24,7 @@ class ReplaceACFilter extends Action {
   }
 
   @override
-  Widget buildAddEventWidget(BuildContext context, EventStorage eventStorage) {
+  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
     throw UnimplementedError();
   }
 }

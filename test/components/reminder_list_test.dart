@@ -2,8 +2,8 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list.dart';
+import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/models/event.dart';
 import 'package:poke/models/reminder.dart';
 
 import '../drag_directions.dart';
@@ -80,7 +80,7 @@ void main() {
   });
 }
 
-class TestAction extends Action<Event> {
+class TestAction extends Action {
   final String id;
 
   TestAction(this.id);
@@ -93,5 +93,11 @@ class TestAction extends Action<Event> {
         Text(id),
       ],
     );
+  }
+
+  @override
+  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
+    // TODO: implement buildLogActionWidget
+    throw UnimplementedError();
   }
 }

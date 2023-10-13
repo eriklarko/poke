@@ -1,18 +1,26 @@
-import 'package:intl/intl.dart';
-
-// date formatter used to generate event id. More precision is better.
-final DateFormat formatter = DateFormat('yyyyMMdd_HHmmss_SSS');
+import 'package:poke/models/action.dart';
+import 'package:poke/utils/date_formatter.dart';
 
 // An event is when an action was performed, like watering a plant or changing
 // AC filter.
-abstract class Event {
+class Event<ActionType extends Action> {
+  final ActionType action;
   final DateTime when;
 
-  Event({required this.when});
+  Event({required this.action, required this.when});
 
-  Object getKey();
+  @override
+  String toString() {
+    return "$action at ${formatDate(when)}";
+  }
 
-  // The event type together with the time the event occured (`this.when`) is
-  // used to uniquely identify an event.
-  String get id => "${runtimeType}_${formatter.format(when)}";
+  @override
+  bool operator ==(Object other) =>
+      other is Event &&
+      other.runtimeType == runtimeType &&
+      other.action == action &&
+      other.when == other.when;
+
+  @override
+  int get hashCode => action.hashCode + when.hashCode;
 }

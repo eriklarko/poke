@@ -26,11 +26,8 @@ class HomeScreen extends StatelessWidget {
             Reminder(
               action: WaterPlantAction(
                 plant: Plant(name: 'Frank'),
-                lastEvent: WateredPlant(
-                  when: DateTime.now(),
-                  plant: Plant(name: 'Frank'),
-                  addedFertilizer: false,
-                ),
+                addedFertilizer: false,
+                lastEvent: DateTime.now(),
               ),
               dueDate: DateTime.now(),
             ),
@@ -40,7 +37,7 @@ class HomeScreen extends StatelessWidget {
               context: context,
               builder: (context) => PokeModal(
                 child:
-                    reminder.action.buildAddEventWidget(context, eventStorage),
+                    reminder.action.buildLogActionWidget(context, eventStorage),
               ),
             );
           },
