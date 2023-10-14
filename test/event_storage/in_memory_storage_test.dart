@@ -1,16 +1,15 @@
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/event.dart';
+import 'package:poke/models/test-action/test_action.dart';
 
 void main() {
   test('logging actions allows reading them later', () async {
     final sut = InMemoryStorage();
 
-    final Action a1 = TestAction();
-    final Action a2 = TestAction();
+    final Action a1 = TestAction(id: '1');
+    final Action a2 = TestAction(id: '2');
     final ts1 = DateTime.parse('1963-11-26 01:02:03.456');
     final ts2 = DateTime.parse('1989-12-06 01:02:03.456');
 
@@ -41,18 +40,4 @@ void main() {
       equals(expected),
     );
   });
-}
-
-class TestAction extends Action {
-  @override
-  Widget buildReminderListItem(BuildContext context) {
-    // TODO: implement buildReminderListItem
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
-    // TODO: implement buildLogActionWidget
-    throw UnimplementedError();
-  }
 }

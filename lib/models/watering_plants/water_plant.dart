@@ -20,7 +20,7 @@ class WaterPlantAction extends Action {
     required this.plant,
     required this.addedFertilizer,
     super.lastEvent,
-  });
+  }) : super(serializationKey: 'water-plant');
 
   @override
   Widget buildReminderListItem(BuildContext context) {
@@ -95,5 +95,11 @@ class WaterPlantAction extends Action {
   @override
   String toString() {
     return "water ${plant.name} ${addedFertilizer ? "with fertilizer" : "without fertilizer"}";
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
   }
 }

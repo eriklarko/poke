@@ -1,21 +1,19 @@
-import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/models/test-action/test_action.dart';
 
 import '../drag_directions.dart';
 import '../mock_callback.dart';
 import '../test_app.dart';
 
 final reminder1 = Reminder(
-  action: TestAction('test-action-1'),
+  action: TestAction(id: 'test-action-1'),
   dueDate: DateTime.now(),
 );
 final reminder2 = Reminder(
-  action: TestAction('test-action-2'),
+  action: TestAction(id: 'test-action-2'),
   dueDate: DateTime.now(),
 );
 
@@ -78,26 +76,4 @@ void main() {
 
     verify(onSnoozeCallback(reminder1)).called(1);
   });
-}
-
-class TestAction extends Action {
-  final String id;
-
-  TestAction(this.id);
-
-  @override
-  Widget buildReminderListItem(BuildContext context) {
-    return Column(
-      key: Key(id),
-      children: [
-        Text(id),
-      ],
-    );
-  }
-
-  @override
-  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
-    // TODO: implement buildLogActionWidget
-    throw UnimplementedError();
-  }
 }
