@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/models/event.dart';
 import 'package:poke/models/test-action/test_action.dart';
 
 void main() {
@@ -17,8 +16,8 @@ void main() {
     await sut.logAction(a2, ts2);
 
     final expected = {
-      Event(action: a1, when: ts1),
-      Event(action: a2, when: ts2)
+      a1: [ts1],
+      a2: [ts2],
     };
     expect(
       await sut.getAll(),
@@ -34,7 +33,9 @@ void main() {
     await sut.logAction(a, ts);
     await sut.logAction(a, ts);
 
-    final expected = {Event(action: a, when: ts)};
+    final expected = {
+      a: [ts]
+    };
     expect(
       await sut.getAll(),
       equals(expected),

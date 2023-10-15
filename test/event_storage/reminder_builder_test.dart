@@ -42,7 +42,7 @@ void main() {
       a2: [ts2],
     };
     expect(
-      groupByAction(await eventStorage.getAll()),
+      await eventStorage.getAll(),
       equals(expected),
     );
   });

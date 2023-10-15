@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/models/test-action/test_action.dart';
 
+@JsonSerializable()
 abstract class Action {
   @JsonKey(includeFromJson: false, includeToJson: false)
   DateTime? lastEvent;
@@ -33,8 +35,31 @@ abstract class Action {
   // this action. An event in Poke is when an action was performed.
   Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage);
 
-  // Gosh, serialization in Dart is verbooose
   Map<String, dynamic> toJson();
+
+  // Gosh, serialization in Dart is verbooose
+  static Action fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('serializationKey')) {
+      switch (json['serializationKey']) {
+        // this json stuff is so wonderful
+        case 'test-action':
+          return TestAction.fromJson(json);
+      }
+
+      print('fromJson $json ${json.runtimeType}');
+      throw ArgumentError.value(
+        json,
+        'json',
+        'Unknown serialization key "$json.serializationKey". Please add it to the switch statement in the Event class',
+      );
+    }
+
+    throw ArgumentError.value(
+      json,
+      'json',
+      'Event._fromJson cannot handle this JSON payload. Please add a handler to _fromJson.',
+    );
+  }
 }
 
 class ReplaceACFilter extends Action {
