@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/event_storage/in_memory_storage.dart';
-import 'package:poke/home_screen.dart';
+import 'package:poke/screens/home_screen.dart';
+import 'package:poke/screens/loading/loading_screen.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -19,12 +20,28 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-          useMaterial3: true,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
+      ),
+
+      // Wrap LoadingScreen in `Builder` so that the context has a chance to
+      // contain a navigator. See https://stackoverflow.com/a/51292613
+      home: Builder(
+        builder: (context) => LoadingScreen(
+          onLoadingDone: () {
+            print('time to show home screen');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+            );
+          },
         ),
-        home: HomeScreen());
+      ),
+    );
   }
 }
 
