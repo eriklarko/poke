@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 
 class PokeHeader extends Text {
-  // TODO: style lol
-  const PokeHeader(super.text, {super.key}) : super();
+  const PokeHeader(super.text, {super.key})
+      : super(
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        );
 }
 
 class PokeText extends Text {
-  // TODO: style lol
-  const PokeText(super.text, {super.key}) : super();
+  const PokeText(super.text, {super.key})
+      : super(
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        );
 }
 
 class PokeFinePrint extends Text {
-  // TODO: style lol
-  const PokeFinePrint(super.text, {super.key}) : super();
+  const PokeFinePrint(super.text, {super.key})
+      : super(
+          style: const TextStyle(
+            fontSize: 12,
+          ),
+        );
 }
