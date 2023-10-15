@@ -3,6 +3,10 @@ import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/test-action/test_action.dart';
 
+import '../utils/clock.dart';
+
+final clock = Clock();
+
 void main() {
   test('logging actions allows reading them later', () async {
     final sut = InMemoryStorage();
@@ -38,6 +42,35 @@ void main() {
     };
     expect(
       await sut.getAll(),
+      equals(expected),
+    );
+  });
+
+  test('Groups plant events based on which plant was watered', () async {
+    final eventStorage = InMemoryStorage();
+
+    // create two different actions to be logged at different timestamps further
+    // down
+    final a1 = TestAction(id: '1');
+    final a2 = TestAction(id: '2');
+
+    // get references to the timestamps we're logging the actions at so that we
+    // can check them later
+    final ts1 = clock.next();
+    final ts2 = clock.next();
+    final ts3 = clock.next();
+
+    // log the actions at their corresponding timestamps
+    await eventStorage.logAction(a1, ts1);
+    await eventStorage.logAction(a2, ts2);
+    await eventStorage.logAction(a1, ts3);
+
+    final expected = {
+      a1: [ts1, ts3],
+      a2: [ts2],
+    };
+    expect(
+      await eventStorage.getAll(),
       equals(expected),
     );
   });

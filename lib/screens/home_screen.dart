@@ -10,7 +10,7 @@ import 'package:poke/event_storage/reminder_builder.dart';
 import 'package:poke/models/reminder.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: PokeAppBar(context, title: 'hiyo'),
       body: Column(children: [
-        PokeHeader('hi'),
+        const PokeHeader('hi'),
         PokeFutureBuilder<List<Reminder>>(
             future: _remFut,
             child: (reminders) {

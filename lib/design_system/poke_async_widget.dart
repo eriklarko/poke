@@ -106,6 +106,8 @@ enum _State {
 class _PokeAsyncWidgetState<ErrorType>
     extends State<PokeAsyncWidget<ErrorType>> {
   _State _state = _State.idle;
+
+  // ignore: avoid_init_to_null
   ErrorType? _error = null;
 
   @override
@@ -139,7 +141,7 @@ class _PokeAsyncWidgetState<ErrorType>
       _State.idle => widget.idle,
       _State.loading => widget.loading,
       _State.success => widget.success ?? widget.idle,
-      _State.error => widget.error(_error!),
+      _State.error => widget.error(_error as ErrorType),
     };
   }
 }
