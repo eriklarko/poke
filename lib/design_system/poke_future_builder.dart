@@ -23,7 +23,6 @@ class PokeFutureBuilder<T> extends StatelessWidget {
     return FutureBuilder<T>(
       future: future,
       builder: (buildContext, snapshot) {
-        print('babab $snapshot');
         if (snapshot.hasData) {
           return child(snapshot.data as T);
         } else if (snapshot.hasError) {

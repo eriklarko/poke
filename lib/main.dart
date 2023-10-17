@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/in_memory_storage.dart';
+import 'package:poke/components/app_lifecycle_listener.dart';
 import 'package:poke/screens/home_screen.dart';
 import 'package:poke/screens/loading/loading_screen.dart';
 
-GetIt getIt = GetIt.instance;
-
 void main() {
-  getIt.registerSingleton<EventStorage>(InMemoryStorage());
-
   runApp(const MyApp());
 }
 
@@ -35,7 +29,9 @@ class MyApp extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
+                builder: (context) => const AppLifecycleListener(
+                  child: const HomeScreen(),
+                ),
               ),
             );
           },
