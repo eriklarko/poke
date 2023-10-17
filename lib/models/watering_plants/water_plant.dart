@@ -63,7 +63,7 @@ class WaterPlantAction extends Action {
         ),
         PokeAsyncWidget(
           controller: _logActionController,
-          idle: PokeButton(
+          idle: PokeButton.primary(
             onPressed: () {
               _logActionController.setLoading();
 
