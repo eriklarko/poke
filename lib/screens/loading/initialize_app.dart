@@ -3,8 +3,16 @@ import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:poke/firebase_options.dart';
+
 Future initializeApp() {
-  return _addTestEvents(GetIt.instance.get<EventStorage>());
+  return Future.wait([
+    Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ),
+    _addTestEvents(GetIt.instance.get<EventStorage>()),
+  ]);
 }
 
 Future _addTestEvents(EventStorage eventStorage) async {
