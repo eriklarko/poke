@@ -94,6 +94,10 @@ class PokeAsyncWidgetController<ErrorType> {
   setErrored(ErrorType error) {
     _state!.setErrored(error);
   }
+
+  void setIdle() {
+    _state!.setIdle();
+  }
 }
 
 enum _State {
@@ -132,6 +136,14 @@ class _PokeAsyncWidgetState<ErrorType>
     setState(() {
       _state = _State.error;
       _error = error;
+    });
+  }
+
+  // could also be called reset
+  setIdle() {
+    setState(() {
+      _state = _State.idle;
+      _error = null;
     });
   }
 
