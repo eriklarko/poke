@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:poke/screens/loading/loading_screen.dart';
 import 'package:poke/utils/nav_service.dart';
 
@@ -31,7 +32,9 @@ class MyApp extends StatelessWidget {
       // There's a Firebase.auth listener registered as part of initalization
       // that will kick in and navigate to the login or home screens as
       // appropriate.
-      home: LoadingScreen(),
+      home: LoadingScreen(
+        loadingFuture: initializeApp(),
+      ),
     );
   }
 }

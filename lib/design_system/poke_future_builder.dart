@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_loading_indicator.dart';
 
 Widget defaultError(Object error) {
   return Text(error.toString());
@@ -14,7 +15,7 @@ class PokeFutureBuilder<T> extends StatelessWidget {
     super.key,
     required this.future,
     required this.child,
-    this.loadingWidget = const Text('l'),
+    this.loadingWidget = PokeLoadingIndicator.small,
     this.error = defaultError,
   });
 

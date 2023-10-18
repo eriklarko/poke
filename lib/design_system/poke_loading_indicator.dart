@@ -10,21 +10,8 @@ class PokeLoadingIndicator extends StatelessWidget {
     required this.height,
   });
 
-  factory PokeLoadingIndicator.small({Key? key}) {
-    return PokeLoadingIndicator._(
-      key: key,
-      width: 20,
-      height: 20,
-    );
-  }
-
-  factory PokeLoadingIndicator.large({Key? key}) {
-    return PokeLoadingIndicator._(
-      key: key,
-      width: 200,
-      height: 200,
-    );
-  }
+  static const small = PokeLoadingIndicator._(width: 20, height: 20);
+  static const large = PokeLoadingIndicator._(width: 200, height: 200);
 
   @override
   Widget build(BuildContext context) {

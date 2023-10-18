@@ -9,13 +9,11 @@ abstract interface class PokeLogger {
 class FirebaseLogger implements PokeLogger {
   @override
   Future logAppForegrounded() {
-    print('logging appforegrounded');
     return FirebaseAnalytics.instance.logAppOpen();
   }
 
   @override
   Future logEvent({required String event, Map<String, dynamic>? data}) async {
-    print('logging $event');
     await FirebaseAnalytics.instance.logEvent(name: event, parameters: data);
   }
 }

@@ -38,7 +38,7 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
           },
           text: widget.text),
 
-      loading: PokeLoadingIndicator.small(),
+      loading: PokeLoadingIndicator.small,
 
       // because of the `onPressed().catchError` implementation in `idle`, this
       // component will never tbe rendered

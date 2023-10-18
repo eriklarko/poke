@@ -17,7 +17,7 @@ final reminder2 = Reminder(
   dueDate: DateTime.now(),
 );
 
-final ignoreCallback = MockCallback<Reminder>();
+final ignoreCallback = MockSingleArgCallback<Reminder>();
 
 void main() {
   testWidgets('renders all reminders', (tester) async {
@@ -39,7 +39,7 @@ void main() {
 
   testWidgets('onTap callback is invoked when tapping the reminder',
       (tester) async {
-    final onTapCallback = MockCallback<Reminder>();
+    final onTapCallback = MockSingleArgCallback<Reminder>();
 
     await pumpInTestApp(
       tester,
@@ -58,7 +58,7 @@ void main() {
   });
 
   testWidgets('endToStart swipe snoozes reminder', (tester) async {
-    final onSnoozeCallback = MockCallback<Reminder>();
+    final onSnoozeCallback = MockSingleArgCallback<Reminder>();
 
     await pumpInTestApp(
       tester,
