@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_async_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -9,6 +10,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PokeAppBar(context),
       body: Center(
         child: Column(
           children: [

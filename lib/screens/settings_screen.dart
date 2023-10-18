@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_async_button.dart';
-import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_text.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -14,45 +14,58 @@ class SettingsScreen extends StatelessWidget {
         FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
 
     return Scaffold(
+        appBar: PokeAppBar(context),
         body: Center(
-      child: Column(
-        children: [
-          if (isAnonymous)
-            PokeText('Hello anonymous')
-          else
-            PokeText(
-                'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}'),
-          if (isAnonymous)
-            PokeAsyncButton(
-              text: 'Make permanent',
-              onPressed: linkWithGoogle,
-            ),
-          PokeAsyncButton(
-            text: 'Log out',
-            onPressed: FirebaseAuth.instance.signOut,
-          )
-        ],
-      ),
-    ));
+          child: Column(
+            children: [
+              if (isAnonymous)
+                PokeText('Hello anonymous')
+              else
+                PokeText(
+                    'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}'),
+              if (isAnonymous)
+                PokeAsyncButton(
+                  text: 'Make permanent',
+                  onPressed: linkWithGoogle,
+                ),
+              PokeAsyncButton(
+                text: 'Log out',
+                onPressed: FirebaseAuth.instance.signOut,
+              )
+            ],
+          ),
+        ));
   }
 
   Future<UserCredential> linkWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final googleSignIn = GoogleSignIn();
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
 
-    return await FirebaseAuth.instance.currentUser!
-        .linkWithCredential(credential);
+      return await FirebaseAuth.instance.currentUser!
+          .linkWithCredential(credential);
+    } finally {
+      // The account selected from the popup this function triggers is cached
+      // indefinitely unless we call `GoogleSignIn.disconnect`. If anything goes
+      // wrong we better disconnect and allow the user to try with another google
+      // account
+      googleSignIn.disconnect();
+    }
 
     // TODO: handle errors!
+    //   account already associated with another account
+    //      create acc with email
+    //      log in anonymously and try to link; will fail because email already in use
     /*try {} on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "provider-already-linked":

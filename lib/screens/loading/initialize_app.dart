@@ -38,11 +38,14 @@ void registerServices() {
 
 void setupCrashHandlers() {
   FlutterError.onError = (errorDetails) {
+    FlutterError.presentError(errorDetails);
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
   };
 
   // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
   PlatformDispatcher.instance.onError = (error, stack) {
+    FlutterError.presentError(
+        FlutterErrorDetails(exception: error, stack: stack));
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
