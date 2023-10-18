@@ -6,15 +6,15 @@ class LoadingScreen extends StatelessWidget {
   // TODO: should probably be a Stream of some kind to allow a progress
   // indicator
   final Future loadingFuture = initializeApp();
-  final Function onLoadingDone;
+  final Function? onLoadingDone;
 
   LoadingScreen({
     super.key,
-    required this.onLoadingDone,
+    this.onLoadingDone,
   }) {
     loadingFuture.then((value) {
       print('Loading done!');
-      onLoadingDone();
+      onLoadingDone?.call();
       //
     }).onError((error, stackTrace) {
       print('Loading error! $error');
