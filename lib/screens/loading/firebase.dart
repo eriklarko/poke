@@ -6,8 +6,8 @@ import 'package:poke/firebase_options.dart';
 class PokeFirebase {
   const PokeFirebase();
 
-  Future<FirebaseApp> initializeApp() {
-    return Firebase.initializeApp(
+  Future<void> initializeApp() async {
+    await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }

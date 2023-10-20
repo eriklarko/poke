@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-// TODO: this really really really needs to not include a network call
-final defaultImage = Image.network('https://placekitten.com/40/40');
+final Image defaultImage = Image.asset('assets/cat.jpeg');
 
 class Plant {
   final String name;

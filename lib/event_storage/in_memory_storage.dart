@@ -16,7 +16,7 @@ class InMemoryStorage implements EventStorage {
       ifAbsent: () => {when},
     );
 
-    return Future(() => null);
+    return Future.value(null);
   }
 
   @override

@@ -4,6 +4,7 @@ abstract class NoArgF {
   void call();
 }
 
+// See comment on MockSingleArgCallback
 class MockNoArgCallback extends Mock implements NoArgF {}
 
 abstract class SingleArgF<T> {

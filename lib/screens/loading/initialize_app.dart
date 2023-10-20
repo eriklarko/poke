@@ -14,7 +14,10 @@ import 'package:poke/screens/home_screen.dart';
 import 'package:poke/screens/loading/firebase.dart';
 import 'package:poke/utils/nav_service.dart';
 
-Future initializeApp({PokeFirebase firebase = const PokeFirebase()}) async {
+Future initializeApp({
+  PokeFirebase firebase = const PokeFirebase(),
+  NavigatorState? nav,
+}) async {
   await firebase.initializeApp();
 
   setupCrashHandlers(firebase);
@@ -23,7 +26,7 @@ Future initializeApp({PokeFirebase firebase = const PokeFirebase()}) async {
 
   await _addTestEvents(GetIt.instance.get<EventStorage>());
 
-  registerFirebaseAuthListener(firebase);
+  registerFirebaseAuthListener(firebase, nav ?? NavService.instance);
 }
 
 void registerServices() {
@@ -34,37 +37,45 @@ void registerServices() {
 }
 
 void setupCrashHandlers(PokeFirebase firebase) {
+  // Gotta get the crashlytics handle outside the two onError functions for
+  // mockito to work
+  final crashlytics = firebase.crashlytics();
+
+  final originalflutterError = FlutterError.onError;
   FlutterError.onError = (errorDetails) {
-    FlutterError.presentError(errorDetails);
-    firebase.crashlytics().recordFlutterFatalError(errorDetails);
+    originalflutterError?.call(errorDetails);
+
+    crashlytics.recordFlutterFatalError(errorDetails);
   };
 
   // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  final originalPlatformDispatcherError = PlatformDispatcher.instance.onError;
   PlatformDispatcher.instance.onError = (error, stack) {
-    FlutterError.presentError(
-      FlutterErrorDetails(exception: error, stack: stack),
-    );
-    firebase.crashlytics().recordError(error, stack, fatal: true);
+    originalPlatformDispatcherError?.call(error, stack);
+
+    crashlytics.recordError(error, stack, fatal: true);
     return true;
   };
 }
 
-void registerFirebaseAuthListener(PokeFirebase firebase) {
+// these routes are put in variables so that tests can verify they're being
+// navigated to
+final MaterialPageRoute toLoginScreen = MaterialPageRoute(
+  builder: (_) => const LoginScreen(),
+);
+
+final MaterialPageRoute toHomeScreen = MaterialPageRoute(
+  builder: (_) => const HomeScreen(),
+);
+
+void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
   firebase.auth().userChanges().listen((User? user) {
     if (user == null) {
       print('User is currently signed out!');
-      NavService.instance.pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
-      );
+      nav.pushReplacement(toLoginScreen);
     } else {
       print('User is signed in!');
-      NavService.instance.pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
+      nav.pushReplacement(toHomeScreen);
     }
   });
 }
