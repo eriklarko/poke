@@ -5,10 +5,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
 import 'dart:typed_data' as _i15;
-import 'dart:ui' as _i18;
+import 'dart:ui' as _i19;
 
 import 'package:cloud_firestore/cloud_firestore.dart' as _i4;
 import 'package:firebase_app_check/firebase_app_check.dart' as _i5;
+import 'package:firebase_app_check_platform_interface/firebase_app_check_platform_interface.dart'
+    as _i17;
 import 'package:firebase_auth/firebase_auth.dart' as _i2;
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart'
     as _i14;
@@ -16,11 +18,11 @@ import 'package:firebase_core/firebase_core.dart' as _i6;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart' as _i3;
 import 'package:flutter/foundation.dart' as _i9;
 import 'package:flutter/scheduler.dart' as _i12;
-import 'package:flutter/services.dart' as _i17;
+import 'package:flutter/services.dart' as _i18;
 import 'package:flutter/src/widgets/focus_manager.dart' as _i8;
 import 'package:flutter/src/widgets/framework.dart' as _i11;
 import 'package:flutter/src/widgets/navigator.dart' as _i10;
-import 'package:flutter/src/widgets/restoration.dart' as _i19;
+import 'package:flutter/src/widgets/restoration.dart' as _i20;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i16;
 import 'package:poke/screens/loading/firebase.dart' as _i13;
@@ -1883,6 +1885,95 @@ class MockFirebaseFirestore extends _i1.Mock implements _i4.FirebaseFirestore {
       ) as _i7.Future<void>);
 }
 
+/// A class which mocks [FirebaseAppCheck].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFirebaseAppCheck extends _i1.Mock implements _i5.FirebaseAppCheck {
+  MockFirebaseAppCheck() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i6.FirebaseApp get app => (super.noSuchMethod(
+        Invocation.getter(#app),
+        returnValue: _FakeFirebaseApp_4(
+          this,
+          Invocation.getter(#app),
+        ),
+      ) as _i6.FirebaseApp);
+
+  @override
+  set app(_i6.FirebaseApp? _app) => super.noSuchMethod(
+        Invocation.setter(
+          #app,
+          _app,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i7.Stream<String?> get onTokenChange => (super.noSuchMethod(
+        Invocation.getter(#onTokenChange),
+        returnValue: _i7.Stream<String?>.empty(),
+      ) as _i7.Stream<String?>);
+
+  @override
+  Map<dynamic, dynamic> get pluginConstants => (super.noSuchMethod(
+        Invocation.getter(#pluginConstants),
+        returnValue: <dynamic, dynamic>{},
+      ) as Map<dynamic, dynamic>);
+
+  @override
+  _i7.Future<void> activate({
+    _i17.WebProvider? webProvider,
+    _i5.AndroidProvider? androidProvider = _i5.AndroidProvider.playIntegrity,
+    _i5.AppleProvider? appleProvider = _i5.AppleProvider.deviceCheck,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #activate,
+          [],
+          {
+            #webProvider: webProvider,
+            #androidProvider: androidProvider,
+            #appleProvider: appleProvider,
+          },
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
+  _i7.Future<String?> getToken([bool? forceRefresh]) => (super.noSuchMethod(
+        Invocation.method(
+          #getToken,
+          [forceRefresh],
+        ),
+        returnValue: _i7.Future<String?>.value(),
+      ) as _i7.Future<String?>);
+
+  @override
+  _i7.Future<void> setTokenAutoRefreshEnabled(
+          bool? isTokenAutoRefreshEnabled) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setTokenAutoRefreshEnabled,
+          [isTokenAutoRefreshEnabled],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
+  _i7.Future<String> getLimitedUseToken() => (super.noSuchMethod(
+        Invocation.method(
+          #getLimitedUseToken,
+          [],
+        ),
+        returnValue: _i7.Future<String>.value(''),
+      ) as _i7.Future<String>);
+}
+
 /// A class which mocks [NavigatorState].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -1985,7 +2076,7 @@ class MockNavigatorState extends _i1.Mock implements _i10.NavigatorState {
 
   @override
   void restoreState(
-    _i17.RestorationBucket? oldBucket,
+    _i18.RestorationBucket? oldBucket,
     bool? initialRestore,
   ) =>
       super.noSuchMethod(
@@ -2000,7 +2091,7 @@ class MockNavigatorState extends _i1.Mock implements _i10.NavigatorState {
       );
 
   @override
-  void didToggleBucket(_i17.RestorationBucket? oldBucket) => super.noSuchMethod(
+  void didToggleBucket(_i18.RestorationBucket? oldBucket) => super.noSuchMethod(
         Invocation.method(
           #didToggleBucket,
           [oldBucket],
@@ -2483,7 +2574,7 @@ class MockNavigatorState extends _i1.Mock implements _i10.NavigatorState {
       );
 
   @override
-  void setState(_i18.VoidCallback? fn) => super.noSuchMethod(
+  void setState(_i19.VoidCallback? fn) => super.noSuchMethod(
         Invocation.method(
           #setState,
           [fn],
@@ -2577,7 +2668,7 @@ class MockNavigatorState extends _i1.Mock implements _i10.NavigatorState {
 
   @override
   void registerForRestoration(
-    _i19.RestorableProperty<Object?>? property,
+    _i20.RestorableProperty<Object?>? property,
     String? restorationId,
   ) =>
       super.noSuchMethod(
@@ -2592,7 +2683,7 @@ class MockNavigatorState extends _i1.Mock implements _i10.NavigatorState {
       );
 
   @override
-  void unregisterFromRestoration(_i19.RestorableProperty<Object?>? property) =>
+  void unregisterFromRestoration(_i20.RestorableProperty<Object?>? property) =>
       super.noSuchMethod(
         Invocation.method(
           #unregisterFromRestoration,

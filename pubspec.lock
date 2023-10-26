@@ -337,6 +337,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.6.8"
+  firebase_database:
+    dependency: "direct main"
+    description:
+      name: firebase_database
+      sha256: a6da92e0ca66b2f73d314d5e098e7537524e9deb313bda979e06cb79bb08e68e
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.3.2"
+  firebase_database_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_database_platform_interface
+      sha256: "1a4374d118051fcbf61af439cd05c6aa9a6f524aed674e5ef5b11ecff149d774"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.5+10"
+  firebase_database_web:
+    dependency: transitive
+    description:
+      name: firebase_database_web
+      sha256: eaef35165591b1bd2ffd112cf22dda1a5eb82bf1b47eaad86bd435403c8221f5
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3+10"
   firebase_performance:
     dependency: "direct main"
     description:

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -31,6 +32,10 @@ import 'initialize_app_test.mocks.dart';
   final mockFirestore = MockFirebaseFirestore();
   when(mockFirebase.firestore()).thenReturn(mockFirestore);
 
+  // app check
+  final mockAppCheck = MockFirebaseAppCheck();
+  when(mockFirebase.appCheck()).thenReturn(mockAppCheck);
+
   return (mockFirebase, userStreamController);
 }
 
@@ -40,6 +45,7 @@ import 'initialize_app_test.mocks.dart';
   User,
   FirebaseCrashlytics,
   FirebaseFirestore,
+  FirebaseAppCheck,
 ], customMocks: [
   MockSpec<NavigatorState>(onMissingStub: OnMissingStub.returnDefault)
 ])
