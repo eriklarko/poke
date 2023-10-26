@@ -8,7 +8,7 @@ part of 'water_plant.dart';
 
 WaterPlantAction _$WaterPlantActionFromJson(Map<String, dynamic> json) =>
     WaterPlantAction(
-      plant: Plant.fromJson(json['plant'] as Map<String, dynamic>),
+      plant: Plant.fromJson(Map<String, dynamic>.from(json['plant'])),
       addedFertilizer: json['addedFertilizer'] as bool,
     )..serializationKey = json['serializationKey'] as String;
 

@@ -122,9 +122,6 @@ class FirebaseStorage implements EventStorage {
     for (final a in value.entries) {
       final actionEqualityKey = a.key;
       final eventsMap = a.value;
-      //value.forEach((actionEqualityKey, eventsMap) async {
-      print('in forEach; $actionEqualityKey');
-      print('in forEach; $eventsMap');
 
       if (eventsMap == null) {
         print('SKIPPING $eventsMap');
@@ -138,7 +135,6 @@ class FirebaseStorage implements EventStorage {
       // this code could be made more tolerant by logging errors and proceeding
       // instead of crashing :)
       final eventDates = eventsMap.values.map((e) => DateTime.parse(e));
-      print('eventDates: $eventDates');
 
       final actionMap =
           (await getActionsRef().child(actionEqualityKey).get()).value;
