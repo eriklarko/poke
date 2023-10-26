@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/screens/loading/firebase.dart';
 
 class FirebaseStorage implements EventStorage {
-  final FirebaseDatabase database = FirebaseDatabase.instance;
+  final PokeFirebase firebase;
+
+  FirebaseStorage(this.firebase);
 
   @override
   Future<void> logAction(Action a, DateTime when) async {
@@ -89,7 +92,7 @@ class FirebaseStorage implements EventStorage {
     }
 
     final String path = "$parent/${user.uid}";
-    return database.ref(path);
+    return firebase.firestore().ref(path);
   }
 
   DatabaseReference getEventsRef() {

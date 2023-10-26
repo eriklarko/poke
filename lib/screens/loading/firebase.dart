@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:poke/firebase_options.dart';
 
 class PokeFirebase {
@@ -18,5 +19,9 @@ class PokeFirebase {
 
   FirebaseCrashlytics crashlytics() {
     return FirebaseCrashlytics.instance;
+  }
+
+  FirebaseDatabase firestore() {
+    return FirebaseDatabase.instance;
   }
 }

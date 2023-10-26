@@ -23,16 +23,16 @@ Future initializeApp({
 
   setupCrashHandlers(firebase);
 
-  registerServices();
+  registerServices(firebase);
 
   registerFirebaseAuthListener(firebase, nav ?? NavService.instance);
 }
 
-void registerServices() {
+void registerServices(PokeFirebase firebase) {
   final getIt = GetIt.instance;
 
   //getIt.registerSingleton<EventStorage>(InMemoryStorage());
-  getIt.registerSingleton<EventStorage>(FirebaseStorage());
+  getIt.registerSingleton<EventStorage>(FirebaseStorage(firebase));
   getIt.registerSingleton<PokeLogger>(FirebaseLogger());
 }
 
