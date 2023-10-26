@@ -22,12 +22,16 @@ class TestAction extends Action {
   @override
   Widget buildReminderListItem(BuildContext context) {
     return SizedBox(
-      width: 10,
-      height: 10,
+      width: 100,
+      height: 100,
       key: id == null ? UniqueKey() : Key(id!),
-      child: (id == null)
-          ? const Text('reminder-test-action')
-          : Text('reminder-test-action-$id'),
+      child: SizedBox(
+        width: 100,
+        height: 100,
+        child: (id == null)
+            ? const Text('reminder-test-action')
+            : Text('reminder-test-action-$id'),
+      ),
     );
   }
 
