@@ -59,6 +59,9 @@ class TestAction extends Action {
   }
 
   @override
+  String get equalityKey => id ?? "unknown";
+
+  @override
   Map<String, dynamic> toJson() {
     return _$TestActionToJson(this);
   }

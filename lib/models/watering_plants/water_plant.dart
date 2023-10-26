@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Action;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/design_system/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
@@ -8,6 +9,9 @@ import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
 
+part "water_plant.g.dart";
+
+@JsonSerializable(explicitToJson: true)
 class WaterPlantAction extends Action {
   final Plant plant;
   final bool addedFertilizer;
@@ -98,7 +102,13 @@ class WaterPlantAction extends Action {
 
   @override
   Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
+    return _$WaterPlantActionToJson(this);
   }
+
+  factory WaterPlantAction.fromJson(Map<String, dynamic> json) {
+    return _$WaterPlantActionFromJson(json);
+  }
+
+  @override
+  String get equalityKey => "water-${plant.id}-$addedFertilizer";
 }

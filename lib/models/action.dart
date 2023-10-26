@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/models/test-action/test_action.dart';
+import 'package:poke/models/watering_plants/water_plant.dart';
 
 abstract class Action {
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,6 +28,8 @@ abstract class Action {
 
   Action({required this.serializationKey, this.lastEvent});
 
+  String get equalityKey;
+
   // Creates the UI used to show this action in the reminder list
   Widget buildReminderListItem(BuildContext context);
 
@@ -43,20 +46,23 @@ abstract class Action {
         // this json stuff is so wonderful
         case 'test-action':
           return TestAction.fromJson(json);
+
+        case 'water-plant':
+          return WaterPlantAction.fromJson(json);
       }
 
       print('fromJson $json ${json.runtimeType}');
       throw ArgumentError.value(
         json,
         'json',
-        'Unknown serialization key "$json.serializationKey". Please add it to the switch statement in the Event class',
+        'Unknown serialization key "${json['serializationKey']}". Please add it to the switch statement in the Action class',
       );
     }
 
     throw ArgumentError.value(
       json,
       'json',
-      'Event._fromJson cannot handle this JSON payload. Please add a handler to _fromJson.',
+      'Action._fromJson cannot handle this JSON payload. Please add a handler to _fromJson.',
     );
   }
 }
@@ -79,4 +85,8 @@ class ReplaceACFilter extends Action {
     // TODO: implement toJson
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement equalityKey
+  String get equalityKey => throw UnimplementedError();
 }

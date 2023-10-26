@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/models/test-action/test_action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
@@ -23,8 +24,6 @@ Future initializeApp({
   setupCrashHandlers(firebase);
 
   registerServices();
-
-  await _addTestEvents(GetIt.instance.get<EventStorage>());
 
   registerFirebaseAuthListener(firebase, nav ?? NavService.instance);
 }
@@ -75,6 +74,11 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
       nav.pushReplacement(toLoginScreen);
     } else {
       print('User is signed in!');
+      /*_addTestEvents(GetIt.instance.get<EventStorage>())
+          .then((_) => nav.pushReplacement(toHomeScreen))
+          .onError((error, stackTrace) =>
+              print('test event error: $error; $stackTrace'));
+      */
       nav.pushReplacement(toHomeScreen);
     }
   });
@@ -83,9 +87,13 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
 Future _addTestEvents(EventStorage eventStorage) async {
   await eventStorage.logAction(
     WaterPlantAction(
-      plant: Plant(name: 'Frank'),
+      plant: Plant(id: 'frank', name: 'Frank'),
       addedFertilizer: false,
     ),
+    DateTime.now(),
+  );
+  await eventStorage.logAction(
+    TestAction(id: 'hello'),
     DateTime.now(),
   );
 }
