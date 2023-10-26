@@ -12,7 +12,7 @@ void main() {
     final sut = PokeFutureBuilder<String>(
       future: future,
       child: (futureValue) => Text(futureValue),
-      error: (_) => const Text('error'),
+      error: (_, __) => const Text('error'),
     );
 
     // render system-under-test
@@ -37,7 +37,7 @@ void main() {
     final sut = PokeFutureBuilder<String>(
       future: future,
       child: (_) => const Text('hello'),
-      error: (_) => const Text('error'),
+      error: (_, __) => const Text('error'),
     );
 
     // render system-under-test
@@ -65,7 +65,7 @@ void main() {
       future: future,
       loadingWidget: const Text('loading'),
       child: (_) => const Text('hello'),
-      error: (_) => const Text('error'),
+      error: (_, __) => const Text('error'),
     );
 
     // render system-under-test
@@ -115,7 +115,7 @@ void main() {
     final sut = PokeFutureBuilder(
       future: future,
       child: (_) => const Text('hello'),
-      error: (error) => Text('error: $error'),
+      error: (error, _) => Text('error: $error'),
     );
 
     // render system-under-test
@@ -130,5 +130,28 @@ void main() {
     // and that the loading and child widgets are not shown
     expect(find.text('hello'), findsNothing);
     expect(find.byType(PokeLoadingIndicator), findsNothing);
+  });
+
+  testWidgets('passes the future to custom error widgets', (tester) async {
+    final future =
+        Future.delayed(const Duration(milliseconds: 1), () => throw 'no good');
+    bool futureChecked = false;
+    final sut = PokeFutureBuilder(
+      future: future,
+      child: (_) => const Text('hello'),
+      error: (error, fut) {
+        expect(fut, equals(future));
+        futureChecked = true;
+        return Text('error: $error');
+      },
+    );
+
+    // render system-under-test
+    await pumpInTestApp(tester, sut);
+
+    // tick some time to allow the future to settle
+    await tester.pumpAndSettle();
+
+    expect(futureChecked, equals(true));
   });
 }
