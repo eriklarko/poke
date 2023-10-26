@@ -7,7 +7,7 @@ import 'package:poke/models/test-action/test_action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
-import 'package:poke/event_storage/in_memory_storage.dart';
+import 'package:poke/event_storage/firebase_storage.dart';
 import 'package:poke/logger/poke_logger.dart';
 
 import 'package:poke/screens/auth/login_screen.dart';
@@ -31,7 +31,8 @@ Future initializeApp({
 void registerServices() {
   final getIt = GetIt.instance;
 
-  getIt.registerSingleton<EventStorage>(InMemoryStorage());
+  //getIt.registerSingleton<EventStorage>(InMemoryStorage());
+  getIt.registerSingleton<EventStorage>(FirebaseStorage());
   getIt.registerSingleton<PokeLogger>(FirebaseLogger());
 }
 
