@@ -41,9 +41,19 @@ registerAppCheck(PokeFirebase firebase) async {
 void registerServices(PokeFirebase firebase) {
   final getIt = GetIt.instance;
 
-  //getIt.registerSingleton<EventStorage>(InMemoryStorage());
-  getIt.registerSingleton<EventStorage>(FirebaseStorage(firebase));
-  getIt.registerSingleton<PokeLogger>(FirebaseLogger());
+  try {
+    // because of hot-reloading we need to allow reassignments in debug
+    // restore this behavior in `finally`
+    if (kDebugMode) {
+      getIt.allowReassignment = true;
+    }
+
+    //getIt.registerSingleton<EventStorage>(InMemoryStorage());
+    getIt.registerSingleton<EventStorage>(FirebaseStorage(firebase));
+    getIt.registerSingleton<PokeLogger>(FirebaseLogger());
+  } finally {
+    getIt.allowReassignment = false;
+  }
 }
 
 void setupCrashHandlers(PokeFirebase firebase) {
