@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -23,5 +24,9 @@ class PokeFirebase {
 
   FirebaseDatabase firestore() {
     return FirebaseDatabase.instance;
+  }
+
+  FirebaseAppCheck appCheck() {
+    return FirebaseAppCheck.instance;
   }
 }

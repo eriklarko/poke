@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +24,18 @@ Future initializeApp({
 
   setupCrashHandlers(firebase);
 
+  await registerAppCheck(firebase);
+
   registerServices(firebase);
 
   registerFirebaseAuthListener(firebase, nav ?? NavService.instance);
+}
+
+registerAppCheck(PokeFirebase firebase) async {
+  await firebase.appCheck().activate(
+        androidProvider:
+            kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      );
 }
 
 void registerServices(PokeFirebase firebase) {
