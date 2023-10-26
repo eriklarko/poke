@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:poke/models/action.dart';
-import 'package:poke/utils/date_formatter.dart';
 
 class Reminder {
   final Action action;
