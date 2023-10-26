@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 
-Widget defaultError(Object error) {
+Widget defaultError(Object error, Future fut) {
+  fut.onError((error, stackTrace) {
+    print('PokeFutureBuild caught unhandeled error: $error $stackTrace');
+  });
   return Text(error.toString());
 }
 
@@ -9,7 +12,7 @@ class PokeFutureBuilder<T> extends StatelessWidget {
   final Future<T> future;
   final Widget Function(T data) child;
   final Widget loadingWidget;
-  final Widget Function(Object error) error;
+  final Widget Function(Object error, Future<T> future) error;
 
   const PokeFutureBuilder({
     super.key,
@@ -27,7 +30,7 @@ class PokeFutureBuilder<T> extends StatelessWidget {
         if (snapshot.hasData) {
           return child(snapshot.data as T);
         } else if (snapshot.hasError) {
-          return error(snapshot.error!);
+          return error(snapshot.error!, future);
         } else {
           return loadingWidget;
         }
