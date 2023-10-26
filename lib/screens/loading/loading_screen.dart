@@ -18,6 +18,8 @@ class LoadingScreen extends StatelessWidget {
       //
     }).onError((error, stackTrace) {
       print('Loading error! $error');
+      print('Loading error stack: $stackTrace');
+      print('');
       if (error != null) {
         throw error;
       }
