@@ -89,10 +89,10 @@ final MaterialPageRoute toHomeScreen = MaterialPageRoute(
 );
 
 void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
-  firebase.auth().userChanges().listen((User? user) {
+  firebase.auth().userChanges().listen((User? user) async {
     if (user == null) {
       print('User is currently signed out!');
-      nav.pushReplacement(toLoginScreen);
+      await nav.pushReplacement(toLoginScreen);
     } else {
       print('User is signed in!');
       /*_addTestEvents(GetIt.instance.get<EventStorage>())
@@ -100,7 +100,7 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
           .onError((error, stackTrace) =>
               print('test event error: $error; $stackTrace'));
       */
-      nav.pushReplacement(toHomeScreen);
+      await nav.pushReplacement(toHomeScreen);
     }
   });
 }
