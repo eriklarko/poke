@@ -45,11 +45,11 @@ class ReminderListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PokeTappable(
-      onTap: () {
-        print('Tap!');
-        onTap(reminder);
-      },
-      child: Dismissible(
+        onTap: () {
+          print('Tap!');
+          onTap(reminder);
+        },
+        child: Dismissible(
           key: ObjectKey(reminder),
 
           // only allow swiping right-to-left
@@ -62,8 +62,13 @@ class ReminderListItem extends StatelessWidget {
             print('dismissed!');
             onSnooze(reminder);
           },
-          child: reminder.buildReminderListItem(context)),
-    );
+          child: Row(
+            children: [
+              Expanded(child: reminder.buildReminderListItem(context)),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ));
   }
 }
 

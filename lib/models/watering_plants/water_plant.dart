@@ -40,7 +40,6 @@ class WaterPlantAction extends Action {
               ),
           ],
         ),
-        const Icon(Icons.chevron_right),
       ],
     );
   }
