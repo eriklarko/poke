@@ -151,10 +151,4 @@ class FirebaseRealtimeDBStorage implements EventStorage {
     }
     return events;
   }
-
-  @override
-  Stream<(Action, Set<DateTime>)> streamAll() {
-    // TODO: implement streamAll
-    throw UnimplementedError();
-  }
 }
