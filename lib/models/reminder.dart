@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart' hide Action;
-import 'package:poke/models/action.dart';
+import 'package:poke/event_storage/action_with_events.dart';
+import 'package:poke/event_storage/event_storage.dart';
 
 class Reminder {
-  final Action action;
+  final ActionWithEvents actionWithEvents;
   final DateTime dueDate;
 
-  Reminder({required this.action, required this.dueDate});
+  Reminder({required this.actionWithEvents, required this.dueDate});
 
   Widget buildReminderListItem(BuildContext context) {
-    return action.buildReminderListItem(context);
+    return actionWithEvents.action.buildReminderListItem(
+      context,
+      actionWithEvents.getLastEvent(),
+    );
+  }
+
+  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
+    return actionWithEvents.action.buildLogActionWidget(
+      context,
+      actionWithEvents.getLastEvent(),
+      eventStorage,
+    );
   }
 
   @override
@@ -17,16 +29,17 @@ class Reminder {
       return false;
     }
 
-    return other.action == action && other.dueDate == dueDate;
+    return other.actionWithEvents == actionWithEvents &&
+        other.dueDate == dueDate;
   }
 
   @override
   int get hashCode {
-    return action.hashCode + dueDate.hashCode;
+    return actionWithEvents.hashCode + dueDate.hashCode;
   }
 
   @override
   String toString() {
-    return "$action due $dueDate";
+    return "${actionWithEvents.action} due $dueDate";
   }
 }

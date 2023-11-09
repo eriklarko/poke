@@ -1,10 +1,10 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/models/test-action/test_action.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
@@ -23,6 +23,8 @@ Future initializeApp({
   await firebase.initializeApp();
 
   setupCrashHandlers(firebase);
+
+  Action.registerSubclasses();
 
   await registerAppCheck(firebase);
 
@@ -109,12 +111,8 @@ Future _addTestEvents(EventStorage eventStorage) async {
   await eventStorage.logAction(
     WaterPlantAction(
       plant: Plant(id: 'frank', name: 'Frank'),
-      addedFertilizer: false,
     ),
     DateTime.now(),
-  );
-  await eventStorage.logAction(
-    TestAction(id: 'hello'),
-    DateTime.now(),
+    eventData: WaterEventData(addedFertilizer: false),
   );
 }

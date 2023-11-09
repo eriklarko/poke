@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:poke/event_storage/action_with_events.dart';
 import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/event_storage/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/loading/firebase.dart';
 
@@ -10,7 +11,9 @@ class FirebaseFirestoreStorage implements EventStorage {
   FirebaseFirestoreStorage(this.firebase);
 
   @override
-  Future<void> logAction(Action a, DateTime when) async {
+  Future<void> logAction<TEventData extends SerializableEventData?,
+          TAction extends Action<TEventData>>(TAction a, DateTime when,
+      {TEventData? eventData}) async {
     /*
      * Desired db structure
      *   /users
@@ -19,29 +22,33 @@ class FirebaseFirestoreStorage implements EventStorage {
      *         /:actionid 1
      *           - actiondata
      *           / events
-     *             - when 1
-     *             - when 2
+     *             - { when: 1963-11-23 13:37:00, data: { ... }
+     *             - { when: 1989-12-23 13:37:00, data: { ... }
      * 
-     *         /water-frank-false
+     *         /water-frank
      *           / plant
      *             - id: frank
      *             - name: Frank
-     *           - addedFertilizer: false
      *           / events
-     *             - yesterday
-     *             - a year ago
+     *             - { when: yesterday,  data: { addedFertilizer: true }
+     *             - { when: a year ago, data: { addedFertilizer: false }
      */
 
     final actionsRef = getActionsCollection();
     final actionRef = actionsRef.doc(a.equalityKey);
 
     final actionJson = a.toJson();
-    actionJson['when'] = FieldValue.arrayUnion([when.toIso8601String()]);
+    actionJson['events'] = FieldValue.arrayUnion([
+      {
+        'when': when.toIso8601String(),
+        'data': eventData?.toJson(),
+      }
+    ]);
     await actionRef.set(actionJson, SetOptions(merge: true));
   }
 
   CollectionReference getActionsCollection() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = firebase.auth().currentUser;
     if (user == null) {
       throw "not logged in!";
     }
@@ -54,9 +61,8 @@ class FirebaseFirestoreStorage implements EventStorage {
   }
 
   @override
-  Future<Map<Action, Set<DateTime>>> getAll() async {
-    final Map<Action, Set<DateTime>> events = {};
-
+  Future<Iterable<ActionWithEvents>> getAll() async {
+    final List<ActionWithEvents> l = [];
     await getActionsCollection().get().then((value) {
       for (final doc in value.docs) {
         final actionJson = doc.data();
@@ -64,18 +70,40 @@ class FirebaseFirestoreStorage implements EventStorage {
           throw "data at ${doc.reference.path} is malformed; expected Map<String, dynamic>, got ${actionJson.runtimeType}";
         }
 
-        final eventStrings = actionJson['when'];
-        if (eventStrings is! Iterable) {
-          throw "event data at ${doc.reference.path} is malformed; expected a list of strings, got ${events.runtimeType}";
-        }
-        final eventDates =
-            eventStrings.map((dateString) => DateTime.parse(dateString));
-
         final action = Action.fromJson(Map<String, dynamic>.from(actionJson));
-        events[action] = Set.from(eventDates);
+        final awe = ActionWithEvents(action);
+        l.add(awe);
+
+        ////////////////////
+        /// parse events ///
+        final eventsList = actionJson['events'];
+        if (eventsList is! Iterable) {
+          throw "event data at ${doc.reference.path} is malformed; expected a list of {when: string, data: Object}, got ${eventsList.runtimeType}";
+        }
+
+        for (final eventMap in eventsList) {
+          if (eventMap is! Map) {
+            throw "";
+          }
+
+          if (!eventMap.containsKey('when')) {
+            throw "";
+          }
+
+          final when = DateTime.parse(eventMap['when']);
+          final SerializableEventData? eventData = Action.eventDataFromJson(
+            actionType: action.runtimeType,
+            json: eventMap['data'],
+          );
+
+          awe.add(when, eventData: eventData);
+        }
+
+        /// parse events ///
+        ////////////////////
       }
     });
 
-    return events;
+    return l;
   }
 }

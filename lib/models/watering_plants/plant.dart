@@ -32,4 +32,16 @@ class Plant {
   factory Plant.fromJson(Map<String, dynamic> json) {
     return _$PlantFromJson(json);
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Plant) {
+      return false;
+    }
+
+    return id == other.id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

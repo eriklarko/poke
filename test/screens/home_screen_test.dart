@@ -6,23 +6,23 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/event_storage/action_with_events.dart';
 import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/models/action.dart';
-import 'package:poke/models/test-action/test_action.dart';
 import 'package:poke/screens/home_screen.dart';
 
+import '../utils/test-action/test_action.dart';
 import 'home_screen_test.mocks.dart';
 
-final Map<Action, Set<DateTime>> noEvents = {};
+final List<ActionWithEvents> noEvents = [];
 
 @GenerateMocks([EventStorage])
 void main() {
   testWidgets('renders reminders', (tester) async {
     final eventStorage = MockEventStorage();
     when(eventStorage.getAll()).thenAnswer(
-      (_) => Future.value({
-        TestAction(id: 'some-action'): {DateTime.now()},
-      }),
+      (_) => Future.value([
+        ActionWithEvents.single(TestAction(id: 'some-action'), DateTime.now()),
+      ]),
     );
     setEventStorage(eventStorage);
 

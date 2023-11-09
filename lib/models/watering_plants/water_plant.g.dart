@@ -9,12 +9,19 @@ part of 'water_plant.dart';
 WaterPlantAction _$WaterPlantActionFromJson(Map<String, dynamic> json) =>
     WaterPlantAction(
       plant: Plant.fromJson(json['plant'] as Map<String, dynamic>),
-      addedFertilizer: json['addedFertilizer'] as bool,
-    )..serializationKey = json['serializationKey'] as String;
+    );
 
 Map<String, dynamic> _$WaterPlantActionToJson(WaterPlantAction instance) =>
     <String, dynamic>{
-      'serializationKey': instance.serializationKey,
       'plant': instance.plant.toJson(),
+    };
+
+WaterEventData _$WaterEventDataFromJson(Map<String, dynamic> json) =>
+    WaterEventData(
+      addedFertilizer: json['addedFertilizer'] as bool,
+    );
+
+Map<String, dynamic> _$WaterEventDataToJson(WaterEventData instance) =>
+    <String, dynamic>{
       'addedFertilizer': instance.addedFertilizer,
     };

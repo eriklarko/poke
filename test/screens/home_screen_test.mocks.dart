@@ -6,8 +6,10 @@
 import 'dart:async' as _i3;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:poke/event_storage/action_with_events.dart' as _i6;
 import 'package:poke/event_storage/event_storage.dart' as _i2;
-import 'package:poke/models/action.dart' as _i4;
+import 'package:poke/event_storage/serializable_event_data.dart' as _i4;
+import 'package:poke/models/action.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -29,29 +31,43 @@ class MockEventStorage extends _i1.Mock implements _i2.EventStorage {
   }
 
   @override
-  _i3.Future<void> logAction(
-    _i4.Action? a,
-    DateTime? when,
-  ) =>
+  _i3.Future<void> logAction<TEventData extends _i4.SerializableEventData?,
+          TAction extends _i5.Action<TEventData>>(
+    TAction? action,
+    DateTime? when, {
+    TEventData? eventData,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #logAction,
           [
-            a,
+            action,
             when,
           ],
+          {#eventData: eventData},
         ),
         returnValue: _i3.Future<void>.value(),
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
 
   @override
-  _i3.Future<Map<_i4.Action, Set<DateTime>>> getAll() => (super.noSuchMethod(
+  _i3.Future<
+      Iterable<
+          _i6.ActionWithEvents<_i4.SerializableEventData?,
+              _i5.Action<_i4.SerializableEventData?>>>> getAll() =>
+      (super.noSuchMethod(
         Invocation.method(
           #getAll,
           [],
         ),
-        returnValue: _i3.Future<Map<_i4.Action, Set<DateTime>>>.value(
-            <_i4.Action, Set<DateTime>>{}),
-      ) as _i3.Future<Map<_i4.Action, Set<DateTime>>>);
+        returnValue: _i3.Future<
+            Iterable<
+                _i6.ActionWithEvents<_i4.SerializableEventData?,
+                    _i5.Action<_i4.SerializableEventData?>>>>.value(<_i6
+            .ActionWithEvents<_i4.SerializableEventData?,
+                _i5.Action<_i4.SerializableEventData?>>>[]),
+      ) as _i3.Future<
+          Iterable<
+              _i6.ActionWithEvents<_i4.SerializableEventData?,
+                  _i5.Action<_i4.SerializableEventData?>>>>);
 }

@@ -1,19 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list.dart';
+import 'package:poke/event_storage/action_with_events.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/models/test-action/test_action.dart';
 
 import '../drag_directions.dart';
 import '../mock_callback.dart';
 import '../test_app.dart';
+import '../utils/test-action/test_action.dart';
 
 final reminder1 = Reminder(
-  action: TestAction(id: 'test-action-1'),
+  actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-1')),
   dueDate: DateTime.now(),
 );
 final reminder2 = Reminder(
-  action: TestAction(id: 'test-action-2'),
+  actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-2')),
   dueDate: DateTime.now(),
 );
 
