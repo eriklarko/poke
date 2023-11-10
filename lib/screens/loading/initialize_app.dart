@@ -80,29 +80,25 @@ void setupCrashHandlers(PokeFirebase firebase) {
   };
 }
 
-// these routes are put in variables so that tests can verify they're being
-// navigated to
-final MaterialPageRoute toLoginScreen = MaterialPageRoute(
-  builder: (_) => const LoginScreen(),
-);
-
-final MaterialPageRoute toHomeScreen = MaterialPageRoute(
-  builder: (_) => const HomeScreen(),
-);
-
 void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
   firebase.auth().userChanges().listen((User? user) async {
     if (user == null) {
       print('User is currently signed out!');
-      await nav.pushReplacement(toLoginScreen);
+      await nav.pushReplacement(MaterialPageRoute(
+        builder: (_) => const LoginScreen(),
+      ));
     } else {
       print('User is signed in!');
       /*_addTestEvents(GetIt.instance.get<EventStorage>())
-          .then((_) => nav.pushReplacement(toHomeScreen))
+          .then((_) => nav.pushReplacement(MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              )))
           .onError((error, stackTrace) =>
               print('test event error: $error; $stackTrace'));
-      */
-      await nav.pushReplacement(toHomeScreen);
+*/
+      await nav.pushReplacement(MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ));
     }
   });
 }

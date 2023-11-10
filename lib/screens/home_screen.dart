@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(context) {
     return Scaffold(
+      key: const ValueKey('home-screen'),
       appBar: PokeAppBar(context, title: 'hiyo'),
       body: Column(children: [
         const PokeHeader('hi'),

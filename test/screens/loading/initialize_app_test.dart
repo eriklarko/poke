@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:poke/screens/auth/login_screen.dart';
+import 'package:poke/screens/home_screen.dart';
 import 'package:poke/screens/loading/firebase.dart';
 import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:get_it/get_it.dart';
@@ -70,7 +72,9 @@ void main() {
     // wait until listeners have had a chance to react
     await Future.delayed(Duration.zero);
 
-    verify(nav.pushReplacement(toLoginScreen)).called(1);
+    verify(nav.pushReplacement(
+      argThat(MatchesRouteType(LoginScreen)),
+    )).called(1);
   });
 
   test('auth listener navigates to home screen when logged in', () async {
@@ -83,7 +87,9 @@ void main() {
     // wait until listeners have had a chance to react
     await Future.delayed(Duration.zero);
 
-    verify(nav.pushReplacement(toHomeScreen)).called(1);
+    verify(nav.pushReplacement(
+      argThat(MatchesRouteType(HomeScreen)),
+    )).called(1);
   });
 
   testWidgets('sends unhandled exceptions to crashlytics', (tester) async {
@@ -152,4 +158,27 @@ void main() {
     final c = firebaseMock.crashlytics();
     verify(c.recordError(error, StackTrace.empty, fatal: true)).called(1);
   });
+}
+
+class MockBuildContext extends Mock implements BuildContext {}
+
+class MatchesRouteType extends Matcher {
+  final Type expected;
+
+  MatchesRouteType(this.expected);
+
+  @override
+  Description describe(Description description) {
+    return description;
+  }
+
+  @override
+  bool matches(item, Map matchState) {
+    if (item is! MaterialPageRoute) {
+      return false;
+    }
+
+    final renderedWidget = item.builder(MockBuildContext());
+    return renderedWidget.runtimeType == expected;
+  }
 }
