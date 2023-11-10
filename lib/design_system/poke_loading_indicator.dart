@@ -5,7 +5,6 @@ class PokeLoadingIndicator extends StatelessWidget {
   final double height;
 
   const PokeLoadingIndicator._({
-    super.key,
     required this.width,
     required this.height,
   });

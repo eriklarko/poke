@@ -31,9 +31,8 @@ class TestAction extends Action<Null> {
   TestAction({this.id}) : super(serializationKey: serializationKey);
 
   @override
-  Widget buildLogActionWidget(BuildContext context, (DateTime, Null)? lastEvent,
+  Widget buildLogActionWidget(BuildContext context, (DateTime, void)? lastEvent,
       EventStorage eventStorage) {
-    // TODO: implement buildLogActionWidget
     throw UnimplementedError();
   }
 
@@ -139,14 +138,12 @@ class TestActionWithData extends Action<Data> {
   @override
   Widget buildLogActionWidget(BuildContext context, (DateTime, Data)? lastEvent,
       EventStorage eventStorage) {
-    // TODO: implement buildLogActionWidget
     throw UnimplementedError();
   }
 
   @override
   Widget buildReminderListItem(
       BuildContext context, (DateTime, Data)? lastEvent) {
-    // TODO: implement buildReminderListItem
     throw UnimplementedError();
   }
 }

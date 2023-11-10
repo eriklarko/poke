@@ -49,6 +49,7 @@ abstract class Action<EventDataType extends SerializableEventData?> {
   //
   // This field cannot be final because json_serializable won't include it if it
   // is, which is stoooopid. Never change it ploxx.
+  // ignore: prefer_final_fields
   /* NOTE! final */ String _serializationKey;
 
   Action({required String serializationKey})
