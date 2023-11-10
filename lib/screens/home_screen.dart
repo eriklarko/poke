@@ -8,6 +8,7 @@ import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/event_storage/reminder_builder.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -42,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                onSnooze: (reminder) => print('Snoozed $reminder'),
+                onSnooze: (reminder) => PokeLogger.instance()
+                    .info('Snoozed reminder', data: {'reminder': reminder}),
               );
             })
       ]),

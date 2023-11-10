@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/logger/poke_logger.dart';
 
 Widget defaultError(Object error, Future fut) {
   fut.onError((error, stackTrace) {
-    print('PokeFutureBuild caught unhandeled error: $error $stackTrace');
+    PokeLogger.instance().error(
+      'PokeFutureBuild caught unhandeled error',
+      error: error,
+      stackTrace: stackTrace,
+    );
   });
   return Text(error.toString());
 }

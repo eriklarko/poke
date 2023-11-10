@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
 
 class ReminderList extends StatelessWidget {
@@ -46,7 +47,10 @@ class ReminderListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return PokeTappable(
         onTap: () {
-          print('Tap!');
+          PokeLogger.instance().debug(
+            'Tapped reminder',
+            data: {'reminder': reminder},
+          );
           onTap(reminder);
         },
         child: Dismissible(
@@ -58,8 +62,10 @@ class ReminderListItem extends StatelessWidget {
 
           background: const SnoozeAction(),
           onDismissed: (direction) {
-            // TODO: Log action
-            print('dismissed!');
+            PokeLogger.instance().info(
+              'dismissed reminder',
+              data: {'reminder': reminder},
+            );
             onSnooze(reminder);
           },
           child: Row(

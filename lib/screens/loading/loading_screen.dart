@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/logger/poke_logger.dart';
 
 class LoadingScreen extends StatelessWidget {
   // TODO: should probably be a Stream of some kind to allow a progress
@@ -13,13 +14,15 @@ class LoadingScreen extends StatelessWidget {
     required this.loadingFuture,
   }) {
     loadingFuture.then((value) {
-      print('Loading done!');
+      PokeLogger.instance().debug('Loading done!');
       onLoadingDone?.call();
       //
     }).onError((error, stackTrace) {
-      print('Loading error! $error');
-      print('Loading error stack: $stackTrace');
-      print('');
+      PokeLogger.instance().error(
+        'Loading error',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (error != null) {
         throw error;
       }

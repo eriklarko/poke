@@ -52,7 +52,7 @@ void registerServices(PokeFirebase firebase) {
 
     //getIt.registerSingleton<EventStorage>(InMemoryStorage());
     getIt.registerSingleton<EventStorage>(FirebaseFirestoreStorage(firebase));
-    getIt.registerSingleton<PokeLogger>(FirebaseLogger());
+    getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
   } finally {
     getIt.allowReassignment = false;
   }
@@ -83,19 +83,19 @@ void setupCrashHandlers(PokeFirebase firebase) {
 void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
   firebase.auth().userChanges().listen((User? user) async {
     if (user == null) {
-      print('User is currently signed out!');
+      PokeLogger.instance().info('User is signed out');
       await nav.pushReplacement(MaterialPageRoute(
         builder: (_) => const LoginScreen(),
       ));
     } else {
-      print('User is signed in!');
+      PokeLogger.instance().info('User is signed in!');
       /*_addTestEvents(GetIt.instance.get<EventStorage>())
           .then((_) => nav.pushReplacement(MaterialPageRoute(
                 builder: (_) => const HomeScreen(),
               )))
           .onError((error, stackTrace) =>
               print('test event error: $error; $stackTrace'));
-*/
+      */
       await nav.pushReplacement(MaterialPageRoute(
         builder: (_) => const HomeScreen(),
       ));

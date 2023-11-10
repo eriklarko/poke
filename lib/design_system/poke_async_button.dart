@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/logger/poke_logger.dart';
 
 class PokeAsyncButton extends StatefulWidget {
   final String text;
@@ -32,7 +33,11 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
             }).catchError((error) {
               controller.setIdle();
 
-              print('Encountered error $error');
+              PokeLogger.instance().error(
+                'Async button encountered error',
+                data: {'btn-text': widget.text},
+                error: error,
+              );
               throw error;
             });
           },

@@ -6,6 +6,7 @@ import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
@@ -74,7 +75,10 @@ class WaterPlantAction extends Action<WaterEventData> {
             onPressed: () {
               _logActionController.setLoading();
 
-              print('pressed btnn ${fertilizerCheckbox.isChecked}');
+              PokeLogger.instance().debug(
+                'Pressed water plant button',
+                data: {'fertCheckboxChecked': fertilizerCheckbox.isChecked},
+              );
 
               // TODO: replace DateTime.now() with something testable
               eventStorage
