@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/logger/firebase_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';

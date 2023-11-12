@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/event_storage/action_with_events.dart';
 import 'package:poke/event_storage/in_memory_storage.dart';
 import 'package:poke/event_storage/reminder_builder.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/predictor/predictor.dart';
 
