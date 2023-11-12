@@ -10,6 +10,8 @@ import 'package:poke/models/watering_plants/water_plant.dart';
 
 import 'package:poke/event_storage/firebase_firestore_storage.dart';
 import 'package:poke/logger/poke_logger.dart';
+import 'package:poke/predictor/average_predictor.dart';
+import 'package:poke/predictor/predictor.dart';
 
 import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
@@ -53,6 +55,7 @@ void registerServices(PokeFirebase firebase) {
     //getIt.registerSingleton<EventStorage>(InMemoryStorage());
     getIt.registerSingleton<EventStorage>(FirebaseFirestoreStorage(firebase));
     getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
+    getIt.registerSingleton<Predictor>(AveragePredictor());
   } finally {
     getIt.allowReassignment = false;
   }

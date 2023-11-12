@@ -10,6 +10,7 @@ import 'package:poke/event_storage/event_storage.dart';
 import 'package:poke/event_storage/reminder_builder.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/predictor/predictor.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   static final EventStorage eventStorage = GetIt.instance.get<EventStorage>();
-  final Future<List<Reminder>> _remFut = buildReminders(eventStorage);
+  static final Predictor predictor = GetIt.instance.get<Predictor>();
+
+  final Future<List<Reminder>> _remFut = buildReminders(
+    eventStorage,
+    predictor,
+  );
 
   @override
   Widget build(context) {
