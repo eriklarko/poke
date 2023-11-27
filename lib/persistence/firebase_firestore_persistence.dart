@@ -1,14 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/loading/firebase.dart';
 
-class FirebaseFirestoreStorage implements EventStorage {
+class FirebaseFirestorePersistence implements Persistence {
   final PokeFirebase firebase;
 
-  FirebaseFirestoreStorage(this.firebase);
+  FirebaseFirestorePersistence(this.firebase);
+
+  @override
+  Future<void> createAction(Action<SerializableEventData?> a) async {
+    final actionsRef = getActionsCollection();
+    final actionRef = actionsRef.doc(a.equalityKey);
+
+    final actionJson = a.toJson();
+    await actionRef.set(actionJson, SetOptions(merge: true));
+  }
 
   @override
   Future<void> logAction<TEventData extends SerializableEventData?,
@@ -61,7 +70,7 @@ class FirebaseFirestoreStorage implements EventStorage {
   }
 
   @override
-  Future<Iterable<ActionWithEvents>> getAll() async {
+  Future<Iterable<ActionWithEvents>> getAllEvents() async {
     final List<ActionWithEvents> l = [];
     await getActionsCollection().get().then((value) {
       for (final doc in value.docs) {
@@ -77,6 +86,10 @@ class FirebaseFirestoreStorage implements EventStorage {
         ////////////////////
         /// parse events ///
         final eventsList = actionJson['events'];
+        if (eventsList == null) {
+          // not all actions have events yet
+          continue;
+        }
         if (eventsList is! Iterable) {
           throw "event data at ${doc.reference.path} is malformed; expected a list of {when: string, data: Object}, got ${eventsList.runtimeType}";
         }

@@ -1,15 +1,15 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
-import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/persistence/persistence.dart';
 import 'package:poke/logger/firebase_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
-import 'package:poke/event_storage/firebase_firestore_storage.dart';
+import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/predictor/average_predictor.dart';
 import 'package:poke/predictor/predictor.dart';
@@ -53,8 +53,9 @@ void registerServices(PokeFirebase firebase) {
       getIt.allowReassignment = true;
     }
 
-    //getIt.registerSingleton<EventStorage>(InMemoryStorage());
-    getIt.registerSingleton<EventStorage>(FirebaseFirestoreStorage(firebase));
+    //getIt.registerSingleton<Persistence>(InMemoryPersistence());
+    getIt
+        .registerSingleton<Persistence>(FirebaseFirestorePersistence(firebase));
     getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
     getIt.registerSingleton<Predictor>(AveragePredictor());
   } finally {
@@ -93,7 +94,7 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
       ));
     } else {
       PokeLogger.instance().info('User is signed in!');
-      /*_addTestEvents(GetIt.instance.get<EventStorage>())
+      /*_addTestEvents(GetIt.instance.get<Persistence>())
           .then((_) => nav.pushReplacement(MaterialPageRoute(
                 builder: (_) => const HomeScreen(),
               )))
@@ -107,8 +108,8 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
   });
 }
 
-Future _addTestEvents(EventStorage eventStorage) async {
-  await eventStorage.logAction(
+Future _addTestEvents(Persistence persistence) async {
+  await persistence.logAction(
     WaterPlantAction(
       plant: Plant(id: 'frank', name: 'Frank'),
     ),

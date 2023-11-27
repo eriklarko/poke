@@ -6,10 +6,11 @@
 import 'dart:async' as _i3;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:poke/event_storage/action_with_events.dart' as _i6;
-import 'package:poke/event_storage/event_storage.dart' as _i2;
-import 'package:poke/event_storage/serializable_event_data.dart' as _i4;
 import 'package:poke/models/action.dart' as _i5;
+import 'package:poke/persistence/action_with_events.dart' as _i6;
+import 'package:poke/persistence/persistence.dart' as _i2;
+import 'package:poke/persistence/serializable_event_data.dart' as _i4;
+import 'package:poke/predictor/predictor.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -22,14 +23,20 @@ import 'package:poke/models/action.dart' as _i5;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-/// A class which mocks [EventStorage].
+class _FakeDateTime_0 extends _i1.SmartFake implements DateTime {
+  _FakeDateTime_0(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+/// A class which mocks [Persistence].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEventStorage extends _i1.Mock implements _i2.EventStorage {
-  MockEventStorage() {
-    _i1.throwOnMissingStub(this);
-  }
-
+class MockPersistence extends _i1.Mock implements _i2.Persistence {
   @override
   _i3.Future<void> logAction<TEventData extends _i4.SerializableEventData?,
           TAction extends _i5.Action<TEventData>>(
@@ -54,13 +61,19 @@ class MockEventStorage extends _i1.Mock implements _i2.EventStorage {
   _i3.Future<
       Iterable<
           _i6.ActionWithEvents<_i4.SerializableEventData?,
-              _i5.Action<_i4.SerializableEventData?>>>> getAll() =>
+              _i5.Action<_i4.SerializableEventData?>>>> getAllEvents() =>
       (super.noSuchMethod(
         Invocation.method(
-          #getAll,
+          #getAllEvents,
           [],
         ),
         returnValue: _i3.Future<
+            Iterable<
+                _i6.ActionWithEvents<_i4.SerializableEventData?,
+                    _i5.Action<_i4.SerializableEventData?>>>>.value(<_i6
+            .ActionWithEvents<_i4.SerializableEventData?,
+                _i5.Action<_i4.SerializableEventData?>>>[]),
+        returnValueForMissingStub: _i3.Future<
             Iterable<
                 _i6.ActionWithEvents<_i4.SerializableEventData?,
                     _i5.Action<_i4.SerializableEventData?>>>>.value(<_i6
@@ -70,4 +83,35 @@ class MockEventStorage extends _i1.Mock implements _i2.EventStorage {
           Iterable<
               _i6.ActionWithEvents<_i4.SerializableEventData?,
                   _i5.Action<_i4.SerializableEventData?>>>>);
+}
+
+/// A class which mocks [Predictor].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPredictor extends _i1.Mock implements _i7.Predictor {
+  @override
+  DateTime predictNext(
+          _i6.ActionWithEvents<_i4.SerializableEventData?,
+                  _i5.Action<_i4.SerializableEventData?>>?
+              actionWithEvents) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #predictNext,
+          [actionWithEvents],
+        ),
+        returnValue: _FakeDateTime_0(
+          this,
+          Invocation.method(
+            #predictNext,
+            [actionWithEvents],
+          ),
+        ),
+        returnValueForMissingStub: _FakeDateTime_0(
+          this,
+          Invocation.method(
+            #predictNext,
+            [actionWithEvents],
+          ),
+        ),
+      ) as DateTime);
 }

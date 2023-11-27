@@ -4,8 +4,9 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/predictor/predictor.dart';
 import 'package:poke/screens/home_screen.dart';
 
 import '../utils/test-action/test_action.dart';
@@ -13,16 +14,17 @@ import 'home_screen_test.mocks.dart';
 
 final List<ActionWithEvents> noEvents = [];
 
-@GenerateMocks([EventStorage])
+@GenerateNiceMocks([MockSpec<Persistence>(), MockSpec<Predictor>()])
 void main() {
   testWidgets('renders reminders', (tester) async {
-    final eventStorage = MockEventStorage();
-    when(eventStorage.getAll()).thenAnswer(
+    final persistence = MockPersistence();
+    when(persistence.getAllEvents()).thenAnswer(
       (_) => Future.value([
         ActionWithEvents.single(TestAction(id: 'some-action'), DateTime.now()),
       ]),
     );
-    setEventStorage(eventStorage);
+    setPersistence(persistence);
+    GetIt.instance.registerSingleton<Predictor>(MockPredictor());
 
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
     await tester.pumpAndSettle();
@@ -32,14 +34,14 @@ void main() {
 
   testWidgets('renders a loading indicator while reminders are loading',
       (tester) async {
-    final eventStorage = MockEventStorage();
-    when(eventStorage.getAll()).thenAnswer(
+    final persistence = MockPersistence();
+    when(persistence.getAllEvents()).thenAnswer(
       (_) => Future.delayed(
         const Duration(milliseconds: 2),
         () => noEvents,
       ),
     );
-    setEventStorage(eventStorage);
+    setPersistence(persistence);
 
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
 
@@ -50,11 +52,11 @@ void main() {
   });
 
   testWidgets('Allows retrying when building reminders fail', (tester) async {
-    final eventStorage = MockEventStorage();
-    when(eventStorage.getAll()).thenAnswer(
+    final persistence = MockPersistence();
+    when(persistence.getAllEvents()).thenAnswer(
       (_) async => noEvents,
     );
-    setEventStorage(eventStorage);
+    setPersistence(persistence);
 
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
 
@@ -64,7 +66,7 @@ void main() {
     // tap the retry button
     await tester.tap(find.byKey(const Key('retry')));
 
-    verify(eventStorage.getAll()).called(2);
+    verify(persistence.getAllEvents()).called(2);
   });
 
   testWidgets('snoozing reminders removes them', (tester) async {
@@ -72,7 +74,7 @@ void main() {
   });
 }
 
-void setEventStorage(EventStorage eventStorage) {
+void setPersistence(Persistence persistence) {
   GetIt.instance.allowReassignment = true;
-  GetIt.instance.registerSingleton<EventStorage>(eventStorage);
+  GetIt.instance.registerSingleton<Persistence>(persistence);
 }

@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
         home: LoadingScreen(
           loadingFuture: initializeApp(),
         ),
+        //home: DevScreen(widget: NewInstanceWidget()),
       ),
     );
   }

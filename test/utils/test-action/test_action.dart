@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 
 part 'test_action.g.dart';
@@ -32,7 +32,7 @@ class TestAction extends Action<Null> {
 
   @override
   Widget buildLogActionWidget(BuildContext context, (DateTime, void)? lastEvent,
-      EventStorage eventStorage) {
+      Persistence persistence) {
     throw UnimplementedError();
   }
 
@@ -137,7 +137,7 @@ class TestActionWithData extends Action<Data> {
 
   @override
   Widget buildLogActionWidget(BuildContext context, (DateTime, Data)? lastEvent,
-      EventStorage eventStorage) {
+      Persistence persistence) {
     throw UnimplementedError();
   }
 

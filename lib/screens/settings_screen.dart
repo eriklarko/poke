@@ -24,11 +24,11 @@ class SettingsScreen extends StatelessWidget {
                 PokeText(
                     'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}'),
               if (isAnonymous)
-                PokeAsyncButton(
+                PokeAsyncButton.once(
                   text: 'Make permanent',
                   onPressed: linkWithGoogle,
                 ),
-              PokeAsyncButton(
+              PokeAsyncButton.rerunnable(
                 text: 'Log out',
                 onPressed: FirebaseAuth.instance.signOut,
               )

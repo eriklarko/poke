@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/foundation.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 
 class ActionWithEvents<TEventData extends SerializableEventData?,

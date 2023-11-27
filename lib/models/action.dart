@@ -1,18 +1,21 @@
 // An action in this app is something the user wants to be poked about in the
 // future, like watering a plant or replacing an AC filter.
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
 typedef ActionFromJson = Action Function(Map<String, dynamic>);
 typedef EventDataFromJson = SerializableEventData Function(
     Map<String, dynamic>);
 
+typedef NewInstaceBuilder = Widget Function(BuildContext, Persistence);
+
 abstract class Action<EventDataType extends SerializableEventData?> {
-  static final Map<String, (Type, ActionFromJson, EventDataFromJson?)>
-      _factories = {};
+  static final Map<String, ActionSubclassData> _subclasses = {};
 
   static void registerSubclasses() {
     registerSubclass(
@@ -20,6 +23,7 @@ abstract class Action<EventDataType extends SerializableEventData?> {
       type: WaterPlantAction,
       actionFromJson: WaterPlantAction.fromJson,
       eventDataFromJson: WaterEventData.fromJson,
+      newInstanceBuilder: WaterPlantAction.buildNewInstanceWidget,
     );
   }
 
@@ -28,14 +32,47 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     required Type type,
     required ActionFromJson actionFromJson,
     EventDataFromJson? eventDataFromJson,
+    NewInstaceBuilder? newInstanceBuilder,
   }) {
-    _factories[serializationKey] = (
+    _subclasses[serializationKey] = ActionSubclassData(
+      serializationKey,
       type,
       actionFromJson,
       eventDataFromJson,
+      newInstanceBuilder,
     );
   }
 
+  static UnmodifiableMapView registeredActions() {
+    return UnmodifiableMapView(_subclasses);
+  }
+
+  Action({required String serializationKey})
+      : _serializationKey = serializationKey;
+
+  // Used by firebase storage to generate a string representation of the action.
+  // Kind of like a hash but meant to be human readable.
+  // NOTE: Should follow the same rules as `hashCode`
+  String get equalityKey;
+
+  // Creates the UI used to show this action in the reminder list
+  Widget buildReminderListItem(
+      BuildContext context, (DateTime, EventDataType)? lastEvent);
+
+  // Creates the UI to use when executing this action, or adding an event of
+  // this action. An event in Poke is when an action was performed.
+  Widget buildLogActionWidget(
+    BuildContext context,
+    (DateTime, EventDataType)? lastEvent,
+    Persistence persistence,
+  );
+
+  Type eventDataType() {
+    return EventDataType;
+  }
+
+  //////////////////////////////////////////////////////////////
+  /////////////////// JSON STUFF ///////////////////////////////
   // In order for dart to know how to deserialize the JSON representation of an
   // action it needs to know which subtype of this class it is. This getter
   // gives dart that information.
@@ -51,23 +88,6 @@ abstract class Action<EventDataType extends SerializableEventData?> {
   // is, which is stoooopid. Never change it ploxx.
   // ignore: prefer_final_fields
   /* NOTE! final */ String _serializationKey;
-
-  Action({required String serializationKey})
-      : _serializationKey = serializationKey;
-
-  String get equalityKey;
-
-  // Creates the UI used to show this action in the reminder list
-  Widget buildReminderListItem(
-      BuildContext context, (DateTime, EventDataType)? lastEvent);
-
-  // Creates the UI to use when executing this action, or adding an event of
-  // this action. An event in Poke is when an action was performed.
-  Widget buildLogActionWidget(
-    BuildContext context,
-    (DateTime, EventDataType)? lastEvent,
-    EventStorage eventStorage,
-  );
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> m = {
@@ -90,12 +110,11 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     }
 
     final String serializationKey = json['serializationKey'];
-    final jsonFactories = _factories[serializationKey];
-    if (jsonFactories == null) {
-      throw "No json factories registered for serialization key '$serializationKey'. Make sure to register custom actions with Action.registerSubclass(...)";
+    final subclassData = _subclasses[serializationKey];
+    if (subclassData == null) {
+      throw "No action subclass registered for serialization key '$serializationKey'. Make sure to register custom actions with Action.registerSubclass(...)";
     }
-    final (_, actionFromJson, _) = jsonFactories;
-    return actionFromJson(json);
+    return subclassData.actionFromJson(json);
   }
 
   static SerializableEventData? eventDataFromJson({
@@ -103,29 +122,42 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     required Map<String, dynamic>? json,
   }) {
     SerializableEventData? eventData;
-    final dataFromJson = _getJsonFactoriesForType(actionType);
-    if (dataFromJson != null) {
+    final eventDataFromJson = _getJsonFactoryForType(actionType);
+    if (eventDataFromJson != null) {
       if (json == null) {
         throw "expected event data but got null";
       }
 
-      eventData = dataFromJson(json);
+      eventData = eventDataFromJson(json);
     }
 
     return eventData;
   }
 
-  static EventDataFromJson? _getJsonFactoriesForType(Type t) {
-    for (final v in _factories.values) {
-      if (v.$1 == t) {
-        return v.$3;
+  static EventDataFromJson? _getJsonFactoryForType(Type t) {
+    for (final v in _subclasses.values) {
+      if (v.type == t) {
+        return v.eventDataFromJson;
       }
     }
 
     return null;
   }
+  /////////////////// JSON STUFF ///////////////////////////////
+  //////////////////////////////////////////////////////////////
+}
 
-  Type eventDataType() {
-    return EventDataType;
-  }
+class ActionSubclassData {
+  //////////////////////////////////////////////////////////////
+  /////////////////// JSON STUFF ///////////////////////////////
+  final String serializationKey;
+  final Type type;
+  final ActionFromJson actionFromJson;
+  final EventDataFromJson? eventDataFromJson;
+  /////////////////// JSON STUFF ///////////////////////////////
+  //////////////////////////////////////////////////////////////
+  final NewInstaceBuilder? newInstanceBuilder;
+
+  ActionSubclassData(this.serializationKey, this.type, this.actionFromJson,
+      this.eventDataFromJson, this.newInstanceBuilder);
 }

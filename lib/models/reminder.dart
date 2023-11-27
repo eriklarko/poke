@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Action;
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
 
 class Reminder {
   final ActionWithEvents actionWithEvents;
@@ -15,11 +15,11 @@ class Reminder {
     );
   }
 
-  Widget buildLogActionWidget(BuildContext context, EventStorage eventStorage) {
+  Widget buildLogActionWidget(BuildContext context, Persistence persistence) {
     return actionWithEvents.action.buildLogActionWidget(
       context,
       actionWithEvents.getLastEvent(),
-      eventStorage,
+      persistence,
     );
   }
 

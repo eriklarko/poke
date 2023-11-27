@@ -6,6 +6,7 @@ class PokeCheckbox extends StatefulWidget {
   PokeCheckbox({Key? key}) : super(key: key);
 
   @override
+  // ignore: no_logic_in_create_state
   State<PokeCheckbox> createState() => _state;
 
   bool get isChecked {

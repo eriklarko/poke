@@ -1,11 +1,11 @@
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/predictor/predictor.dart';
 
 Future<List<Reminder>> buildReminders(
-    EventStorage eventStorage, Predictor predictor) async {
-  final groupedByAction = await eventStorage.getAll();
+    Persistence persistence, Predictor predictor) async {
+  final groupedByAction = await persistence.getAllEvents();
 
   List<Reminder> reminders = [];
   for (final ActionWithEvents actionWithEvents in groupedByAction) {

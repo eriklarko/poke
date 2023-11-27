@@ -1,9 +1,9 @@
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 
-class InMemoryStorage implements EventStorage {
+class InMemoryPersistence implements Persistence {
   // naming stuff is serious okay
   final Map<Action, ActionWithEvents> jiggers = {};
 
@@ -21,7 +21,13 @@ class InMemoryStorage implements EventStorage {
   }
 
   @override
-  Future<Iterable<ActionWithEvents>> getAll() {
+  Future<Iterable<ActionWithEvents>> getAllEvents() {
     return Future.value(jiggers.values);
+  }
+
+  @override
+  Future<void> createAction(Action<SerializableEventData?> action) {
+    jiggers[action] = ActionWithEvents(action);
+    return Future.value(null);
   }
 }

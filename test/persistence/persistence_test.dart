@@ -1,20 +1,20 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/firebase_firestore_storage.dart';
-import 'package:poke/event_storage/in_memory_storage.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/firebase_firestore_persistence.dart';
+import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/loading/firebase.dart';
 import '../utils/clock.dart';
 import '../utils/test-action/test_action.dart';
 import 'event_storage_test.mocks.dart';
 
-final Iterable<EventStorage Function()> eventStorageConstructors = [
-  () => InMemoryStorage(),
+final Iterable<Persistence Function()> persistenceConstructors = [
+  () => InMemoryPersistence(),
   () {
     final mockFirebase = MockPokeFirebase();
 
@@ -26,34 +26,35 @@ final Iterable<EventStorage Function()> eventStorageConstructors = [
 
     when(mockFirebase.firestore()).thenReturn(FakeFirebaseFirestore());
 
-    return FirebaseFirestoreStorage(mockFirebase);
+    return FirebaseFirestorePersistence(mockFirebase);
   },
 ];
 
 @GenerateMocks([PokeFirebase, FirebaseAuth, User])
 void main() {
-  test('false positives avoided by not testing any event storages', () {
-    expect(eventStorageConstructors, isNotEmpty);
+  test('false positives avoided by not testing any persistence implementations',
+      () {
+    expect(persistenceConstructors, isNotEmpty);
   });
 
   registerTestActions();
 
-  for (final eventStorageConstructor in eventStorageConstructors) {
-    group('${eventStorageConstructor().runtimeType}', () {
+  for (final persistenceConstructor in persistenceConstructors) {
+    group('${persistenceConstructor().runtimeType}', () {
       test('events can be serialized and deserialized again', () async {
-        final eventStorage = eventStorageConstructor();
+        final persistenceImpl = persistenceConstructor();
 
         final testAction = TestAction(id: 'hello');
         final ts = DateTime.parse('1963-11-26 01:02:03.456');
 
         // log action happened at `ts`
-        await eventStorage.logAction(
+        await persistenceImpl.logAction(
           testAction,
           ts,
         );
 
         // read all logged actions, aka events
-        final events = await eventStorage.getAll();
+        final events = await persistenceImpl.getAllEvents();
 
         expect(
           events,
@@ -64,21 +65,21 @@ void main() {
       });
 
       test("events with data can be serialized correctly", () async {
-        final eventStorage = eventStorageConstructor();
+        final persistenceImpl = persistenceConstructor();
 
         final testAction = TestActionWithData(id: '1');
         final ts = DateTime.parse('1963-11-26 01:02:03.456');
 
         final data = Data('foo');
         // log action happened at `ts`
-        await eventStorage.logAction(
+        await persistenceImpl.logAction(
           testAction,
           ts,
           eventData: data,
         );
 
         // read all logged actions, aka events
-        final events = await eventStorage.getAll();
+        final events = await persistenceImpl.getAllEvents();
 
         expect(
           events.first,
@@ -93,7 +94,7 @@ void main() {
       });
 
       test('logging actions allows reading them later', () async {
-        final sut = eventStorageConstructor();
+        final sut = persistenceConstructor();
 
         final Action a1 = TestAction(id: '1');
         final Action a2 = TestAction(id: '2');
@@ -108,13 +109,13 @@ void main() {
           ActionWithEvents.single(a2, ts2),
         ];
         expect(
-          await sut.getAll(),
+          await sut.getAllEvents(),
           equals(expected),
         );
       });
 
       test('does not log the same event twice', () async {
-        final sut = eventStorageConstructor();
+        final sut = persistenceConstructor();
         final Action a = TestAction(id: '1');
 
         final ts = DateTime.parse('1963-11-26 01:02:03.456');
@@ -122,7 +123,7 @@ void main() {
         await sut.logAction(a, ts);
 
         expect(
-          await sut.getAll(),
+          await sut.getAllEvents(),
           equals([
             ActionWithEvents.single(a, ts),
           ]),
@@ -130,7 +131,7 @@ void main() {
       });
 
       test('groups events together under the action', () async {
-        final eventStorage = eventStorageConstructor();
+        final persistenceImpl = persistenceConstructor();
 
         // create two different actions to be logged at different timestamps further
         // down
@@ -145,17 +146,31 @@ void main() {
         final ts3 = clock.next();
 
         // log the actions at their corresponding timestamps
-        await eventStorage.logAction(a1, ts1);
-        await eventStorage.logAction(a2, ts2);
-        await eventStorage.logAction(a1, ts3);
+        await persistenceImpl.logAction(a1, ts1);
+        await persistenceImpl.logAction(a2, ts2);
+        await persistenceImpl.logAction(a1, ts3);
 
         final expected = [
           ActionWithEvents.multiple(a1, {ts1: null, ts3: null}),
           ActionWithEvents.single(a2, ts2),
         ];
         expect(
-          await eventStorage.getAll(),
+          await persistenceImpl.getAllEvents(),
           equals(expected),
+        );
+      });
+
+      test('can add actions', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        final testAction = TestAction(id: '1');
+        persistenceImpl.createAction(testAction);
+
+        expect(
+          await persistenceImpl.getAllEvents(),
+          equals([
+            ActionWithEvents(testAction),
+          ]),
         );
       });
     }); // end group

@@ -1,8 +1,8 @@
-import 'package:poke/event_storage/action_with_events.dart';
-import 'package:poke/event_storage/serializable_event_data.dart';
+import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 
-abstract class EventStorage {
+abstract class Persistence {
   // This method head is impossible to read, but what it's saying is:
   //   method name: logAction
   //   return type: Future<void>
@@ -18,5 +18,7 @@ abstract class EventStorage {
     TEventData eventData,
   });
 
-  Future<Iterable<ActionWithEvents>> getAll();
+  Future<Iterable<ActionWithEvents>> getAllEvents();
+
+  Future<void> createAction(Action action);
 }

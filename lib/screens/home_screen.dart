@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:poke/components/expandable-floating-action-button/expandable-floating-action-button.dart';
 import 'package:poke/components/reminder_list.dart';
@@ -6,9 +6,10 @@ import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_future_builder.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
-import 'package:poke/event_storage/event_storage.dart';
-import 'package:poke/event_storage/reminder_builder.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/reminder_builder.dart';
 import 'package:poke/logger/poke_logger.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/predictor/predictor.dart';
 
@@ -20,11 +21,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static final EventStorage eventStorage = GetIt.instance.get<EventStorage>();
+  static final Persistence persistence = GetIt.instance.get<Persistence>();
   static final Predictor predictor = GetIt.instance.get<Predictor>();
 
   final Future<List<Reminder>> _remFut = buildReminders(
-    eventStorage,
+    persistence,
     predictor,
   );
 
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     context: context,
                     builder: (context) => PokeModal(
                       child:
-                          reminder.buildLogActionWidget(context, eventStorage),
+                          reminder.buildLogActionWidget(context, persistence),
                     ),
                   );
                 },
@@ -54,13 +55,24 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             })
       ]),
-      floatingActionButton: const ExpandableFab(
+      floatingActionButton: ExpandableFab(
         distance: 110,
-        children: [
-          ActionButton(
-            icon: Icon(Icons.new_label),
-          ),
-        ],
+        children: List.of(
+          Action.registeredActions().values.map((v) {
+            return ActionButton(
+              icon: const Icon(Icons.new_label),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => PokeModal(
+                    child: v.newInstanceBuilder(context, persistence),
+                  ),
+                );
+                print('foof');
+              },
+            );
+          }),
+        ),
       ),
     );
   }

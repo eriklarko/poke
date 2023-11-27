@@ -15,11 +15,11 @@ class LoginScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            PokeAsyncButton(
+            PokeAsyncButton.rerunnable(
               text: 'Log in anonymously',
               onPressed: _logInAnonymously,
             ),
-            PokeAsyncButton(
+            PokeAsyncButton.rerunnable(
               text: 'Log in with Google',
               onPressed: _logInWithGoogle,
             ),

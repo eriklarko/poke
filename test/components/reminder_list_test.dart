@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list.dart';
-import 'package:poke/event_storage/action_with_events.dart';
+import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/models/reminder.dart';
 
 import '../drag_directions.dart';
