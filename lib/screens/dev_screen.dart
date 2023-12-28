@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_app_bar.dart';
 
 class DevScreen extends StatelessWidget {
   final Widget widget;
@@ -7,6 +8,6 @@ class DevScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: widget);
+    return Scaffold(appBar: PokeAppBar(context), body: widget);
   }
 }
