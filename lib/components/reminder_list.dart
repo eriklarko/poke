@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/design_system/poke_text.dart';
@@ -68,10 +69,21 @@ class ReminderListItem extends StatelessWidget {
             );
             onSnooze(reminder);
           },
-          child: Row(
+          child: Stack(
             children: [
-              Expanded(child: reminder.buildReminderListItem(context)),
-              const Icon(Icons.chevron_right),
+              if (reminder.isDue())
+                const Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(Icons.alarm, color: Colors.redAccent),
+                  ),
+                ),
+              Row(
+                children: [
+                  Expanded(child: reminder.buildReminderListItem(context)),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
             ],
           ),
         ));

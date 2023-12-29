@@ -77,4 +77,8 @@ void main() {
 
     verify(onSnoozeCallback(reminder1)).called(1);
   });
+
+  testWidgets('expired reminders are marked', (tester) async {
+    fail('');
+  });
 }

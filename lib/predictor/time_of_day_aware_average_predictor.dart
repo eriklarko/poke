@@ -13,10 +13,13 @@ class TimeOfDayAwareAveragePredictor extends Predictor {
   final _averagePredictor = AveragePredictor();
 
   @override
-  DateTime predictNext(ActionWithEvents actionWithEvents) {
-    DateTime avgPrediction = _averagePredictor.predictNext(actionWithEvents);
-    final predictedDate = DateUtils.dateOnly(avgPrediction);
+  DateTime? predictNext(ActionWithEvents actionWithEvents) {
+    final avgPrediction = _averagePredictor.predictNext(actionWithEvents);
+    if (avgPrediction == null) {
+      return null;
+    }
 
+    final predictedDate = DateUtils.dateOnly(avgPrediction);
     final predictedTimeOfDay =
         _findMostCommonTimeOfDay(actionWithEvents.events.keys);
 

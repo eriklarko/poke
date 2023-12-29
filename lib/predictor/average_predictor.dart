@@ -3,7 +3,7 @@ import 'package:poke/predictor/predictor.dart';
 
 class AveragePredictor extends Predictor {
   @override
-  DateTime predictNext(ActionWithEvents actionWithEvents) {
+  DateTime? predictNext(ActionWithEvents actionWithEvents) {
     final previousOccurrences = List.of(actionWithEvents.events.keys);
     return _predictNext(previousOccurrences);
   }
@@ -34,12 +34,13 @@ class AveragePredictor extends Predictor {
   //   the time between the last  two waterings is 8 days = 192 hours
   //   averaging these two intervals gives us (169 + 192) / 2 = 180.5
   //   so we want to return `lastEvent + 180.5 hours = 1963-12-16 00:30`
-  DateTime _predictNext(
+  DateTime? _predictNext(
     List<DateTime> previousOccurrences,
   ) {
     if (previousOccurrences.length < 2) {
       // CANNOT CALCULATE
-      throw "Not enough data";
+      //throw "Not enough data";
+      return null;
     }
 
     Duration avgTimeBetweenOccurrences =

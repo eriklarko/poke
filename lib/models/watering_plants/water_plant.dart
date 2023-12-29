@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/design_system/poke_async_widget.dart';
@@ -40,11 +41,7 @@ class WaterPlantAction extends Action<WaterEventData> {
               PokeText(plant.name),
               Column(
                 children: [
-                  PokeFinePrint(
-                    lastEvent == null
-                        ? ''
-                        : 'Last watered on ${formatDate(lastEvent.$1)}',
-                  ),
+                  PokeFinePrint(_buildLastWateredString(lastEvent?.$1)),
                   PokeFinePrint(
                     lastEvent?.$2.addedFertilizer == true
                         ? 'included fertilizer'
@@ -57,6 +54,17 @@ class WaterPlantAction extends Action<WaterEventData> {
         ),
       ],
     );
+  }
+
+  String _buildLastWateredString(DateTime? lastEvent) {
+    if (lastEvent == null) {
+      return '';
+    }
+
+    int daysSince = clock.now().difference(lastEvent).inDays;
+    String dayS = daysSince == 1 ? "day" : "days";
+
+    return 'Last watered $daysSince $dayS ago';
   }
 
   @override

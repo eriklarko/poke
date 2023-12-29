@@ -1,10 +1,11 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
 
 class Reminder {
   final ActionWithEvents actionWithEvents;
-  final DateTime dueDate;
+  final DateTime? dueDate;
 
   Reminder({required this.actionWithEvents, required this.dueDate});
 
@@ -48,5 +49,13 @@ class Reminder {
   @override
   String toString() {
     return "${actionWithEvents.action} due $dueDate";
+  }
+
+  bool isDue() {
+    if (dueDate == null) {
+      return false;
+    }
+
+    return clock.now().isAfter(dueDate!);
   }
 }
