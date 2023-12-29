@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
@@ -51,6 +52,14 @@ class TestAction extends Action<Null> {
             : Text('reminder-test-action-$id'),
       ),
     );
+  }
+
+  @override
+  Widget buildDetailsScreen(
+    BuildContext context,
+    Map<DateTime, void> events,
+  ) {
+    throw UnimplementedError();
   }
 
   @override
@@ -144,6 +153,14 @@ class TestActionWithData extends Action<Data> {
   @override
   Widget buildReminderListItem(
       BuildContext context, (DateTime, Data)? lastEvent) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildDetailsScreen(
+    BuildContext context,
+    Map<DateTime, Data> events,
+  ) {
     throw UnimplementedError();
   }
 }

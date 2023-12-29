@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/design_system/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
+import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
@@ -33,18 +34,26 @@ class WaterPlantAction extends Action<WaterEventData> {
     return Row(
       children: [
         plant.image,
-        Column(
-          children: [
-            PokeText(plant.name),
-            if (lastEvent != null)
+        Expanded(
+          child: Column(
+            children: [
+              PokeText(plant.name),
               Column(
                 children: [
-                  PokeFinePrint('Last watered on ${formatDate(lastEvent.$1)}'),
-                  if (lastEvent.$2.addedFertilizer == true)
-                    const PokeFinePrint('included fertilizer'),
+                  PokeFinePrint(
+                    lastEvent == null
+                        ? ''
+                        : 'Last watered on ${formatDate(lastEvent.$1)}',
+                  ),
+                  PokeFinePrint(
+                    lastEvent?.$2.addedFertilizer == true
+                        ? 'included fertilizer'
+                        : '',
+                  ),
                 ],
               ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -70,6 +79,7 @@ class WaterPlantAction extends Action<WaterEventData> {
             fertilizerCheckbox,
           ],
         ),
+        PokeConstants.FixedSpacer(2),
         PokeAsyncWidget(
           controller: _logActionController,
           idle: PokeButton.primary(
@@ -117,6 +127,33 @@ class WaterPlantAction extends Action<WaterEventData> {
   ) {
     return NewInstanceWidget(
       persistence: persistence,
+    );
+  }
+
+  @override
+  Widget buildDetailsScreen(
+    BuildContext context,
+    Map<DateTime, SerializableEventData?> events,
+  ) {
+    var eventEntries = List.of(events.entries);
+    return Column(
+      children: [
+        PokeText("${plant.name} details"),
+        plant.image,
+        Expanded(
+          child: ListView.builder(
+            itemCount: events.length,
+            itemBuilder: ((context, index) {
+              var entry = eventEntries[index];
+              var date = entry.key;
+              WaterEventData? waterEventData = entry.value is WaterEventData
+                  ? (entry.value as WaterEventData)
+                  : null;
+              return PokeText("$date - ${waterEventData?.addedFertilizer}");
+            }),
+          ),
+        )
+      ],
     );
   }
 

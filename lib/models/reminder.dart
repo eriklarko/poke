@@ -23,6 +23,13 @@ class Reminder {
     );
   }
 
+  Widget buildDetailsScreen(BuildContext context) {
+    return actionWithEvents.action.buildDetailsScreen(
+      context,
+      actionWithEvents.events,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (other is! Reminder || other.runtimeType != runtimeType) {

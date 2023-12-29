@@ -67,6 +67,11 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     Persistence persistence,
   );
 
+  Widget buildDetailsScreen(
+    BuildContext context,
+    Map<DateTime, EventDataType> events,
+  );
+
   Type eventDataType() {
     return EventDataType;
   }

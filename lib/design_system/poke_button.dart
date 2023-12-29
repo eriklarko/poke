@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 
-// Standard button
+// Standard buttons
 class PokeButton extends StatelessWidget {
-  final Function() onPressed;
-  final String text;
-  final ButtonStyle Function(BuildContext) style;
+  final Widget Function(BuildContext) buildChild;
 
   const PokeButton._({
-    super.key,
-    required this.onPressed,
-    required this.text,
-    required this.style,
+    required this.buildChild,
   });
 
   factory PokeButton.primary({
@@ -20,22 +16,35 @@ class PokeButton extends StatelessWidget {
     required String text,
   }) {
     return PokeButton._(
-      key: key,
-      onPressed: onPressed,
-      text: text,
-      style: (_) => TextButton.styleFrom(
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.white,
+      buildChild: (_) => TextButton(
+        key: key,
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.amber,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.all(PokeConstants.space(4)),
+        ),
+        child: PokeText(text),
+      ),
+    );
+  }
+
+  factory PokeButton.icon(
+    Icon icon, {
+    Key? key,
+    required Null Function() onPressed,
+  }) {
+    return PokeButton._(
+      buildChild: (_) => IconButton(
+        key: key,
+        icon: icon,
+        onPressed: onPressed,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: style(context),
-      child: PokeText(text),
-    );
+    return buildChild(context);
   }
 }
