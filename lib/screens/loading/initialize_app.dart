@@ -11,8 +11,8 @@ import 'package:poke/models/watering_plants/water_plant.dart';
 
 import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/logger/poke_logger.dart';
-import 'package:poke/predictor/average_predictor.dart';
 import 'package:poke/predictor/predictor.dart';
+import 'package:poke/predictor/time_of_day_aware_average_predictor.dart';
 
 import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
@@ -57,7 +57,7 @@ void registerServices(PokeFirebase firebase) {
     getIt
         .registerSingleton<Persistence>(FirebaseFirestorePersistence(firebase));
     getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
-    getIt.registerSingleton<Predictor>(AveragePredictor());
+    getIt.registerSingleton<Predictor>(TimeOfDayAwareAveragePredictor());
   } finally {
     getIt.allowReassignment = false;
   }
