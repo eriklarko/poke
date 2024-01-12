@@ -192,4 +192,9 @@ class Data extends SerializableEventData {
 
   @override
   int get hashCode => someProp.hashCode;
+
+  @override
+  String toString() {
+    return "TestData{someProp=$someProp}";
+  }
 }

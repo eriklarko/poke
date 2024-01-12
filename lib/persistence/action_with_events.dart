@@ -29,7 +29,7 @@ class ActionWithEvents<TEventData extends SerializableEventData?,
 
   (DateTime, TEventData?)? getLastEvent() {
     final eventTimestamps = List.of(events.keys);
-    eventTimestamps.sort((a, b) => a.compareTo(b));
+    eventTimestamps.sort((a, b) => b.compareTo(a));
 
     if (events.isEmpty) {
       return null;
