@@ -143,24 +143,10 @@ class WaterPlantAction extends Action<WaterEventData> {
     BuildContext context,
     Map<DateTime, SerializableEventData?> events,
   ) {
-    var eventEntries = List.of(events.entries);
     return Column(
       children: [
         PokeText("${plant.name} details"),
         plant.image,
-        Expanded(
-          child: ListView.builder(
-            itemCount: events.length,
-            itemBuilder: ((context, index) {
-              var entry = eventEntries[index];
-              var date = entry.key;
-              WaterEventData? waterEventData = entry.value is WaterEventData
-                  ? (entry.value as WaterEventData)
-                  : null;
-              return PokeText("$date - ${waterEventData?.addedFertilizer}");
-            }),
-          ),
-        )
       ],
     );
   }

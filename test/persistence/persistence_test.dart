@@ -173,6 +173,27 @@ void main() {
           ]),
         );
       });
+
+      test('can remove events', () async {
+        final sut = persistenceConstructor();
+
+        final Action a = TestAction(id: '1');
+        final ts1 = DateTime.parse('1963-11-26 01:02:03.456');
+        final ts2 = DateTime.parse('1989-12-06 01:02:03.456');
+
+        await sut.logAction(a, ts1);
+        await sut.logAction(a, ts2);
+
+        await sut.deleteEvent(a, ts2);
+
+        final expected = [
+          ActionWithEvents.single(a, ts1),
+        ];
+        expect(
+          await sut.getAllEvents(),
+          equals(expected),
+        );
+      });
     }); // end group
   }
 }

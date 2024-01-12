@@ -30,4 +30,19 @@ class InMemoryPersistence implements Persistence {
     jiggers[action] = ActionWithEvents(action);
     return Future.value(null);
   }
+
+  @override
+  Future<void> deleteEvent(
+      Action<SerializableEventData?> a, DateTime eventDate) {
+    if (!jiggers.containsKey(a)) {
+      throw "Could not find action $a";
+    }
+
+    final events = jiggers[a]!.events;
+    events.remove(eventDate);
+
+    jiggers[a] = ActionWithEvents.multiple(a, events);
+
+    return Future.value(null);
+  }
 }

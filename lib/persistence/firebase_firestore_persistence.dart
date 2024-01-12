@@ -119,4 +119,22 @@ class FirebaseFirestorePersistence implements Persistence {
 
     return l;
   }
+
+  @override
+  Future<void> deleteEvent(Action a, DateTime eventDate) async {
+    final actionRef = getActionsCollection().doc(a.equalityKey);
+    final actionSnap = await actionRef.get();
+
+    // get all events as a list
+    final List events = actionSnap.get('events');
+
+    // with the list of events, find the one we want to remove
+    final event = events.where((element) {
+      return element["when"] == eventDate.toIso8601String();
+    }).toList();
+
+    // and remove the event by updating the events array with the
+    // FieldValue.arrayRemove directive
+    await actionRef.update({"events": FieldValue.arrayRemove(event)});
+  }
 }

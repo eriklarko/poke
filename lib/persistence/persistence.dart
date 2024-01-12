@@ -21,4 +21,6 @@ abstract class Persistence {
   Future<Iterable<ActionWithEvents>> getAllEvents();
 
   Future<void> createAction(Action action);
+
+  Future<void> deleteEvent(Action a, DateTime eventDate);
 }

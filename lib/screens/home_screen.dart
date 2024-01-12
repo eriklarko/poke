@@ -13,7 +13,7 @@ import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/predictor/predictor.dart';
-import 'package:poke/screens/action_details_screen.dart';
+import 'package:poke/screens/action_details_screen/action_details_screen.dart';
 import 'package:poke/utils/nav_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           NavService.instance
                               .push(MaterialPageRoute(builder: (_) {
                             return ActionDetailsScreen(
+                              actionWithEvents: reminder.actionWithEvents,
                               body: reminder.buildDetailsScreen(context),
                             );
                           }));
