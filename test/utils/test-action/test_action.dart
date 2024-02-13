@@ -153,7 +153,12 @@ class TestActionWithData extends Action<Data> {
   @override
   Widget buildReminderListItem(
       BuildContext context, (DateTime, Data)? lastEvent) {
-    throw UnimplementedError();
+    if (lastEvent == null) {
+      return Text("unknown");
+    }
+
+    final Data d = lastEvent.$2;
+    return Text(d.someProp);
   }
 
   @override

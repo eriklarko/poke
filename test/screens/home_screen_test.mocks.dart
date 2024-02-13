@@ -23,16 +23,6 @@ import 'package:poke/predictor/predictor.dart' as _i7;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeDateTime_0 extends _i1.SmartFake implements DateTime {
-  _FakeDateTime_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 /// A class which mocks [Persistence].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -83,6 +73,35 @@ class MockPersistence extends _i1.Mock implements _i2.Persistence {
           Iterable<
               _i6.ActionWithEvents<_i4.SerializableEventData?,
                   _i5.Action<_i4.SerializableEventData?>>>>);
+
+  @override
+  _i3.Future<void> createAction(
+          _i5.Action<_i4.SerializableEventData?>? action) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createAction,
+          [action],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> deleteEvent(
+    _i5.Action<_i4.SerializableEventData?>? a,
+    DateTime? eventDate,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #deleteEvent,
+          [
+            a,
+            eventDate,
+          ],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
 }
 
 /// A class which mocks [Predictor].
@@ -90,7 +109,7 @@ class MockPersistence extends _i1.Mock implements _i2.Persistence {
 /// See the documentation for Mockito's code generation for more information.
 class MockPredictor extends _i1.Mock implements _i7.Predictor {
   @override
-  DateTime predictNext(
+  DateTime? predictNext(
           _i6.ActionWithEvents<_i4.SerializableEventData?,
                   _i5.Action<_i4.SerializableEventData?>>?
               actionWithEvents) =>
@@ -99,19 +118,6 @@ class MockPredictor extends _i1.Mock implements _i7.Predictor {
           #predictNext,
           [actionWithEvents],
         ),
-        returnValue: _FakeDateTime_0(
-          this,
-          Invocation.method(
-            #predictNext,
-            [actionWithEvents],
-          ),
-        ),
-        returnValueForMissingStub: _FakeDateTime_0(
-          this,
-          Invocation.method(
-            #predictNext,
-            [actionWithEvents],
-          ),
-        ),
-      ) as DateTime);
+        returnValueForMissingStub: null,
+      ) as DateTime?);
 }
