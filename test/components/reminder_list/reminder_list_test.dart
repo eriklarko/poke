@@ -1,13 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:poke/components/reminder_list.dart';
+import 'package:poke/components/reminder_list/reminder_list.dart';
+import 'package:poke/components/reminder_list/reminder_list_item.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/models/reminder.dart';
 
-import '../drag_directions.dart';
-import '../mock_callback.dart';
-import '../test_app.dart';
-import '../utils/test-action/test_action.dart';
+import '../../drag_directions.dart';
+import '../../mock_callback.dart';
+import '../../test_app.dart';
+import '../../utils/test-action/test_action.dart';
 
 final reminder1 = Reminder(
   actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-1')),
@@ -29,6 +30,7 @@ void main() {
           reminder1,
           reminder2,
         ],
+        updatesStream: const Stream.empty(),
         onTap: ignoreCallback,
         onSnooze: ignoreCallback,
       ),
@@ -48,6 +50,7 @@ void main() {
         reminders: [
           reminder1,
         ],
+        updatesStream: const Stream.empty(),
         onTap: onTapCallback,
         onSnooze: ignoreCallback,
       ),
@@ -67,6 +70,7 @@ void main() {
         reminders: [
           reminder1,
         ],
+        updatesStream: const Stream.empty(),
         onTap: ignoreCallback,
         onSnooze: onSnoozeCallback,
       ),

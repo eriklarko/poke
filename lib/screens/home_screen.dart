@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:poke/components/expandable-floating-action-button/expandable-floating-action-button.dart';
-import 'package:poke/components/reminder_list.dart';
+import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_future_builder.dart';
@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
             future: _remFut,
             child: (reminders) {
               return ReminderList(
+                updatesStream: Stream.empty(),
                 reminders: reminders,
                 onTap: (reminder) {
                   showDialog(
