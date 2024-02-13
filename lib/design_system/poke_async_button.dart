@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poke/design_system/poke_async_widget.dart';
+import 'package:poke/design_system/async_widget/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_text.dart';
@@ -31,7 +31,7 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
 
   @override
   Widget build(BuildContext context) {
-    return PokeAsyncWidget(
+    return PokeAsyncWidget.simple(
       idle: PokeButton.primary(
           onPressed: () {
             controller.setLoading();
@@ -50,7 +50,7 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
           },
           text: widget.text),
 
-      loading: PokeLoadingIndicator.small,
+      loading: const PokeLoadingIndicator.small(),
 
       error: (error) => PokeText(error.toString()),
 

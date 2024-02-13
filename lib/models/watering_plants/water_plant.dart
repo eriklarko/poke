@@ -1,7 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:poke/design_system/poke_async_widget.dart';
+import 'package:poke/design_system/async_widget/poke_async_widget.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_constants.dart';
@@ -88,7 +88,7 @@ class WaterPlantAction extends Action<WaterEventData> {
           ],
         ),
         PokeConstants.FixedSpacer(2),
-        PokeAsyncWidget(
+        PokeAsyncWidget.simple(
           controller: _logActionController,
           idle: PokeButton.primary(
             onPressed: () {
