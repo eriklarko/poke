@@ -33,7 +33,7 @@ class LoadingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: PokeLoadingIndicator.large,
+        child: PokeLoadingIndicator.large(),
       ),
     );
   }

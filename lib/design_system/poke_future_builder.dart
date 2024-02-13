@@ -23,7 +23,7 @@ class PokeFutureBuilder<T> extends StatelessWidget {
     super.key,
     required this.future,
     required this.child,
-    this.loadingWidget = PokeLoadingIndicator.small,
+    this.loadingWidget = const PokeLoadingIndicator.small(),
     this.error = defaultError,
   });
 
