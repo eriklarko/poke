@@ -39,37 +39,39 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: PokeAppBar(context, title: 'hiyo'),
       body: Column(children: [
         const PokeHeader('hi'),
-        PokeFutureBuilder<List<Reminder>>(
-            future: _remFut,
-            child: (reminders) {
-              return ReminderList(
-                updatesStream: Stream.empty(),
-                reminders: reminders,
-                onTap: (reminder) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => PokeModal(
-                      actionButton: PokeButton.icon(
-                        const Icon(Icons.chevron_right),
-                        onPressed: () {
-                          NavService.instance
-                              .push(MaterialPageRoute(builder: (_) {
-                            return ActionDetailsScreen(
-                              actionWithEvents: reminder.actionWithEvents,
-                              body: reminder.buildDetailsScreen(context),
-                            );
-                          }));
-                        },
+        Expanded(
+          child: PokeFutureBuilder<List<Reminder>>(
+              future: _remFut,
+              child: (reminders) {
+                return ReminderList(
+                  updatesStream: persistence.getNotificationStream(),
+                  reminders: reminders,
+                  onTap: (reminder) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => PokeModal(
+                        actionButton: PokeButton.icon(
+                          const Icon(Icons.chevron_right),
+                          onPressed: () {
+                            NavService.instance
+                                .push(MaterialPageRoute(builder: (_) {
+                              return ActionDetailsScreen(
+                                actionWithEvents: reminder.actionWithEvents,
+                                body: reminder.buildDetailsScreen(context),
+                              );
+                            }));
+                          },
+                        ),
+                        child:
+                            reminder.buildLogActionWidget(context, persistence),
                       ),
-                      child:
-                          reminder.buildLogActionWidget(context, persistence),
-                    ),
-                  );
-                },
-                onSnooze: (reminder) => PokeLogger.instance()
-                    .info('Snoozed reminder', data: {'reminder': reminder}),
-              );
-            })
+                    );
+                  },
+                  onSnooze: (reminder) => PokeLogger.instance()
+                      .info('Snoozed reminder', data: {'reminder': reminder}),
+                );
+              }),
+        )
       ]),
       floatingActionButton: ExpandableFab(
         distance: 110,

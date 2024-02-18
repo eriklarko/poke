@@ -111,5 +111,30 @@ void main() {
     verify(onSnoozeCallback(reminder)).called(1);
   });
 
+  testWidgets('shows loading indicator while list item data is updated',
+      (tester) async {
+    final sc = StreamController<PersistenceEvent>();
+
+    await testApp(
+      tester,
+      ReminderList(
+        reminders: [
+          reminder,
+        ],
+        updatesStream: sc.stream,
+        onTap: ignoreCallback,
+        onSnooze: ignoreCallback,
+      ),
+    );
+
+    // send an `updating` event on the stream, indicating which reminder is
+    // being updated
+    sc.add(
+      PersistenceEvent.updating(
+        actionId: reminder.actionWithEvents.action.equalityKey,
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(PokeLoadingIndicator), findsOneWidget);
   });
 }

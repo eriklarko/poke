@@ -77,6 +77,45 @@ void main() {
   testWidgets('snoozing reminders removes them', (tester) async {
     fail('not implemented yet');
   });
+
+  testWidgets('rerenders when visible persistence data is changed',
+      (tester) async {
+    // create the action with one event being shown to the user
+    final action = TestActionWithData(id: 'some-action');
+
+    // set up the persistence system to return the action above
+    final persistence = InMemoryPersistence();
+    persistence.logAction(
+      action,
+      DateTime.now(),
+      eventData: Data("first-data"),
+    );
+    setPersistence(persistence);
+
+    // more deps, not really part of this test
+    final p = MockPredictor();
+    when(p.predictNext(any)).thenReturn(DateTime.now());
+    GetIt.instance.registerSingleton<Predictor>(MockPredictor());
+
+    // render reminders for the action
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    await tester.pumpAndSettle();
+
+    // check that the first data is shown
+    expect(find.text("first-data"), findsOneWidget);
+
+    // add a new event to the data, rendering its data instead
+    persistence.logAction(
+      action,
+      DateTime.now(),
+      eventData: Data("second-data"),
+    );
+    //await pumpEventQueue(); // this hangs forever :(
+    await tester.pumpAndSettle();
+
+    // check that this second data is shown
+    expect(find.text("second-data"), findsOneWidget);
+  });
 }
 
 void setPersistence(Persistence persistence) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
