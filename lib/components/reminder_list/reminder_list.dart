@@ -48,12 +48,12 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   void _onEventReceived(PersistenceEvent event) {
-    final PokeAsyncWidgetController? controller = controllers[event.key];
+    final PokeAsyncWidgetController? controller = controllers[event.actionId];
     if (controller == null) {
       PokeLogger.instance().warn(
         "No controller found",
         data: {
-          "key": event.key,
+          "key": event.actionId,
         },
       );
 

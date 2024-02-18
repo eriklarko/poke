@@ -15,7 +15,7 @@ class ActionWithEvents<TEventData extends SerializableEventData?,
     add(when, eventData: data);
   }
 
-  ActionWithEvents.multiple(this.action, Map<DateTime, TEventData> data) {
+  ActionWithEvents.multiple(this.action, Map<DateTime, TEventData?> data) {
     data.forEach((key, value) {
       add(key, eventData: value);
     });
@@ -63,5 +63,15 @@ class ActionWithEvents<TEventData extends SerializableEventData?,
   @override
   String toString() {
     return '$action - $events';
+  }
+
+  ActionWithEvents<TEventData, TAction> copy() {
+    final TAction actionCopy = action;
+    final Map<DateTime, TEventData?> eventsCopy = Map.from(events);
+
+    return ActionWithEvents<TEventData, TAction>.multiple(
+      actionCopy,
+      eventsCopy,
+    );
   }
 }

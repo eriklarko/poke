@@ -1,4 +1,5 @@
 import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 
@@ -18,9 +19,14 @@ abstract class Persistence {
     TEventData eventData,
   });
 
+  Future<ActionWithEvents> getAction(String equalityKey);
+
+  // TODO: rename getAllActions
   Future<Iterable<ActionWithEvents>> getAllEvents();
 
   Future<void> createAction(Action action);
 
   Future<void> deleteEvent(Action a, DateTime eventDate);
+
+  Stream<PersistenceEvent> getNotificationStream();
 }

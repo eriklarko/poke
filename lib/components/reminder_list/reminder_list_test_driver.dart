@@ -41,9 +41,10 @@ class UpdatingReminderListTestDriver extends StatelessWidget {
         ),
         PokeButton.primary(
           onPressed: () {
-            sc.add(Updating(rem.actionWithEvents.action.equalityKey));
+            final u = Updating(rem.actionWithEvents.action.equalityKey);
+            sc.add(u);
             Future.delayed(Duration(seconds: 2)).then((a) {
-              sc.add(Added(rem.actionWithEvents.action.equalityKey));
+              sc.add(FinishedUpdating(u));
             });
           },
           text: 'foo',

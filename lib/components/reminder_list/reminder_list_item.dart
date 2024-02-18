@@ -83,9 +83,9 @@ class ReminderListItem extends StatelessWidget {
           child: Stack(
             children: [
               if (reminder.isDue())
-                const Expanded(
+                const Positioned.fill(
                   child: Align(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.topRight,
                     child: Icon(Icons.alarm, color: Colors.redAccent),
                   ),
                 ),

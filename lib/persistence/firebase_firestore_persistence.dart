@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/loading/firebase.dart';
@@ -70,6 +71,12 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
+  Future<ActionWithEvents> getAction(String equalityKey) {
+    // TODO: implement getAction
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Iterable<ActionWithEvents>> getAllEvents() async {
     final List<ActionWithEvents> l = [];
     await getActionsCollection().get().then((value) {
@@ -136,5 +143,11 @@ class FirebaseFirestorePersistence implements Persistence {
     // and remove the event by updating the events array with the
     // FieldValue.arrayRemove directive
     await actionRef.update({"events": FieldValue.arrayRemove(event)});
+  }
+
+  @override
+  Stream<PersistenceEvent> getNotificationStream() {
+    // TODO: implement getNotificationStream
+    throw UnimplementedError();
   }
 }

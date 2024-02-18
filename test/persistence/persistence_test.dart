@@ -1,5 +1,6 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
+import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -8,10 +9,12 @@ import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/utils/key_factory.dart';
 import '../utils/clock.dart';
 import '../utils/test-action/test_action.dart';
-import 'event_storage_test.mocks.dart';
+import 'persistence_test.mocks.dart';
 
 final Iterable<Persistence Function()> persistenceConstructors = [
   () => InMemoryPersistence(),
@@ -175,24 +178,126 @@ void main() {
       });
 
       test('can remove events', () async {
-        final sut = persistenceConstructor();
+        final persistenceImpl = persistenceConstructor();
 
         final Action a = TestAction(id: '1');
         final ts1 = DateTime.parse('1963-11-26 01:02:03.456');
         final ts2 = DateTime.parse('1989-12-06 01:02:03.456');
 
-        await sut.logAction(a, ts1);
-        await sut.logAction(a, ts2);
+        await persistenceImpl.logAction(a, ts1);
+        await persistenceImpl.logAction(a, ts2);
 
-        await sut.deleteEvent(a, ts2);
+        await persistenceImpl.deleteEvent(a, ts2);
 
         final expected = [
           ActionWithEvents.single(a, ts1),
         ];
         expect(
-          await sut.getAllEvents(),
+          await persistenceImpl.getAllEvents(),
           equals(expected),
         );
+      });
+
+      test('can fetch single action', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        final Action a1 = TestAction(id: '1');
+        final Action a2 = TestAction(id: '2');
+
+        await persistenceImpl.createAction(a1);
+        await persistenceImpl.createAction(a2);
+
+        expect(
+          await persistenceImpl.getAction(a1.equalityKey),
+          equals(ActionWithEvents(a1)),
+        );
+      });
+
+      group('notification stream', () {
+        test('sends events when a new action is added', () async {
+          final persistenceImpl = persistenceConstructor();
+          final testAction = TestAction(id: '1');
+
+          // tell the key factory to return the same global key each time
+          KeyFactory.setGlobalKey(GlobalKey());
+
+          // when testing broadcast streams the `expect` call must come before
+          // the events are emitted. If we `expect` after the events are emitted
+          // we're too late, the events are already gone
+          final updatingEvent = Updating(testAction.equalityKey);
+          expectLater(
+            persistenceImpl.getNotificationStream(),
+            emitsInOrder([
+              updatingEvent,
+              FinishedUpdating(updatingEvent),
+            ]),
+          );
+
+          await persistenceImpl.createAction(testAction);
+        });
+
+        test('sends events when a new log is added', () async {
+          final persistenceImpl = persistenceConstructor();
+          final Action testAction = TestAction(id: '1');
+          final DateTime ts = DateTime.parse('1963-11-26 01:02:03.456');
+
+          KeyFactory.setGlobalKey(GlobalKey());
+
+          await persistenceImpl.createAction(testAction);
+
+          final updatingEvent = Updating(testAction.equalityKey);
+          expectLater(
+            persistenceImpl.getNotificationStream(),
+            emitsInOrder([
+              updatingEvent,
+              FinishedUpdating(updatingEvent),
+            ]),
+          );
+          await persistenceImpl.logAction(testAction, ts);
+        });
+
+        test('sends events when a log is added to a nonexisting action',
+            () async {
+          final persistenceImpl = persistenceConstructor();
+          final testAction = TestAction(id: '1');
+          final ts = DateTime.parse('1963-11-26 01:02:03.456');
+
+          KeyFactory.setGlobalKey(GlobalKey());
+
+          final updatingEvent = Updating(testAction.equalityKey);
+          expectLater(
+            persistenceImpl.getNotificationStream(),
+            emitsInOrder([
+              updatingEvent,
+              FinishedUpdating(updatingEvent),
+            ]),
+          );
+
+          await persistenceImpl.logAction(testAction, ts);
+        });
+
+        test('sends events when a log is deleted', () async {
+          final persistenceImpl = persistenceConstructor();
+
+          final Action testAction = TestAction(id: '1');
+          final ts = DateTime.parse('1963-11-26 01:02:03.456');
+
+          KeyFactory.setGlobalKey(GlobalKey());
+
+          await persistenceImpl.createAction(testAction);
+          await persistenceImpl.logAction(testAction, ts);
+
+          final updatingEvent = Updating(testAction.equalityKey);
+          expectLater(
+            persistenceImpl.getNotificationStream(),
+            emitsInOrder([
+              updatingEvent,
+              FinishedUpdating(updatingEvent),
+            ]),
+          );
+
+          await persistenceImpl.deleteEvent(testAction, ts);
+        });
       });
     }); // end group
   }
