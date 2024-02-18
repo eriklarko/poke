@@ -1,34 +1,45 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
+import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/persistence/persistence_event.dart';
 
 import '../../drag_directions.dart';
 import '../../mock_callback.dart';
 import '../../test_app.dart';
 import '../../utils/test-action/test_action.dart';
 
-final reminder1 = Reminder(
+final reminder = Reminder(
   actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-1')),
-  dueDate: DateTime.now(),
+  // set due date to tomorrow
+  dueDate: DateTime.now().add(const Duration(days: 1)),
 );
-final reminder2 = Reminder(
+final expiredReminder = Reminder(
   actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-2')),
-  dueDate: DateTime.now(),
+  // set due date to yesterday
+  dueDate: DateTime.now().subtract(const Duration(days: 1)),
 );
 
 final ignoreCallback = MockSingleArgCallback<Reminder>();
 
 void main() {
+  final testApp = pumpInTestAppFactory(
+    (widgetUnderTest) => Expanded(child: widgetUnderTest),
+  );
+
   testWidgets('renders all reminders', (tester) async {
-    await pumpInTestApp(
+    await testApp(
       tester,
       ReminderList(
         reminders: [
-          reminder1,
-          reminder2,
+          reminder,
+          expiredReminder,
         ],
         updatesStream: const Stream.empty(),
         onTap: ignoreCallback,
@@ -44,11 +55,11 @@ void main() {
       (tester) async {
     final onTapCallback = MockSingleArgCallback<Reminder>();
 
-    await pumpInTestApp(
+    await testApp(
       tester,
       ReminderList(
         reminders: [
-          reminder1,
+          reminder,
         ],
         updatesStream: const Stream.empty(),
         onTap: onTapCallback,
@@ -58,17 +69,35 @@ void main() {
 
     await tester.tap(find.byType(ReminderListItem));
 
-    verify(onTapCallback(reminder1)).called(1);
+    verify(onTapCallback(reminder)).called(1);
+  });
+
+  testWidgets('expired reminders are marked', (tester) async {
+    await testApp(
+      tester,
+      ReminderList(
+        reminders: [
+          reminder,
+          expiredReminder,
+        ],
+        updatesStream: const Stream.empty(),
+        onTap: ignoreCallback,
+        onSnooze: ignoreCallback,
+      ),
+    );
+
+    final expiredReminders = find.byIcon(Icons.alarm);
+    expect(expiredReminders, findsOneWidget);
   });
 
   testWidgets('endToStart swipe snoozes reminder', (tester) async {
     final onSnoozeCallback = MockSingleArgCallback<Reminder>();
 
-    await pumpInTestApp(
+    await testApp(
       tester,
       ReminderList(
         reminders: [
-          reminder1,
+          reminder,
         ],
         updatesStream: const Stream.empty(),
         onTap: ignoreCallback,
@@ -79,10 +108,8 @@ void main() {
     await tester.drag(find.byType(ReminderListItem), endToStart);
     await tester.pumpAndSettle();
 
-    verify(onSnoozeCallback(reminder1)).called(1);
+    verify(onSnoozeCallback(reminder)).called(1);
   });
 
-  testWidgets('expired reminders are marked', (tester) async {
-    fail('');
   });
 }
