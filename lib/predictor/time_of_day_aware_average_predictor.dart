@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/predictor/average_predictor.dart';

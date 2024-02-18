@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_async_button.dart';
-import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/watering_plants/plant.dart';

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:logger/logger.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
-import 'package:poke/persistence/serializable_event_data.dart';
 
 class EventHistory extends StatelessWidget {
   final ActionWithEvents actionWithEvents;
