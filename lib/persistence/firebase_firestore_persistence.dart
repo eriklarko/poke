@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
@@ -8,22 +10,32 @@ import 'package:poke/screens/loading/firebase.dart';
 
 class FirebaseFirestorePersistence implements Persistence {
   final PokeFirebase firebase;
+  final StreamController<PersistenceEvent> notificationStreamController =
+      StreamController.broadcast();
 
   FirebaseFirestorePersistence(this.firebase);
 
   @override
   Future<void> createAction(Action<SerializableEventData?> a) async {
+    final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
+    notificationStreamController.add(updatingEvent);
+
     final actionsRef = getActionsCollection();
     final actionRef = actionsRef.doc(a.equalityKey);
 
     final actionJson = a.toJson();
     await actionRef.set(actionJson, SetOptions(merge: true));
+
+    notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
   }
 
   @override
   Future<void> logAction<TEventData extends SerializableEventData?,
           TAction extends Action<TEventData>>(TAction a, DateTime when,
       {TEventData? eventData}) async {
+    final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
+    notificationStreamController.add(updatingEvent);
+
     /*
      * Desired db structure
      *   /users
@@ -55,6 +67,8 @@ class FirebaseFirestorePersistence implements Persistence {
       }
     ]);
     await actionRef.set(actionJson, SetOptions(merge: true));
+
+    notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
   }
 
   CollectionReference getActionsCollection() {
@@ -71,9 +85,65 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
-  Future<ActionWithEvents> getAction(String equalityKey) {
-    // TODO: implement getAction
-    throw UnimplementedError();
+  Future<ActionWithEvents> getAction(String equalityKey) async {
+    final docSnapshop = await getActionsCollection().doc(equalityKey).get();
+    return parseAction(docSnapshop);
+  }
+
+  ActionWithEvents parseAction(DocumentSnapshot<Object?> doc) {
+    final actionJson = doc.data();
+    if (actionJson is! Map) {
+      throw "data at ${doc.reference.path} is malformed; expected Map<String, dynamic>, got ${actionJson.runtimeType}";
+    }
+
+    final action = Action.fromJson(Map<String, dynamic>.from(actionJson));
+    final events = parseEvents(
+      actionJson['events'],
+      action.runtimeType,
+      doc.reference.path,
+    );
+
+    if (events == null) {
+      return ActionWithEvents(action);
+    } else {
+      return ActionWithEvents.multiple(action, events);
+    }
+  }
+
+  Map<DateTime, SerializableEventData?>? parseEvents(
+    dynamic eventsJson,
+    Type actionType,
+
+    // used to tell the caller the path to the data if it is malformed in any way.
+    String refPath,
+  ) {
+    if (eventsJson == null) {
+      // not all actions have events yet
+      return null;
+    }
+    if (eventsJson is! Iterable) {
+      throw "event data at $refPath is malformed; expected a list of {when: string, data: Object}, got ${eventsJson.runtimeType}";
+    }
+
+    final Map<DateTime, SerializableEventData?> events = {};
+    for (final eventMap in eventsJson) {
+      if (eventMap is! Map) {
+        throw "";
+      }
+
+      if (!eventMap.containsKey('when')) {
+        throw "";
+      }
+
+      final when = DateTime.parse(eventMap['when']);
+      final SerializableEventData? eventData = Action.eventDataFromJson(
+        actionType: actionType,
+        json: eventMap['data'],
+      );
+
+      events[when] = eventData;
+    }
+    return events;
   }
 
   @override
@@ -81,46 +151,8 @@ class FirebaseFirestorePersistence implements Persistence {
     final List<ActionWithEvents> l = [];
     await getActionsCollection().get().then((value) {
       for (final doc in value.docs) {
-        final actionJson = doc.data();
-        if (actionJson is! Map) {
-          throw "data at ${doc.reference.path} is malformed; expected Map<String, dynamic>, got ${actionJson.runtimeType}";
-        }
-
-        final action = Action.fromJson(Map<String, dynamic>.from(actionJson));
-        final awe = ActionWithEvents(action);
+        final awe = parseAction(doc);
         l.add(awe);
-
-        ////////////////////
-        /// parse events ///
-        final eventsList = actionJson['events'];
-        if (eventsList == null) {
-          // not all actions have events yet
-          continue;
-        }
-        if (eventsList is! Iterable) {
-          throw "event data at ${doc.reference.path} is malformed; expected a list of {when: string, data: Object}, got ${eventsList.runtimeType}";
-        }
-
-        for (final eventMap in eventsList) {
-          if (eventMap is! Map) {
-            throw "";
-          }
-
-          if (!eventMap.containsKey('when')) {
-            throw "";
-          }
-
-          final when = DateTime.parse(eventMap['when']);
-          final SerializableEventData? eventData = Action.eventDataFromJson(
-            actionType: action.runtimeType,
-            json: eventMap['data'],
-          );
-
-          awe.add(when, eventData: eventData);
-        }
-
-        /// parse events ///
-        ////////////////////
       }
     });
 
@@ -129,6 +161,9 @@ class FirebaseFirestorePersistence implements Persistence {
 
   @override
   Future<void> deleteEvent(Action a, DateTime eventDate) async {
+    final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
+    notificationStreamController.add(updatingEvent);
+
     final actionRef = getActionsCollection().doc(a.equalityKey);
     final actionSnap = await actionRef.get();
 
@@ -143,11 +178,12 @@ class FirebaseFirestorePersistence implements Persistence {
     // and remove the event by updating the events array with the
     // FieldValue.arrayRemove directive
     await actionRef.update({"events": FieldValue.arrayRemove(event)});
+
+    notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
   }
 
   @override
   Stream<PersistenceEvent> getNotificationStream() {
-    // TODO: implement getNotificationStream
-    throw UnimplementedError();
+    return notificationStreamController.stream;
   }
 }
