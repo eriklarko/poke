@@ -85,9 +85,12 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
-  Future<ActionWithEvents> getAction(String equalityKey) async {
-    final docSnapshop = await getActionsCollection().doc(equalityKey).get();
-    return parseAction(docSnapshop);
+  Future<ActionWithEvents?> getAction(String equalityKey) async {
+    final docSnapshot = await getActionsCollection().doc(equalityKey).get();
+    if (docSnapshot.data() == null) {
+      return null;
+    }
+    return parseAction(docSnapshot);
   }
 
   ActionWithEvents parseAction(DocumentSnapshot<Object?> doc) {

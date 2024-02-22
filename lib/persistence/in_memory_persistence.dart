@@ -34,17 +34,17 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
-  Future<ActionWithEvents> getAction(String equalityKey) {
+  Future<ActionWithEvents?> getAction(String equalityKey) {
     // Search existing actions for the one with the provided equality key.
-    // I'm not using findWhere here because the StateError it returns wasn't as
-    // readable as I wanted
+    // I'm not using findWhere here because it throws StateError when nothing is
+    // found, and I want null
     for (final awe in jiggers.values) {
       if (awe.action.equalityKey == equalityKey) {
         return Future.value(awe.copy());
       }
     }
 
-    throw "No action with equality key '$equalityKey' found";
+    return Future.value(null);
   }
 
   @override

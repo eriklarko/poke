@@ -19,7 +19,7 @@ abstract class Persistence {
     TEventData eventData,
   });
 
-  Future<ActionWithEvents> getAction(String equalityKey);
+  Future<ActionWithEvents?> getAction(String equalityKey);
 
   // TODO: rename getAllActions
   Future<Iterable<ActionWithEvents>> getAllEvents();

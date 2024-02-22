@@ -213,6 +213,17 @@ void main() {
         );
       });
 
+      test('getAction returns null if no action is found', () async {
+        final persistenceImpl = persistenceConstructor();
+        final Action a = TestAction(id: '1');
+        await persistenceImpl.createAction(a);
+
+        expect(
+          await persistenceImpl.getAction('2'),
+          equals(null),
+        );
+      });
+
       group('notification stream', () {
         test('sends events when a new action is added', () async {
           final persistenceImpl = persistenceConstructor();
