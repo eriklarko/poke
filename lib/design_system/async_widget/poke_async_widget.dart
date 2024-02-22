@@ -55,7 +55,7 @@ class PokeAsyncWidget<ErrorType> extends StatefulWidget {
   });
 
   @override
-  State<PokeAsyncWidget<ErrorType>> createState() => _WidgetState();
+  State<PokeAsyncWidget<ErrorType>> createState() => controller._state;
 
   // This factory constructor simplifies the usage of the async widget slightly by
   // allowing you to pass widgets for each state instead of implementing the
@@ -135,35 +135,31 @@ class PokeAsyncWidget<ErrorType> extends StatefulWidget {
 class _WidgetState<ErrorType> extends State<PokeAsyncWidget<ErrorType>> {
   PokeAsyncWidgetState _state = PokeAsyncWidgetState.idle;
 
-  @override
-  void initState() {
-    super.initState();
-    widget.controller._setState(this);
-  }
-
   setLoading() {
-    setState(() {
-      _state = PokeAsyncWidgetState.loading;
-    });
+    _safeSetState(PokeAsyncWidgetState.loading);
   }
 
   setSuccessful() {
-    setState(() {
-      _state = PokeAsyncWidgetState.success;
-    });
+    _safeSetState(PokeAsyncWidgetState.success);
   }
 
   setErrored(ErrorType error) {
-    setState(() {
-      _state = PokeAsyncWidgetState.error(error);
-    });
+    _safeSetState(PokeAsyncWidgetState.error(error));
   }
 
   // could also be called reset
   setIdle() {
-    setState(() {
-      _state = PokeAsyncWidgetState.idle;
-    });
+    _safeSetState(PokeAsyncWidgetState.idle);
+  }
+
+  _safeSetState(PokeAsyncWidgetState newState) {
+    if (mounted) {
+      setState(() {
+        _state = newState;
+      });
+    } else {
+      _state = newState;
+    }
   }
 
   @override
@@ -173,25 +169,21 @@ class _WidgetState<ErrorType> extends State<PokeAsyncWidget<ErrorType>> {
 }
 
 class PokeAsyncWidgetController<ErrorType> {
-  _WidgetState? _state;
-
-  _setState(_WidgetState state) {
-    _state = state;
-  }
+  final _WidgetState<ErrorType> _state = _WidgetState();
 
   setLoading() {
-    _state!.setLoading();
+    _state.setLoading();
   }
 
   setSuccessful() {
-    _state!.setSuccessful();
+    _state.setSuccessful();
   }
 
   setErrored(ErrorType error) {
-    _state!.setErrored(error);
+    _state.setErrored(error);
   }
 
   setIdle() {
-    _state!.setIdle();
+    _state.setIdle();
   }
 }
