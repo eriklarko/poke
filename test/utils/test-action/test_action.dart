@@ -153,7 +153,7 @@ class TestActionWithData extends Action<Data> {
   Widget buildReminderListItem(
       BuildContext context, (DateTime, Data)? lastEvent) {
     if (lastEvent == null) {
-      return Text("unknown");
+      return const Text("unknown");
     }
 
     final Data d = lastEvent.$2;
