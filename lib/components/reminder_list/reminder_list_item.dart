@@ -1,47 +1,8 @@
-import 'package:flutter/material.dart' hide Overlay;
-import 'package:poke/design_system/async_widget/poke_async_widget.dart';
-import 'package:poke/design_system/async_widget/state.dart';
-import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
-
-import 'overlay.dart';
-
-class UpdatingReminderListItem extends PokeAsyncWidget {
-  UpdatingReminderListItem({
-    super.key,
-    required super.controller,
-    required Reminder reminder,
-    required Function(Reminder) onTap,
-    required Function(Reminder) onSnooze,
-  }) : super(
-          builder: (context, state) {
-            final Widget listItem = ReminderListItem(
-              reminder,
-              onTap: onTap,
-              onSnooze: onSnooze,
-            );
-
-            return switch (state) {
-              Loading() => Stack(children: [
-                  listItem,
-                  const Overlay(
-                    child: PokeLoadingIndicator.small(color: Colors.white),
-                  ),
-                ]),
-              Error() => Stack(children: [
-                  listItem,
-                  Overlay(
-                    child: PokeText("NOO $state.error"),
-                  ),
-                ]),
-              Object() => listItem,
-            };
-          },
-        );
-}
 
 class ReminderListItem extends StatelessWidget {
   final Reminder reminder;

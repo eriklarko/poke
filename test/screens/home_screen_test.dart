@@ -74,11 +74,15 @@ void main() {
     verify(persistence.getAllEvents()).called(2);
   });
 
-  testWidgets('snoozing reminders removes them', (tester) async {
+  testWidgets('Snoozing reminders removes them', (tester) async {
     fail('not implemented yet');
   });
 
-  testWidgets('rerenders when visible persistence data is changed',
+  testWidgets('Renders new action when it is added', (tester) async {
+    fail("niy");
+  });
+
+  testWidgets('Rerenders when visible persistence data is changed',
       (tester) async {
     // create the action with one event being shown to the user
     final action = TestActionWithData(id: 'some-action');

@@ -4,16 +4,16 @@ import 'package:poke/models/reminder.dart';
 import 'package:poke/predictor/predictor.dart';
 
 Future<List<Reminder>> buildReminders(
-    Persistence persistence, Predictor predictor) async {
+  Persistence persistence,
+  Predictor predictor,
+) async {
   final groupedByAction = await persistence.getAllEvents();
+  return List.of(groupedByAction.map((awe) => buildReminder(awe, predictor)));
+}
 
-  List<Reminder> reminders = [];
-  for (final ActionWithEvents actionWithEvents in groupedByAction) {
-    final reminder = Reminder(
-        actionWithEvents: actionWithEvents,
-        dueDate: predictor.predictNext(actionWithEvents));
-
-    reminders.add(reminder);
-  }
-  return reminders;
+Reminder buildReminder(ActionWithEvents action, Predictor predictor) {
+  return Reminder(
+    actionWithEvents: action,
+    dueDate: predictor.predictNext(action),
+  );
 }
