@@ -9,8 +9,8 @@ class ReminderListItem extends StatelessWidget {
   final Function(Reminder) onTap;
   final Function(Reminder) onSnooze;
 
-  const ReminderListItem(
-    this.reminder, {
+  const ReminderListItem({
+    required this.reminder,
     super.key,
     required this.onTap,
     required this.onSnooze,

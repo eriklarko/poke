@@ -36,7 +36,7 @@ import 'package:flutter_test/flutter_test.dart';
 //    expect(find.text("hello world 1"), findsOneWidget);
 //    expect(find.text("hello world 2"), findsOneWidget);
 //  });
-Function(WidgetTester, Widget) pumpInTestAppFactory(
+Future<void> Function(WidgetTester, Widget) pumpInTestAppFactory(
   Widget Function(Widget) widgetUnderTestWrapper,
 ) {
   return (

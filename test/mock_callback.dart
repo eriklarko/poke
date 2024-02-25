@@ -38,3 +38,7 @@ abstract class SingleArgF<T> {
 //    verify(mockCallback('tap')).called(1);
 //  });
 class MockSingleArgCallback<T> extends Mock implements SingleArgF<T> {}
+
+class MockTwoArgCallback<T, U> extends Mock {
+  void call(T t, U u);
+}

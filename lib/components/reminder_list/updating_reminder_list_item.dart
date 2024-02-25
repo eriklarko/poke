@@ -1,28 +1,24 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart' hide Overlay;
-import 'package:get_it/get_it.dart';
-import 'package:poke/design_system/async_widget/poke_async_widget.dart';
-import 'package:poke/design_system/async_widget/state.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/persistence/persistence.dart';
-import 'package:poke/persistence/persistence_event.dart';
-import 'package:poke/persistence/reminder_builder.dart';
-import 'package:poke/predictor/predictor.dart';
 
 import 'overlay.dart';
 import 'reminder_list_item.dart';
 
+// Wraps a `ReminderListItem`, providing a means to render a loading indicator
+// on top of it while the reminder data is being updated.
 class UpdatingReminderListItem extends StatefulWidget {
-  final Reminder reminder;
+  final Reminder initialData;
+  // TODO: document that sending null on this stream shows the loading indicator
+  final Stream<Reminder?> dataStream;
   final Function(Reminder) onTap;
   final Function(Reminder) onSnooze;
 
   const UpdatingReminderListItem({
     super.key,
-    required this.reminder,
+    required this.initialData,
+    required this.dataStream,
     required this.onTap,
     required this.onSnooze,
   });
@@ -33,72 +29,55 @@ class UpdatingReminderListItem extends StatefulWidget {
 }
 
 class _UpdatingReminderListItemState extends State<UpdatingReminderListItem> {
-  final Persistence persistence = GetIt.instance.get<Persistence>();
-  final Predictor predictor = GetIt.instance.get<Predictor>();
-  final PokeAsyncWidgetController _controller = PokeAsyncWidgetController();
-
-  Reminder? updatedReminder;
-
-  late StreamSubscription _subscription;
+  // TODO: describe; used to render something behind the loading indicator while new data is coming in
+  late Reminder _lastKnownReminder;
 
   @override
   void initState() {
     super.initState();
-
-    _subscription =
-        persistence.getNotificationStream().listen(_onEventReceived);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    _subscription.cancel();
-  }
-
-  void _onEventReceived(PersistenceEvent event) async {
-    if (event is Updating) {
-      _controller.setLoading();
-    } else {
-      final updatedAction = await persistence
-          .getAction(widget.reminder.actionWithEvents.action.equalityKey);
-
-      final Reminder reminder = buildReminder(updatedAction, predictor);
-      setState(() {
-        updatedReminder = reminder;
-      });
-
-      _controller.setIdle();
-    }
+    _lastKnownReminder = widget.initialData;
   }
 
   @override
   Widget build(BuildContext context) {
-    return PokeAsyncWidget(
-      controller: _controller,
-      builder: (context, state) {
-        final Widget listItem = ReminderListItem(
-          updatedReminder ?? widget.reminder,
-          onTap: widget.onTap,
-          onSnooze: widget.onSnooze,
-        );
-
-        return switch (state) {
-          Loading() => Stack(children: [
-              listItem,
-              const Overlay(
-                child: PokeLoadingIndicator.small(color: Colors.white),
-              ),
-            ]),
-          Error() => Stack(children: [
-              listItem,
-              Overlay(
-                child: PokeText("NOO $state.error"),
-              ),
-            ]),
-          Object() => listItem,
-        };
-      },
+    return StreamBuilder<Reminder?>(
+      stream: widget.dataStream,
+      initialData: widget.initialData,
+      builder: buildListItem,
     );
+  }
+
+  Widget buildListItem(
+    BuildContext context,
+    AsyncSnapshot<Reminder?> snapshot,
+  ) {
+    final Widget listItem = ReminderListItem(
+      reminder: snapshot.data ?? _lastKnownReminder,
+      onTap: widget.onTap,
+      onSnooze: widget.onSnooze,
+    );
+
+    // if we have data, return just the list item; no loading overlay or anything required
+    // `snapshot.hasData` is false if `null` was sent on the stream.
+    if (snapshot.hasData) {
+      return listItem;
+    }
+
+    if (snapshot.hasError) {
+      return Stack(children: [
+        listItem,
+        Overlay(
+          child: PokeText("NOO $snapshot.error"),
+        ),
+      ]);
+    }
+
+    // we don't have any data or any errors, we must be loading
+    return Stack(children: [
+      listItem,
+      const Overlay(
+        child: PokeLoadingIndicator.small(color: Colors.white),
+      ),
+    ]);
   }
 }

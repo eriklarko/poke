@@ -33,24 +33,27 @@ class TestAction extends Action<Null> {
   @override
   Widget buildLogActionWidget(BuildContext context, (DateTime, void)? lastEvent,
       Persistence persistence) {
-    throw UnimplementedError();
+    return _someWidget('log-action');
+  }
+
+  Widget _someWidget(String idPrefix) {
+    final key = getKey(idPrefix);
+    return SizedBox(
+      width: 100,
+      height: 100,
+      key: key,
+      child: Text("$key"),
+    );
+  }
+
+  Key getKey(String prefix) {
+    return id == null ? UniqueKey() : Key("test-action-$prefix-$id");
   }
 
   @override
   Widget buildReminderListItem(
       BuildContext context, (DateTime, Null)? lastEvent) {
-    return SizedBox(
-      width: 100,
-      height: 100,
-      key: id == null ? UniqueKey() : Key(id!),
-      child: SizedBox(
-        width: 100,
-        height: 100,
-        child: (id == null)
-            ? const Text('reminder-test-action')
-            : Text('reminder-test-action-$id'),
-      ),
-    );
+    return _someWidget('reminder-list-item');
   }
 
   @override
@@ -58,7 +61,7 @@ class TestAction extends Action<Null> {
     BuildContext context,
     Map<DateTime, void> events,
   ) {
-    throw UnimplementedError();
+    return _someWidget('details-screen');
   }
 
   @override
