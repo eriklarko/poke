@@ -5,6 +5,7 @@ import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/design_system/async_widget/poke_async_widget.dart';
 import 'package:poke/design_system/async_widget/state.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/models/reminder.dart';
 
 import 'updating_reminder_list_item.dart';
@@ -13,11 +14,13 @@ import 'updating_reminder_list_item.dart';
 class ReminderList extends StatefulWidget {
   final ReminderService reminderService;
   final Function(Reminder) onReminderTapped;
+  final List<SwipeAction<Reminder>>? swipeActions;
 
   const ReminderList({
     super.key,
     required this.reminderService,
     required this.onReminderTapped,
+    this.swipeActions,
   });
 
   @override
@@ -123,11 +126,7 @@ class _ReminderListState extends State<ReminderList> {
                   initialData: reminder,
                   dataStream: listItemStream.stream,
                   onTap: widget.onReminderTapped,
-                  onSnooze: (reminder) {
-                    print(
-                      "Snoozing action ${reminder.actionWithEvents.action.equalityKey}",
-                    );
-                  },
+                  swipeActions: widget.swipeActions,
                 );
               },
             ),

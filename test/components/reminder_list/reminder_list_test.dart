@@ -14,7 +14,6 @@ import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/predictor/predictor.dart';
 
-import '../../drag_directions.dart';
 import '../../mock_callback.dart';
 import '../../test_app.dart';
 import '../../utils/persistence.dart';
@@ -103,26 +102,6 @@ void main() {
 
     final expiredReminders = find.byIcon(Icons.alarm);
     expect(expiredReminders, findsOneWidget);
-  });
-
-  testWidgets('endToStart swipe snoozes reminder', (tester) async {
-    final onSnoozeCallback = MockSingleArgCallback<Reminder>();
-
-    await testApp(
-      tester,
-      ReminderList(
-        reminderService: reminderServiceMock([
-          reminder,
-        ]),
-        //onSnooze: onSnoozeCallback,
-        onReminderTapped: ignoreCallback,
-      ),
-    );
-
-    await tester.drag(find.byType(ReminderListItem), endToStart);
-    await tester.pumpAndSettle();
-
-    verify(onSnoozeCallback(reminder)).called(1);
   });
 
   testWidgets('allows retrying when building reminders fail', (tester) async {

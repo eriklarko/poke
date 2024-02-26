@@ -27,7 +27,6 @@ void main() {
         ),
         dataStream: StreamController<Reminder?>().stream,
         onTap: ignoreCallback,
-        onSnooze: ignoreCallback,
       ),
     );
 
@@ -46,7 +45,6 @@ void main() {
         ),
         dataStream: sc.stream,
         onTap: ignoreCallback,
-        onSnooze: ignoreCallback,
       ),
     );
 
@@ -77,7 +75,6 @@ void main() {
         initialData: reminder,
         dataStream: sc.stream,
         onTap: ignoreCallback,
-        onSnooze: ignoreCallback,
       ),
     );
 
@@ -110,7 +107,6 @@ void main() {
         ),
         dataStream: sc.stream,
         onTap: ignoreCallback,
-        onSnooze: ignoreCallback,
       ),
     );
 

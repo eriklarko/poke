@@ -7,6 +7,7 @@ import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/action_details_screen/action_details_screen.dart';
@@ -27,13 +28,29 @@ class HomeScreen extends StatelessWidget {
           const PokeHeader('hi'),
           Expanded(
             child: ReminderList(
-              reminderService: ReminderService(),
-              onReminderTapped: (reminder) => openReminderDialog(
-                context,
-                reminder,
-              ),
-              //swipeActions: [{}],
-            ),
+                reminderService: ReminderService(),
+                onReminderTapped: (reminder) => openReminderDialog(
+                      context,
+                      reminder,
+                    ),
+                swipeActions: [
+                  (
+                    (Reminder reminder) {
+                      print('snoozing $reminder');
+                    },
+                    Container(
+                      decoration: const BoxDecoration(color: Colors.amber),
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.alarm_off_sharp),
+                          PokeText("snooze"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ]),
           ),
         ],
       ),

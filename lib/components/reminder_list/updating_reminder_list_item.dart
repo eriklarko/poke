@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Overlay;
 import 'package:poke/design_system/poke_loading_indicator.dart';
+import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 
@@ -13,14 +14,14 @@ class UpdatingReminderListItem extends StatefulWidget {
   // TODO: document that sending null on this stream shows the loading indicator
   final Stream<Reminder?> dataStream;
   final Function(Reminder) onTap;
-  final Function(Reminder) onSnooze;
+  final List<SwipeAction<Reminder>>? swipeActions;
 
   const UpdatingReminderListItem({
     super.key,
     required this.initialData,
     required this.dataStream,
     required this.onTap,
-    required this.onSnooze,
+    this.swipeActions,
   });
 
   @override
@@ -54,7 +55,7 @@ class _UpdatingReminderListItemState extends State<UpdatingReminderListItem> {
     final Widget listItem = ReminderListItem(
       reminder: snapshot.data ?? _lastKnownReminder,
       onTap: widget.onTap,
-      onSnooze: widget.onSnooze,
+      swipeActions: widget.swipeActions,
     );
 
     // if we have data, return just the list item; no loading overlay or anything required

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -7,13 +8,13 @@ import 'package:poke/models/reminder.dart';
 class ReminderListItem extends StatelessWidget {
   final Reminder reminder;
   final Function(Reminder) onTap;
-  final Function(Reminder) onSnooze;
+  final List<SwipeAction<Reminder>>? swipeActions;
 
   const ReminderListItem({
     required this.reminder,
     super.key,
     required this.onTap,
-    required this.onSnooze,
+    this.swipeActions,
   });
 
   @override
@@ -26,21 +27,10 @@ class ReminderListItem extends StatelessWidget {
           );
           onTap(reminder);
         },
-        child: Dismissible(
+        child: PokeSwipeable<Reminder>(
           key: ObjectKey(reminder),
-
-          // only allow swiping right-to-left
-          direction: DismissDirection.endToStart,
-          //
-
-          background: const SnoozeAction(),
-          onDismissed: (direction) {
-            PokeLogger.instance().info(
-              'dismissed reminder',
-              data: {'reminder': reminder},
-            );
-            onSnooze(reminder);
-          },
+          value: reminder,
+          swipeActions: swipeActions ?? [],
           child: Stack(
             children: [
               if (reminder.isDue())

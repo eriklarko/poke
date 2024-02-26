@@ -3,14 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:poke/components/expandable-floating-action-button/expandable-floating-action-button.dart';
 import 'package:poke/design_system/poke_button.dart';
-import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/predictor/predictor.dart';
 import 'package:poke/screens/home_screen.dart';
 
-import '../mock_callback.dart';
 import '../utils/persistence.dart';
 import '../utils/test-action/test_action.dart';
 import 'home_screen_test.mocks.dart';
