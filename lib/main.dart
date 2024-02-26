@@ -37,7 +37,39 @@ class MyApp extends StatelessWidget {
         home: LoadingScreen(
           loadingFuture: initializeApp(),
         ),
-        //home: DevScreen(widget: NewInstanceWidget()),
+        //home: DevScreen(widget: UpdatingReminderListTestDriver()),
+      ),
+    );
+  }
+}
+
+class AnimatedButton extends StatefulWidget {
+  @override
+  State<AnimatedButton> createState() => _AnimatedButtonState();
+}
+
+class _AnimatedButtonState extends State<AnimatedButton> {
+  String buttonText =
+      'hello000000000000000000000000000000000000000000000000000000000000';
+  //final Tween<double> opacity = Tween<double>();
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedSize(
+        //decoration: BoxDecoration(color: Colors.red),
+        duration: Duration(milliseconds: 5000),
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              if (buttonText == 'hello') {
+                buttonText = '';
+              } else {
+                buttonText = 'hello';
+              }
+            });
+          },
+          child: Text(buttonText),
+        ),
       ),
     );
   }

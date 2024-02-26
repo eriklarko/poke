@@ -11,7 +11,7 @@ import 'reminder_list_item.dart';
 // on top of it while the reminder data is being updated.
 class UpdatingReminderListItem extends StatefulWidget {
   final Reminder initialData;
-  // TODO: document that sending null on this stream shows the loading indicator
+  // sending null on this stream shows the loading indicator
   final Stream<Reminder?> dataStream;
   final Function(Reminder) onTap;
   final List<SwipeAction<Reminder>>? swipeActions;
@@ -30,7 +30,7 @@ class UpdatingReminderListItem extends StatefulWidget {
 }
 
 class _UpdatingReminderListItemState extends State<UpdatingReminderListItem> {
-  // TODO: describe; used to render something behind the loading indicator while new data is coming in
+  // used to render something behind the loading indicator while new data is coming in
   late Reminder _lastKnownReminder;
 
   @override

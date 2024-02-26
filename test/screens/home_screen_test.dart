@@ -58,7 +58,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // click floating action button to bring up buttons for creating new actions
-    await tester.tap(find.byType(ExpandableFab));
+    await tester.tap(find.widgetWithIcon(ExpandableFab, Icons.create));
     await tester.pumpAndSettle();
 
     // click the button for creating a new test action. we see this button

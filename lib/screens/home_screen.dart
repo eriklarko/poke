@@ -28,29 +28,30 @@ class HomeScreen extends StatelessWidget {
           const PokeHeader('hi'),
           Expanded(
             child: ReminderList(
-                reminderService: ReminderService(),
-                onReminderTapped: (reminder) => openReminderDialog(
-                      context,
-                      reminder,
-                    ),
-                swipeActions: [
-                  (
-                    (Reminder reminder) {
-                      print('snoozing $reminder');
-                    },
-                    Container(
-                      decoration: const BoxDecoration(color: Colors.amber),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(Icons.alarm_off_sharp),
-                          PokeText("snooze"),
-                        ],
-                      ),
+              reminderService: ReminderService(),
+              onReminderTapped: (reminder) => openLogActionDialog(
+                context,
+                reminder,
+              ),
+              swipeActions: [
+                (
+                  (Reminder reminder) {
+                    print('snoozing $reminder');
+                  },
+                  Container(
+                    decoration: const BoxDecoration(color: Colors.amber),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.alarm_off_sharp),
+                        PokeText("snooze"),
+                      ],
                     ),
                   ),
-                ]),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -59,7 +60,7 @@ class HomeScreen extends StatelessWidget {
         children: List.of(
           Action.registeredActions().values.map((v) {
             return ActionButton(
-              key: Key('add-action-${v.serializationKey}'),
+              key: Key('add-new-${v.serializationKey}'),
               icon: const Icon(Icons.new_label),
               onPressed: () {
                 showDialog(
@@ -76,7 +77,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void openReminderDialog(context, reminder) {
+  void openLogActionDialog(context, reminder) {
     showDialog(
       context: context,
       builder: (context) => PokeModal(
