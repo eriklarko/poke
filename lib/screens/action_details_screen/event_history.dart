@@ -24,7 +24,7 @@ class EventHistory extends StatelessWidget {
         return Row(
           children: [
             PokeText("$date"),
-            PokeButton.icon(const Icon(Icons.delete), onPressed: () {
+            PokeButton.icon(Icons.delete, onPressed: () {
               PokeLogger.instance()
                   .info('Deleting event', data: {"event": entry});
 

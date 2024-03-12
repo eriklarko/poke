@@ -40,11 +40,11 @@ class HomeScreen extends StatelessWidget {
                   },
                   Container(
                     decoration: const BoxDecoration(color: Colors.amber),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(Icons.alarm_off_sharp),
+                        const Icon(Icons.alarm_off_sharp),
                         PokeText("snooze"),
                       ],
                     ),
@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
       context: context,
       builder: (context) => PokeModal(
         actionButton: PokeButton.icon(
-          const Icon(Icons.chevron_right),
+          Icons.chevron_right,
           onPressed: () {
             NavService.instance.push(MaterialPageRoute(builder: (_) {
               return ActionDetailsScreen(

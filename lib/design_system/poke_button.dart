@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_constants.dart';
+import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/design_system/poke_text.dart';
 
 // Standard buttons
@@ -30,15 +31,26 @@ class PokeButton extends StatelessWidget {
   }
 
   factory PokeButton.icon(
-    Icon icon, {
+    IconData icon, {
     Key? key,
+    String? text,
+    double? iconSize,
+    Color? color,
     required Function()? onPressed,
   }) {
     return PokeButton._(
-      buildChild: (_) => IconButton(
+      buildChild: (_) => PokeTappable(
         key: key,
-        icon: icon,
-        onPressed: onPressed,
+        onTap: onPressed,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: iconSize, color: color),
+            if (text != null) PokeText(text, color: color),
+          ],
+        ),
       ),
     );
   }
