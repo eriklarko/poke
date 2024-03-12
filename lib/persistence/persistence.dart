@@ -26,6 +26,8 @@ abstract class Persistence {
 
   Future<void> createAction(Action action);
 
+  Future<void> updateAction(String equalityKey, Action action);
+
   Future<void> deleteEvent(Action a, DateTime eventDate);
 
   Stream<PersistenceEvent> getNotificationStream();

@@ -10,6 +10,7 @@ import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence_event.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/screens/loading/firebase.dart';
 import 'package:poke/utils/key_factory.dart';
 import '../utils/clock.dart';
@@ -167,13 +168,101 @@ void main() {
         final persistenceImpl = persistenceConstructor();
 
         final testAction = TestAction(id: '1');
-        persistenceImpl.createAction(testAction);
+        await persistenceImpl.createAction(testAction);
 
         expect(
           await persistenceImpl.getAllEvents(),
           equals([
             ActionWithEvents(testAction),
           ]),
+        );
+      });
+
+      test('can update action', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        Action.registerSubclass(
+          serializationKey: UpdateTestAction.serializationKey,
+          type: UpdateTestAction,
+          actionFromJson: UpdateTestAction.fromJson,
+        );
+
+        // create an action with some properties
+        final testAction = UpdateTestAction(
+          id: '1',
+          props: {
+            'propToUpdate': '1',
+            'propToRemove': '2',
+            'unchanged': '3',
+          },
+        );
+        await persistenceImpl.createAction(testAction);
+
+        // remove prop `propToRemove`, add prop `newProp: 4` and update the action
+        testAction.props.remove('b');
+        testAction.props['c'] = '3';
+        await persistenceImpl.updateAction(
+          testAction.equalityKey,
+          UpdateTestAction(id: testAction.id, props: {
+            'propToUpdate': '11', // update from '1' to '11'
+            // remove propToRemove
+            'unchanged': testAction.props['unchanged']!, // keep unchanged
+            'newProp': '4', // add new prop
+          }),
+        );
+
+        final awe = await persistenceImpl.getAction(testAction.equalityKey);
+        final actualAction = awe!.action as UpdateTestAction;
+        expect(
+          actualAction.props,
+          equals({
+            'propToUpdate': '11',
+            'unchanged': '3',
+            'newProp': '4',
+          }),
+        );
+      });
+
+      test('events are kept after updating action', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        Action.registerSubclass(
+          serializationKey: UpdateTestAction.serializationKey,
+          type: UpdateTestAction,
+          actionFromJson: UpdateTestAction.fromJson,
+        );
+
+        // create an action
+        final testAction = UpdateTestAction(
+          id: '1',
+          props: {
+            'propToUpdate': '1',
+          },
+        );
+        await persistenceImpl.createAction(testAction);
+
+        // log some events so we can check that they're not lost after updating
+        final dt1 = DateTime.parse('1963-11-23 13:37');
+        final dt2 = DateTime.parse('1989-12-06 06:06');
+        await persistenceImpl.logAction(testAction, dt1);
+        await persistenceImpl.logAction(testAction, dt2);
+
+        // update the action
+        await persistenceImpl.updateAction(
+          testAction.equalityKey,
+          UpdateTestAction(id: testAction.id, props: {
+            'propToUpdate': '11', // update from '1' to '11'
+          }),
+        );
+
+        // and check that the events are still there
+        final awe = await persistenceImpl.getAction(testAction.equalityKey);
+        expect(
+          awe!.events,
+          equals({
+            dt1: null,
+            dt2: null,
+          }),
         );
       });
 
@@ -311,5 +400,57 @@ void main() {
         });
       });
     }); // end group
+  }
+}
+
+// Helper class used to test updating actions. It keeps its properties in a map
+// to make it easy to modify them on the fly
+class UpdateTestAction extends Action {
+  static const String serializationKey = 'update-test-action';
+  final Map<String, String> props;
+  final String id;
+
+  UpdateTestAction({
+    required this.props,
+    required this.id,
+  }) : super(serializationKey: serializationKey);
+
+  @override
+  Widget buildDetailsScreen(
+      BuildContext context, Map<DateTime, SerializableEventData?> events) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildLogActionWidget(BuildContext context,
+      (DateTime, SerializableEventData?)? lastEvent, Persistence persistence) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildReminderListItem(
+      BuildContext context, (DateTime, SerializableEventData?)? lastEvent) {
+    throw UnimplementedError();
+  }
+
+  @override
+  String get equalityKey => 'update-test-action-$id';
+
+  @override
+  Map<String, dynamic> subclassToJson() {
+    return {
+      'id': id,
+      'props': props,
+    };
+  }
+
+  factory UpdateTestAction.fromJson(Map<String, dynamic> json) {
+    final String id = json['id'];
+    final Map<String, String> props = Map<String, String>.from(json['props']);
+
+    return UpdateTestAction(
+      id: id,
+      props: props,
+    );
   }
 }

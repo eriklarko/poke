@@ -30,6 +30,30 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
+  Future<void> updateAction(
+    String equalityKey,
+    Action<SerializableEventData?> newData,
+  ) async {
+    final updatingEvent = PersistenceEvent.updating(actionId: equalityKey);
+    notificationStreamController.add(updatingEvent);
+
+    final actionsRef = getActionsCollection();
+    final actionRef = actionsRef.doc(equalityKey);
+
+    final existingData = await actionRef.get();
+    if (!existingData.exists) {
+      throw "No such action $equalityKey";
+    }
+
+    // for some reason I can't get
+    //  await actionRef.set(newData.toJson(), SetOptions(mergeFields: ['events']));
+    // to write the updated action data while keeping the events intact.
+    await actionRef.update(newData.toJson());
+
+    notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
+  }
+
+  @override
   Future<void> logAction<TEventData extends SerializableEventData?,
           TAction extends Action<TEventData>>(TAction a, DateTime when,
       {TEventData? eventData}) async {

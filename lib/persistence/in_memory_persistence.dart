@@ -72,6 +72,26 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
+  Future<void> updateAction(
+    String equalityKey,
+    Action<SerializableEventData?> newData,
+  ) async {
+    final Updating u = PersistenceEvent.updating(actionId: equalityKey);
+    emitEvent(u);
+
+    final existingData = await getAction(equalityKey);
+    if (existingData == null) {
+      throw "unknown action $equalityKey";
+    }
+
+    jiggers.remove(existingData.action);
+    jiggers[newData] = ActionWithEvents.multiple(newData, existingData.events);
+
+    emitEvent(PersistenceEvent.finished(u));
+    return Future.value(null);
+  }
+
+  @override
   Future<void> deleteEvent(
       Action<SerializableEventData?> a, DateTime eventDate) {
     if (!jiggers.containsKey(a)) {
