@@ -12,7 +12,7 @@ class PokeButton extends StatelessWidget {
 
   factory PokeButton.primary({
     Key? key,
-    required Function() onPressed,
+    required Function()? onPressed,
     required String text,
   }) {
     return PokeButton._(
@@ -32,7 +32,7 @@ class PokeButton extends StatelessWidget {
   factory PokeButton.icon(
     Icon icon, {
     Key? key,
-    required Null Function() onPressed,
+    required Function()? onPressed,
   }) {
     return PokeButton._(
       buildChild: (_) => IconButton(

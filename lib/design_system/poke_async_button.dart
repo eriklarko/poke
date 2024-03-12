@@ -8,7 +8,7 @@ import 'package:poke/logger/poke_logger.dart';
 class PokeAsyncButton extends StatefulWidget {
   final String text;
   final bool rerunnable;
-  final Future Function() onPressed;
+  final Future Function()? onPressed;
 
   const PokeAsyncButton.once({
     super.key,
@@ -32,23 +32,28 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
   @override
   Widget build(BuildContext context) {
     return PokeAsyncWidget.simple(
+      controller: controller,
+
       idle: PokeButton.primary(
-          onPressed: () {
-            controller.setLoading();
+        onPressed: widget.onPressed == null
+            ? null
+            : () {
+                controller.setLoading();
 
-            widget.onPressed().then((_) {
-              controller.setSuccessful();
-            }).catchError((error) {
-              controller.setErrored(error);
+                widget.onPressed!.call().then((_) {
+                  controller.setSuccessful();
+                }).catchError((error) {
+                  controller.setErrored(error);
 
-              PokeLogger.instance().error(
-                'Async button encountered error',
-                data: {'btn-text': widget.text},
-                error: error,
-              );
-            });
-          },
-          text: widget.text),
+                  PokeLogger.instance().error(
+                    'Async button encountered error',
+                    data: {'btn-text': widget.text},
+                    error: error,
+                  );
+                });
+              },
+        text: widget.text,
+      ),
 
       loading: const PokeLoadingIndicator.small(),
 
@@ -59,9 +64,7 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
       // for buttons that should execute their action only once we don't want to
       // show the button again once the action is completed, so we specify a
       // `success` widget here
-      success: widget.rerunnable ? null : const PokeText('success!'),
-
-      controller: controller,
+      success: widget.rerunnable ? null : PokeText('success!'),
     );
   }
 }
