@@ -30,6 +30,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               PokeAsyncButton.rerunnable(
                 text: 'Log out',
+                // TODO: just calling firebaseAuth.signOut makes it so that the
+                // same google account is used next time the user taps "Log in
+                // with Google". Need to clear something so that an account can
+                // be chosen again
                 onPressed: FirebaseAuth.instance.signOut,
               )
             ],
