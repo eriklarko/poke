@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
@@ -9,6 +10,8 @@ import 'package:poke/models/action.dart';
 class InMemoryPersistence implements Persistence {
   // naming stuff is serious okay
   final Map<Action, ActionWithEvents> jiggers = {};
+
+  final Map<Uri, Uint8List> uploadedData = {};
 
   final StreamController<PersistenceEvent> notificationStreamController =
       StreamController.broadcast();
@@ -117,5 +120,19 @@ class InMemoryPersistence implements Persistence {
   @override
   Stream<PersistenceEvent> getNotificationStream() {
     return notificationStreamController.stream;
+  }
+
+  @override
+  Future<Uri> uploadData(Uint8List data, String storageKey) {
+    final Uri uri = Uri.file(storageKey);
+    uploadedData[uri] = data;
+
+    return Future.value(uri);
+  }
+
+  @override
+  Future<Uint8List?> getUploadedData(String storageKey) {
+    final Uri uri = Uri.file(storageKey);
+    return Future.value(uploadedData[uri]);
   }
 }

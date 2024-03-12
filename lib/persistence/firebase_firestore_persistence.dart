@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:poke/persistence/action_with_events.dart';
@@ -6,7 +7,7 @@ import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/screens/loading/poke_firebase.dart';
 
 class FirebaseFirestorePersistence implements Persistence {
   final PokeFirebase firebase;
@@ -212,5 +213,40 @@ class FirebaseFirestorePersistence implements Persistence {
   @override
   Stream<PersistenceEvent> getNotificationStream() {
     return notificationStreamController.stream;
+  }
+
+  @override
+  Future<Uri> uploadData(
+    Uint8List bytes,
+    String storageKey,
+  ) async {
+    final user = firebase.auth().currentUser;
+    if (user == null) {
+      throw "not logged in!";
+    }
+
+    final storageRef = firebase.storage().ref();
+    final spaceRef = storageRef.child(
+      "/users/${user.uid}/$storageKey",
+    );
+
+    await spaceRef.putData(bytes);
+    final downloadUrl = await spaceRef.getDownloadURL();
+    return Uri.parse(downloadUrl);
+  }
+
+  @override
+  Future<Uint8List?> getUploadedData(String storageKey) {
+    final user = firebase.auth().currentUser;
+    if (user == null) {
+      throw "not logged in!";
+    }
+
+    final storageRef = firebase.storage().ref();
+    final spaceRef = storageRef.child(
+      "/users/${user.uid}/$storageKey",
+    );
+
+    return spaceRef.getData();
   }
 }

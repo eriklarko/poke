@@ -16,7 +16,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart' as _i3;
 import 'package:firebase_database/firebase_database.dart' as _i5;
 import 'package:firebase_storage/firebase_storage.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:poke/screens/loading/firebase.dart' as _i10;
+import 'package:poke/screens/loading/poke_firebase.dart' as _i10;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values

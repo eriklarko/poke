@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:poke/logger/local_logger.dart';
-import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/screens/loading/poke_firebase.dart';
 
 class FirebaseLogger extends LocalLogger {
   final PokeFirebase firebase;

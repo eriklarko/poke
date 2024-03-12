@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter/material.dart' hide Action;
@@ -11,11 +13,12 @@ import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
-import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/utils/key_factory.dart';
 import '../utils/clock.dart';
 import '../utils/test-action/test_action.dart';
 import 'persistence_test.mocks.dart';
+import 'package:firebase_storage_mocks/firebase_storage_mocks.dart';
 
 final Iterable<Persistence Function()> persistenceConstructors = [
   () => InMemoryPersistence(),
@@ -29,6 +32,8 @@ final Iterable<Persistence Function()> persistenceConstructors = [
     when(mockFirebase.auth()).thenReturn(mockAuth);
 
     when(mockFirebase.firestore()).thenReturn(FakeFirebaseFirestore());
+
+    when(mockFirebase.storage()).thenReturn(MockFirebaseStorage());
 
     return FirebaseFirestorePersistence(mockFirebase);
   },
@@ -310,6 +315,19 @@ void main() {
         expect(
           await persistenceImpl.getAction('2'),
           equals(null),
+        );
+      });
+
+      test('uploadData allows retrieving it later', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        final bytes = Uint8List.fromList([1, 3, 3, 7]);
+        const storageKey = 'foo';
+        await persistenceImpl.uploadData(bytes, storageKey);
+
+        expect(
+          await persistenceImpl.getUploadedData(storageKey),
+          equals(bytes),
         );
       });
 

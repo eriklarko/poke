@@ -11,7 +11,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
-import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:get_it/get_it.dart';
 

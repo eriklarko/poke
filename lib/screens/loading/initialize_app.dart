@@ -16,7 +16,7 @@ import 'package:poke/predictor/time_of_day_aware_average_predictor.dart';
 
 import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
-import 'package:poke/screens/loading/firebase.dart';
+import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/utils/nav_service.dart';
 
 Future initializeApp({

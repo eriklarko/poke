@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
@@ -31,4 +33,8 @@ abstract class Persistence {
   Future<void> deleteEvent(Action a, DateTime eventDate);
 
   Stream<PersistenceEvent> getNotificationStream();
+
+  Future<Uri> uploadData(Uint8List bytes, String storageKey);
+
+  Future<Uint8List?> getUploadedData(String storageKey);
 }
