@@ -11,11 +11,17 @@ class PokeHeader extends Text {
 }
 
 class PokeText extends Text {
-  const PokeText(super.text, {super.key})
-      : super(
-          style: const TextStyle(
+  PokeText(
+    super.text, {
+    super.key,
+    Color? color,
+    bool center = false,
+  }) : super(
+          style: TextStyle(
             fontSize: 18,
+            color: color,
           ),
+          textAlign: center ? TextAlign.center : TextAlign.start,
         );
 }
 

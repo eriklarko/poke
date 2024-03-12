@@ -17,7 +17,7 @@ void main() {
         swipeActions: const [],
         key: UniqueKey(),
         value: null,
-        child: const PokeText('foo'),
+        child: PokeText('foo'),
       ),
     );
 
@@ -37,10 +37,10 @@ void main() {
         swipeActions: [
           (
             swipeActionCallback,
-            const PokeText("swipe-action"),
+            PokeText("swipe-action"),
           )
         ],
-        child: const PokeText('foof'),
+        child: PokeText('foof'),
       ),
     );
 

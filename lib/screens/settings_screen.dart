@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             children: [
               if (isAnonymous)
-                const PokeText('Hello anonymous')
+                PokeText('Hello anonymous')
               else
                 PokeText(
                     'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}'),

@@ -105,7 +105,7 @@ void main() {
         swipeActions: [
           (
             swipeActionCallback,
-            const PokeText("swipe-action"),
+            PokeText("swipe-action"),
           )
         ],
       ),
