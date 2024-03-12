@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:poke/components/expandable-floating-action-button/expandable-floating-action-button.dart';
+import 'package:poke/components/expandable_floating_action_button/expandable_floating_action_button.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';

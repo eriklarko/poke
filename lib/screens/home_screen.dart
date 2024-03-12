@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
-import 'package:poke/components/expandable-floating-action-button/expandable-floating-action-button.dart';
+import 'package:poke/components/expandable_floating_action_button/expandable_floating_action_button.dart';
 import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
