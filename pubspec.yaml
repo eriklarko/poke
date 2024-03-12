@@ -50,6 +50,10 @@ dependencies:
   logger: ^2.0.2+1
   clock: ^1.1.1
   flutter_slidable: ^3.0.1
+  image_picker: ^1.0.7
+  image_picker_android: ^0.8.9+3
+  image_picker_platform_interface: ^2.9.3
+  file: ^7.0.0
 
 dev_dependencies:
   flutter_test:
