@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_tappable.dart';
-import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
 
@@ -49,26 +48,5 @@ class ReminderListItem extends StatelessWidget {
             ],
           ),
         ));
-  }
-}
-
-class SnoozeAction extends StatelessWidget {
-  const SnoozeAction({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.amber,
-      child: const Padding(
-        padding: EdgeInsets.only(right: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            PokeText('Snooze'),
-            Icon(Icons.snooze),
-          ],
-        ),
-      ),
-    );
   }
 }

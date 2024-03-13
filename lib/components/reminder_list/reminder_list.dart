@@ -69,12 +69,31 @@ class _ReminderListState extends State<ReminderList> {
   Future<void> _loadReminders() async {
     _controller.setLoading();
 
-    final newReminders = await widget.reminderService.buildReminders();
-    setState(() {
-      _reminders = newReminders;
-    });
+    try {
+      final newReminders = await widget.reminderService.buildReminders();
 
-    _controller.setSuccessful();
+      if (!mounted) {
+        // because of the await above we might have moved into a time where the
+        // widget has been removed. This can happen if eg the app is reloaded
+        // while we're fetching the reminders
+        return;
+      }
+
+      setState(() {
+        _reminders = newReminders;
+      });
+
+      _controller.setSuccessful();
+    } catch (e) {
+      PokeLogger.instance().error("Failed loading reminders", data: {
+        "error": e,
+        // TODO: Add something about which user and other context. Possibly on all errors??
+      });
+
+      if (mounted) {
+        _controller.setErrored(e.toString());
+      }
+    }
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
@@ -145,11 +164,17 @@ class _ReminderListState extends State<ReminderList> {
 
                 _listItemStreams[actionId] = listItemStream;
 
-                return UpdatingReminderListItem(
-                  initialData: reminder,
-                  dataStream: listItemStream.stream,
-                  onTap: widget.onReminderTapped,
-                  swipeActions: widget.swipeActions,
+                return Padding(
+                  padding: EdgeInsets.only(bottom: PokeConstants.space()),
+                  child: SizedBox(
+                    height: PokeConstants.space(15),
+                    child: UpdatingReminderListItem(
+                      initialData: reminder,
+                      dataStream: listItemStream.stream,
+                      onTap: widget.onReminderTapped,
+                      swipeActions: widget.swipeActions,
+                    ),
+                  ),
                 );
               },
             ),

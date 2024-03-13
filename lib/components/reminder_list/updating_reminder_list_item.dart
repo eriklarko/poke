@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart' hide Overlay;
+import 'package:poke/components/updating_widget/overlay.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 
-import 'overlay.dart';
 import 'reminder_list_item.dart';
 
 // Wraps a `ReminderListItem`, providing a means to render a loading indicator
