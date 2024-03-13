@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/design_system/async_widget/poke_async_widget.dart';
 import 'package:poke/design_system/async_widget/state.dart';
+import 'package:poke/design_system/poke_button.dart';
+import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_swipeable.dart';
+import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
 
 import 'updating_reminder_list_item.dart';
@@ -30,7 +34,8 @@ class ReminderList extends StatefulWidget {
 class _ReminderListState extends State<ReminderList> {
   /// async controller used to show a loading indicator or error screen instead
   /// of the list of reminders
-  final PokeAsyncWidgetController _controller = PokeAsyncWidgetController();
+  final PokeAsyncWidgetController<String> _controller =
+      PokeAsyncWidgetController();
 
   /// maps each action to the stream used to send messages to the list item.
   /// these streams are used to tell the list item to render a loading indicator
@@ -73,6 +78,10 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
+    if (!mounted) {
+      return;
+    }
+
     if (update.type == UpdateType.removed) {
       _removeReminder(update.actionId);
       return;
@@ -113,6 +122,20 @@ class _ReminderListState extends State<ReminderList> {
 
         return switch (state) {
           Loading() => const Center(child: PokeLoadingIndicator.large()),
+          Error() => Column(
+              children: [
+                const PokeHeader("Failed loading reminders"),
+                PokeText(state.error),
+                PokeConstants.FixedSpacer(2),
+                PokeButton.primary(
+                  key: const ValueKey("retry"),
+                  text: "retry",
+                  onPressed: () {
+                    _loadReminders();
+                  },
+                )
+              ],
+            ),
           Object() => ListView.builder(
               itemCount: _reminders.length,
               itemBuilder: (context, position) {

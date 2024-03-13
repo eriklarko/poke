@@ -115,11 +115,44 @@ void main() {
         onReminderTapped: ignoreCallback,
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+
+    // check that the error is shown
+    expect(
+      find.text("test error"),
+      findsOneWidget,
+    );
 
     // tap the retry button
     await tester.tap(find.byKey(const Key('retry')));
     verify(reminderService.buildReminders()).called(2);
+  });
+
+  testWidgets("shows loading indicator while loading reminders",
+      (tester) async {
+    // set up reminder service taking 2s to load reminders
+    final reminderService = MockReminderService();
+    when(reminderService.buildReminders()).thenAnswer(
+      (_) => Future.delayed(const Duration(
+        seconds: 2,
+      )).then((value) => []),
+    );
+
+    await testApp(
+      tester,
+      ReminderList(
+        reminderService: reminderService,
+        onReminderTapped: ignoreCallback,
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byType(PokeLoadingIndicator),
+      findsOneWidget,
+    );
+
+    await tester.pump(const Duration(seconds: 3));
   });
 
   testWidgets('renders new action when it is added', (tester) async {
