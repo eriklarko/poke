@@ -55,7 +55,7 @@ class PokeAsyncWidget<ErrorType> extends StatefulWidget {
   });
 
   @override
-  State<PokeAsyncWidget<ErrorType>> createState() => controller._state;
+  State<PokeAsyncWidget<ErrorType>> createState() => _WidgetState();
 
   // This factory constructor simplifies the usage of the async widget slightly by
   // allowing you to pass widgets for each state instead of implementing the
@@ -135,21 +135,32 @@ class PokeAsyncWidget<ErrorType> extends StatefulWidget {
 class _WidgetState<ErrorType> extends State<PokeAsyncWidget<ErrorType>> {
   PokeAsyncWidgetState _state = PokeAsyncWidgetState.idle;
 
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller._setState(this);
+  }
+
   setLoading() {
-    _safeSetState(PokeAsyncWidgetState.loading);
+    setAsyncState(PokeAsyncWidgetState.loading);
   }
 
   setSuccessful() {
-    _safeSetState(PokeAsyncWidgetState.success);
+    setAsyncState(PokeAsyncWidgetState.success);
   }
 
   setErrored(ErrorType error) {
-    _safeSetState(PokeAsyncWidgetState.error(error));
+    setAsyncState(PokeAsyncWidgetState.error(error));
   }
 
   // could also be called reset
   setIdle() {
-    _safeSetState(PokeAsyncWidgetState.idle);
+    setAsyncState(PokeAsyncWidgetState.idle);
+  }
+
+  setAsyncState(PokeAsyncWidgetState newState) {
+    _safeSetState(newState);
   }
 
   _safeSetState(PokeAsyncWidgetState newState) {
@@ -169,21 +180,44 @@ class _WidgetState<ErrorType> extends State<PokeAsyncWidget<ErrorType>> {
 }
 
 class PokeAsyncWidgetController<ErrorType> {
-  final _WidgetState<ErrorType> _state = _WidgetState();
+  _WidgetState<ErrorType>? _state;
+
+  // save the async state here in case this controller is interacted with before
+  // it has been assigned to a PokeAsyncWidget
+  PokeAsyncWidgetState? _lastAsyncState;
+
+  void _setState(_WidgetState<ErrorType> newState) {
+    _state = newState;
+
+    // update the state if the controller was asked to change state before it
+    // was assigned to a widget
+    if (_lastAsyncState != null) {
+      newState._state = _lastAsyncState!;
+      _lastAsyncState = null;
+    }
+  }
 
   setLoading() {
-    _state.setLoading();
+    setAsyncState(PokeAsyncWidgetState.loading);
   }
 
   setSuccessful() {
-    _state.setSuccessful();
+    setAsyncState(PokeAsyncWidgetState.success);
   }
 
   setErrored(ErrorType error) {
-    _state.setErrored(error);
+    setAsyncState(PokeAsyncWidgetState.error(error));
   }
 
   setIdle() {
-    _state.setIdle();
+    setAsyncState(PokeAsyncWidgetState.idle);
+  }
+
+  setAsyncState(PokeAsyncWidgetState newState) {
+    if (_state == null) {
+      _lastAsyncState = newState;
+    } else {
+      _state!.setAsyncState(newState);
+    }
   }
 }
