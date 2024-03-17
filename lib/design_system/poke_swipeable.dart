@@ -3,10 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 typedef SwipeAction<T> = (Function(T), Widget);
 
-// TODO: document; this is any widget that you want to drag to the side to
-// display a set of options related to that widget. The by far most common
-// example is items in lists where you can drag to star or remove eg
+// This is any widget that you want to drag to the side to display a set of
+// options related to that widget. The by far most common example is items in
+// lists where you can drag to star or remove eg
 class PokeSwipeable<T> extends StatelessWidget {
+  // The thing being swiped
   final Widget child;
 
   /// what gets passed into the swipe action callback functions
