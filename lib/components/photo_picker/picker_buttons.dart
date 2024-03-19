@@ -14,7 +14,7 @@ class PickerButtons extends StatelessWidget {
   // https://pub.dev/packages/image_picker
   final ImagePicker picker;
 
-  PickerButtons._({
+  const PickerButtons._({
     super.key,
     required this.iconSize,
     required this.showText,

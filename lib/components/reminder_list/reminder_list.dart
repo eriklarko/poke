@@ -71,6 +71,7 @@ class _ReminderListState extends State<ReminderList> {
 
     try {
       final newReminders = await widget.reminderService.buildReminders();
+      // TODO: Sort showing plant watered longest ago first
 
       if (!mounted) {
         // because of the await above we might have moved into a time where the

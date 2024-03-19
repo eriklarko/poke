@@ -153,14 +153,10 @@ abstract class Action<EventDataType extends SerializableEventData?> {
 }
 
 class ActionSubclassData {
-  //////////////////////////////////////////////////////////////
-  /////////////////// JSON STUFF ///////////////////////////////
   final String serializationKey;
   final Type type;
   final ActionFromJson actionFromJson;
   final EventDataFromJson? eventDataFromJson;
-  /////////////////// JSON STUFF ///////////////////////////////
-  //////////////////////////////////////////////////////////////
   final NewInstaceBuilder? newInstanceBuilder;
 
   ActionSubclassData(this.serializationKey, this.type, this.actionFromJson,
