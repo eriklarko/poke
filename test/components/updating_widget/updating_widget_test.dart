@@ -1,3 +1,4 @@
+import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/components/updating_widget/overlay.dart';
 import 'package:poke/components/updating_widget/updating_widget.dart';
@@ -47,9 +48,11 @@ void main() {
     final controller = UpdatingWidgetController();
     await pumpInTestApp(
       tester,
-      UpdatingWidget(
-        controller: controller,
-        buildChild: (context) => PokeText('foo'),
+      SizedBox.expand(
+        child: UpdatingWidget(
+          controller: controller,
+          buildChild: (context) => PokeText('foo'),
+        ),
       ),
     );
 

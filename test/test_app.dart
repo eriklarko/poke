@@ -45,12 +45,8 @@ Future<void> Function(WidgetTester, Widget) pumpInTestAppFactory(
   ) async {
     final app = MaterialApp(
       title: 'why the flying fudge do we need this shit?',
-      home: Material(
-        child: Column(
-          children: [
-            widgetUnderTestWrapper(widgetUnderTest),
-          ],
-        ),
+      home: Scaffold(
+        body: widgetUnderTestWrapper(widgetUnderTest),
       ),
     );
 

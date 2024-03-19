@@ -44,10 +44,6 @@ StreamController<ReminderUpdate> addStream(MockReminderService mrf) {
 
 @GenerateNiceMocks([MockSpec<ReminderService>(), MockSpec<Predictor>()])
 void main() {
-  final testApp = pumpInTestAppFactory(
-    (widgetUnderTest) => Expanded(child: widgetUnderTest),
-  );
-
   final reminder = Reminder(
     actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-1')),
     // set due date to tomorrow
@@ -60,7 +56,7 @@ void main() {
   );
 
   testWidgets('renders all reminders', (tester) async {
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: reminderServiceMock([reminder, expiredReminder]),
@@ -77,7 +73,7 @@ void main() {
       (tester) async {
     final onTapCallback = MockSingleArgCallback<Reminder>();
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: reminderServiceMock([reminder]),
@@ -91,7 +87,7 @@ void main() {
   });
 
   testWidgets('expired reminders are marked', (tester) async {
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: reminderServiceMock([reminder, expiredReminder]),
@@ -108,7 +104,7 @@ void main() {
     final reminderService = MockReminderService();
     when(reminderService.buildReminders()).thenThrow("test error");
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: reminderService,
@@ -138,7 +134,7 @@ void main() {
       )).then((value) => []),
     );
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: reminderService,
@@ -159,7 +155,7 @@ void main() {
     final mockReminderService = reminderServiceMock([reminder]);
     final sc = addStream(mockReminderService);
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: mockReminderService,
@@ -194,7 +190,7 @@ void main() {
     final mockReminderService = reminderServiceMock([reminder]);
     final sc = addStream(mockReminderService);
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: mockReminderService,
@@ -224,7 +220,7 @@ void main() {
     final mockReminderService = reminderServiceMock([reminder]);
     final sc = addStream(mockReminderService);
 
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: mockReminderService,
@@ -270,7 +266,7 @@ void main() {
     GetIt.instance.registerSingleton<Predictor>(MockPredictor());
 
     // render reminders for the action
-    await testApp(
+    await pumpInTestApp(
       tester,
       ReminderList(
         reminderService: ReminderService(),
