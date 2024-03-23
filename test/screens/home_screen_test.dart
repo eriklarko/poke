@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:poke/components/expandable_floating_action_button/expandable_floating_action_button.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
@@ -48,7 +47,7 @@ void main() {
           onPressed: () {
             persistence.createAction(newAction);
           },
-          key: const Key('add-new-test-action'),
+          key: const Key('test-action-new'),
           text: "foo",
         );
       },
@@ -58,12 +57,17 @@ void main() {
     await tester.pumpAndSettle();
 
     // click floating action button to bring up buttons for creating new actions
-    await tester.tap(find.widgetWithIcon(ExpandableFab, Icons.create));
+    await tester.tap(find.widgetWithIcon(FloatingActionButton, Icons.create));
     await tester.pumpAndSettle();
 
     // click the button for creating a new test action. we see this button
     // because it was registered with `Action.registerSubclass`
     await tester.tap(find.byKey(const Key('add-new-test-action')));
+    await tester.pumpAndSettle();
+
+    // click the button rendered in `newInstanceBuilder` above
+    await tester.tap(find.byKey(const Key('test-action-new')));
+    await tester.pumpAndSettle();
 
     expect(find.byKey(newAction.getKey('reminder-list-item')), findsOneWidget);
   });
