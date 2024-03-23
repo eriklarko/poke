@@ -1,0 +1,70 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui';
+
+import 'package:flutter/widgets.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+
+@GenerateNiceMocks([MockSpec<BuildContext>()])
+class Images {
+  /// File Info
+  /// • Resolution: 24×24
+  /// • MIME type: image/png
+  /// • Extension: png
+  /// • Size: 965 B
+  /// • Bit depth: 8
+  static const heartEyesEmoji =
+      "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApgAAAKYB3X3/OAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJtZZPbBtFFMZ/M7ubXdtdb1xSFyeilBapySVU8h8OoFaooFSqiihIVIpQBKci6KEg9Q6H9kovIHoCIVQJJCKE1ENFjnAgcaSGC6rEnxBwA04Tx43t2FnvDAfjkNibxgHxnWb2e/u992bee7tCa00YFsffekFY+nUzFtjW0LrvjRXrCDIAaPLlW0nHL0SsZtVoaF98mLrx3pdhOqLtYPHChahZcYYO7KvPFxvRl5XPp1sN3adWiD1ZAqD6XYK1b/dvE5IWryTt2udLFedwc1+9kLp+vbbpoDh+6TklxBeAi9TL0taeWpdmZzQDry0AcO+jQ12RyohqqoYoo8RDwJrU+qXkjWtfi8Xxt58BdQuwQs9qC/afLwCw8tnQbqYAPsgxE1S6F3EAIXux2oQFKm0ihMsOF71dHYx+f3NND68ghCu1YIoePPQN1pGRABkJ6Bus96CutRZMydTl+TvuiRW1m3n0eDl0vRPcEysqdXn+jsQPsrHMquGeXEaY4Yk4wxWcY5V/9scqOMOVUFthatyTy8QyqwZ+kDURKoMWxNKr2EeqVKcTNOajqKoBgOE28U4tdQl5p5bwCw7BWquaZSzAPlwjlithJtp3pTImSqQRrb2Z8PHGigD4RZuNX6JYj6wj7O4TFLbCO/Mn/m8R+h6rYSUb3ekokRY6f/YukArN979jcW+V/S8g0eT/N3VN3kTqWbQ428m9/8k0P/1aIhF36PccEl6EhOcAUCrXKZXXWS3XKd2vc/TRBG9O5ELC17MmWubD2nKhUKZa26Ba2+D3P+4/MNCFwg59oWVeYhkzgN/JDR8deKBoD7Y+ljEjGZ0sosXVTvbc6RHirr2reNy1OXd6pJsQ+gqjk8VWFYmHrwBzW/n+uMPFiRwHB2I7ih8ciHFxIkd/3Omk5tCDV1t+2nNu5sxxpDFNx+huNhVT3/zMDz8usXC3ddaHBj1GHj/As08fwTS7Kt1HBTmyN29vdwAw+/wbwLVOJ3uAD1wi/dUH7Qei66PfyuRj4Ik9is+hglfbkbfR3cnZm7chlUWLdwmprtCohX4HUtlOcQjLYCu+fzGJH2QRKvP3UNz8bWk1qMxjGTOMThZ3kvgLI5AzFfo379UAAAAASUVORK5CYII=";
+  static final heartEyesEmojiBytes = base64Decode(heartEyesEmoji);
+
+  /// File Info
+  /// • Resolution: 5×5
+  /// • MIME type: image/png
+  /// • Extension: png
+  /// • Size: 85 B
+  /// • Bit depth: 8
+  static const redCircle =
+      "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
+  static final redCircleBytes = base64Decode(redCircle);
+
+  Images._();
+
+  static String getNetworkImageSource(Image i) {
+    if (i.image is NetworkImage) {
+      return (i.image as NetworkImage).url;
+    }
+
+    throw ArgumentError(
+      "Unsupported image, passed to getNetworkImageSource. Only NetworkImage is supported, got ${i.image.runtimeType}",
+      "i",
+    );
+  }
+
+  // taken from https://github.com/Baseflow/flutter_cached_network_image/issues/714#issuecomment-1072493110
+  static Future<Uint8List?> getBytes(
+    ImageProvider image, {
+    BuildContext? context,
+    ImageByteFormat format = ImageByteFormat.rawRgba,
+  }) async {
+    final imageStream = image.resolve(createLocalImageConfiguration(
+      context ?? MockBuildContext(),
+    ));
+    final Completer<Uint8List?> completer = Completer<Uint8List?>();
+    final ImageStreamListener listener = ImageStreamListener(
+      (imageInfo, synchronousCall) async {
+        final bytes = await imageInfo.image.toByteData(format: format);
+        if (!completer.isCompleted) {
+          completer.complete(bytes?.buffer.asUint8List());
+        }
+      },
+    );
+    imageStream.addListener(listener);
+    final imageBytes = await completer.future;
+    imageStream.removeListener(listener);
+    return imageBytes;
+  }
+}
+
+class MockBuildContext extends Mock implements BuildContext {}

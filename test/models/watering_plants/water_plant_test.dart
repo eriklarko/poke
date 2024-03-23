@@ -4,7 +4,11 @@ import 'package:poke/models/watering_plants/water_plant.dart';
 
 void main() {
   test('serializes as expected', () {
-    final Plant plant = Plant(id: '1', name: 'plant-1');
+    final Plant plant = Plant(
+      id: '1',
+      name: 'plant-1',
+      imageUri: Uri.parse('https://placekitten.com/200/200'),
+    );
     final WaterPlantAction sut = WaterPlantAction(plant: plant);
 
     expect(
@@ -14,6 +18,7 @@ void main() {
         'plant': {
           'id': '1',
           'name': 'plant-1',
+          'imageUri': 'https://placekitten.com/200/200',
         },
       }),
     );
@@ -25,6 +30,7 @@ void main() {
       'plant': {
         'id': '1',
         'name': 'plant-1',
+        'imageUri': 'https://placekitten.com/200/200',
       },
     };
 
@@ -32,7 +38,11 @@ void main() {
       WaterPlantAction.fromJson(json),
       equals(
         WaterPlantAction(
-          plant: Plant(id: '1', name: 'plant-1'),
+          plant: Plant(
+            id: '1',
+            name: 'plant-1',
+            imageUri: Uri.parse('https://placekitten.com/200/200'),
+          ),
         ),
       ),
     );

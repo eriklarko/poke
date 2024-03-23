@@ -18,6 +18,7 @@ import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
 import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/utils/nav_service.dart';
+import 'package:uuid/uuid.dart';
 
 Future initializeApp({
   PokeFirebase firebase = const PokeFirebase(),
@@ -58,6 +59,8 @@ void registerServices(PokeFirebase firebase) {
         .registerSingleton<Persistence>(FirebaseFirestorePersistence(firebase));
     getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
     getIt.registerSingleton<Predictor>(TimeOfDayAwareAveragePredictor());
+
+    getIt.registerSingleton<Uuid>(const Uuid());
   } finally {
     getIt.allowReassignment = false;
   }

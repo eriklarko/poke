@@ -6,6 +6,8 @@ import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/models/watering_plants/editable_plant_image.dart';
+import 'package:poke/models/watering_plants/plant_image.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -34,11 +36,15 @@ class WaterPlantAction extends Action<WaterEventData> {
       BuildContext context, (DateTime, WaterEventData)? lastEvent) {
     return Row(
       children: [
-        plant.image,
+        PlantImage.fill(image: plant.image),
+        PokeConstants.FixedSpacer(),
         Expanded(
           child: Column(
             children: [
-              PokeText(plant.name),
+              PokeText(
+                plant.name,
+                center: true,
+              ),
               Column(
                 children: [
                   PokeFinePrint(_buildLastWateredString(lastEvent?.$1)),
@@ -77,13 +83,13 @@ class WaterPlantAction extends Action<WaterEventData> {
 
     return Column(
       children: [
-        plant.image,
+        EditablePlantImage(action: this),
         PokeText(plant.name),
         if (lastEvent != null)
           PokeText('Last watered on ${formatDate(lastEvent.$1)}'),
         Row(
           children: [
-            const PokeText('Added fertilizer'),
+            PokeText('Added fertilizer'),
             fertilizerCheckbox,
           ],
         ),

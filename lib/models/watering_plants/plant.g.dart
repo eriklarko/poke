@@ -9,9 +9,13 @@ part of 'plant.dart';
 Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       id: json['id'] as String,
       name: json['name'] as String,
+      imageUri: json['imageUri'] == null
+          ? null
+          : Uri.parse(json['imageUri'] as String),
     );
 
 Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'imageUri': instance.imageUri?.toString(),
     };
