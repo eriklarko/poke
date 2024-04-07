@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/components/reminder_list/updating_reminder_list_item.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/persistence/action_with_events.dart';
 
 import '../../mock_callback.dart';
 import '../../test_app.dart';
@@ -18,10 +17,9 @@ void main() {
       tester,
       UpdatingReminderListItem(
         initialData: Reminder(
-          actionWithEvents: ActionWithEvents.single(
-            TestActionWithData(),
+          action: TestActionWithData().withEvent(
             DateTime.now(),
-            data: Data("initial-data"),
+            eventData: Data("initial-data"),
           ),
           dueDate: null,
         ),
@@ -40,7 +38,7 @@ void main() {
       tester,
       UpdatingReminderListItem(
         initialData: Reminder(
-          actionWithEvents: ActionWithEvents(TestAction()),
+          action: TestAction(),
           dueDate: null,
         ),
         dataStream: sc.stream,
@@ -61,10 +59,9 @@ void main() {
   testWidgets('rerenders when new reminder is received', (tester) async {
     final sc = StreamController<Reminder?>();
     final reminder = Reminder(
-      actionWithEvents: ActionWithEvents.single(
-        TestActionWithData(),
+      action: TestActionWithData().withEvent(
         DateTime.now(),
-        data: Data("initial-data"),
+        eventData: Data("initial-data"),
       ),
       dueDate: null,
     );
@@ -79,10 +76,10 @@ void main() {
     );
 
     final updatedReminder = Reminder(
-      actionWithEvents: reminder.actionWithEvents.copy().add(
-            DateTime.now(),
-            eventData: Data('updated-data'),
-          ),
+      action: reminder.action.withEvent(
+        DateTime.now(),
+        eventData: Data('updated-data'),
+      ),
       dueDate: reminder.dueDate,
     );
     sc.add(updatedReminder);
@@ -98,10 +95,9 @@ void main() {
       tester,
       UpdatingReminderListItem(
         initialData: Reminder(
-          actionWithEvents: ActionWithEvents.single(
-            TestActionWithData(),
+          action: TestActionWithData().withEvent(
             DateTime.now(),
-            data: Data("initial-data"),
+            eventData: Data("initial-data"),
           ),
           dueDate: null,
         ),

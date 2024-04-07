@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/predictor/time_of_day_aware_average_predictor.dart';
 
 import '../utils/test-action/test_action.dart';
@@ -22,8 +21,7 @@ void main() {
     //   the time between the last  two waterings is 8 days = 192 hours
     //   averaging these two intervals gives us (169 + 192) / 2 = 180.5
     //   so we want to return `lastEvent + 180.5 hours`
-    final actual =
-        sut.predictNext(ActionWithEvents.multiple(TestAction(), events));
+    final actual = sut.predictNext(TestAction().withEvents(events));
 
     expect(actual, equals(DateTime.parse('1963-12-16 12:00')));
   });

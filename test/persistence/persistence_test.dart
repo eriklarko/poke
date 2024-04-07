@@ -6,13 +6,11 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence_event.dart';
-import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/utils/key_factory.dart';
 import '../utils/clock.dart';
@@ -57,10 +55,7 @@ void main() {
         final ts = DateTime.parse('1963-11-26 01:02:03.456');
 
         // log action happened at `ts`
-        await persistenceImpl.logAction(
-          testAction,
-          ts,
-        );
+        await persistenceImpl.logAction(testAction, ts);
 
         // read all logged actions, aka events
         final events = await persistenceImpl.getAllEvents();
@@ -68,7 +63,7 @@ void main() {
         expect(
           events,
           equals([
-            ActionWithEvents<Null, TestAction>.single(testAction, ts),
+            testAction.withEvent(ts),
           ]),
         );
       });
@@ -93,10 +88,9 @@ void main() {
         expect(
           events.first,
           equals(
-            ActionWithEvents<Data, TestActionWithData>.single(
-              testAction,
+            testAction.withEvent(
               ts,
-              data: data,
+              eventData: data,
             ),
           ),
         );
@@ -114,8 +108,8 @@ void main() {
         await sut.logAction(a2, ts2);
 
         final expected = [
-          ActionWithEvents.single(a1, ts1),
-          ActionWithEvents.single(a2, ts2),
+          a1.withEvent(ts1),
+          a2.withEvent(ts2),
         ];
         expect(
           await sut.getAllEvents(),
@@ -134,7 +128,7 @@ void main() {
         expect(
           await sut.getAllEvents(),
           equals([
-            ActionWithEvents.single(a, ts),
+            a.withEvent(ts),
           ]),
         );
       });
@@ -160,8 +154,8 @@ void main() {
         await persistenceImpl.logAction(a1, ts3);
 
         final expected = [
-          ActionWithEvents.multiple(a1, {ts1: null, ts3: null}),
-          ActionWithEvents.single(a2, ts2),
+          a1.withEvents({ts1: null, ts3: null}),
+          a2.withEvent(ts2),
         ];
         expect(
           await persistenceImpl.getAllEvents(),
@@ -177,9 +171,7 @@ void main() {
 
         expect(
           await persistenceImpl.getAllEvents(),
-          equals([
-            ActionWithEvents(testAction),
-          ]),
+          equals([testAction]),
         );
       });
 
@@ -187,13 +179,13 @@ void main() {
         final persistenceImpl = persistenceConstructor();
 
         Action.registerSubclass(
-          serializationKey: UpdateTestAction.serializationKey,
-          type: UpdateTestAction,
-          actionFromJson: UpdateTestAction.fromJson,
+          serializationKey: TestAction.serializationKey,
+          actionFromJson: TestAction.fromJson,
+          newInstanceBuilder: (_, __) => Container(),
         );
 
         // create an action with some properties
-        final testAction = UpdateTestAction(
+        final testAction = TestAction(
           id: '1',
           props: {
             'propToUpdate': '1',
@@ -204,20 +196,20 @@ void main() {
         await persistenceImpl.createAction(testAction);
 
         // remove prop `propToRemove`, add prop `newProp: 4` and update the action
-        testAction.props.remove('b');
-        testAction.props['c'] = '3';
+        testAction.props!.remove('b');
+        testAction.props!['c'] = '3';
         await persistenceImpl.updateAction(
           testAction.equalityKey,
-          UpdateTestAction(id: testAction.id, props: {
+          TestAction(id: testAction.id, props: {
             'propToUpdate': '11', // update from '1' to '11'
             // remove propToRemove
-            'unchanged': testAction.props['unchanged']!, // keep unchanged
+            'unchanged': testAction.props!['unchanged']!, // keep unchanged
             'newProp': '4', // add new prop
           }),
         );
 
-        final awe = await persistenceImpl.getAction(testAction.equalityKey);
-        final actualAction = awe!.action as UpdateTestAction;
+        final actualAction = await persistenceImpl
+            .getAction(testAction.equalityKey) as TestAction;
         expect(
           actualAction.props,
           equals({
@@ -232,13 +224,13 @@ void main() {
         final persistenceImpl = persistenceConstructor();
 
         Action.registerSubclass(
-          serializationKey: UpdateTestAction.serializationKey,
-          type: UpdateTestAction,
-          actionFromJson: UpdateTestAction.fromJson,
+          serializationKey: TestAction.serializationKey,
+          actionFromJson: TestAction.fromJson,
+          newInstanceBuilder: (_, __) => Container(),
         );
 
         // create an action
-        final testAction = UpdateTestAction(
+        final testAction = TestAction(
           id: '1',
           props: {
             'propToUpdate': '1',
@@ -255,15 +247,15 @@ void main() {
         // update the action
         await persistenceImpl.updateAction(
           testAction.equalityKey,
-          UpdateTestAction(id: testAction.id, props: {
+          TestAction(id: testAction.id, props: {
             'propToUpdate': '11', // update from '1' to '11'
           }),
         );
 
         // and check that the events are still there
-        final awe = await persistenceImpl.getAction(testAction.equalityKey);
+        final action = await persistenceImpl.getAction(testAction.equalityKey);
         expect(
-          awe!.events,
+          action!.events,
           equals({
             dt1: null,
             dt2: null,
@@ -283,9 +275,7 @@ void main() {
 
         await persistenceImpl.deleteEvent(a, ts2);
 
-        final expected = [
-          ActionWithEvents.single(a, ts1),
-        ];
+        final expected = [TestAction(id: '1').withEvent(ts1)];
         expect(
           await persistenceImpl.getAllEvents(),
           equals(expected),
@@ -303,7 +293,7 @@ void main() {
 
         expect(
           await persistenceImpl.getAction(a1.equalityKey),
-          equals(ActionWithEvents(a1)),
+          equals(a1),
         );
       });
 
@@ -418,57 +408,5 @@ void main() {
         });
       });
     }); // end group
-  }
-}
-
-// Helper class used to test updating actions. It keeps its properties in a map
-// to make it easy to modify them on the fly
-class UpdateTestAction extends Action {
-  static const String serializationKey = 'update-test-action';
-  final Map<String, String> props;
-  final String id;
-
-  UpdateTestAction({
-    required this.props,
-    required this.id,
-  }) : super(serializationKey: serializationKey);
-
-  @override
-  Widget buildDetailsScreen(
-      BuildContext context, Map<DateTime, SerializableEventData?> events) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildLogActionWidget(BuildContext context,
-      (DateTime, SerializableEventData?)? lastEvent, Persistence persistence) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildReminderListItem(
-      BuildContext context, (DateTime, SerializableEventData?)? lastEvent) {
-    throw UnimplementedError();
-  }
-
-  @override
-  String get equalityKey => 'update-test-action-$id';
-
-  @override
-  Map<String, dynamic> subclassToJson() {
-    return {
-      'id': id,
-      'props': props,
-    };
-  }
-
-  factory UpdateTestAction.fromJson(Map<String, dynamic> json) {
-    final String id = json['id'];
-    final Map<String, String> props = Map<String, String>.from(json['props']);
-
-    return UpdateTestAction(
-      id: id,
-      props: props,
-    );
   }
 }

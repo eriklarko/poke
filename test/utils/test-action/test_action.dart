@@ -1,38 +1,42 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
-import 'package:poke/models/action.dart';
 
 part 'test_action.g.dart';
 
 void registerTestActions() {
   Action.registerSubclass(
     serializationKey: TestAction.serializationKey,
-    type: TestAction,
     actionFromJson: TestAction.fromJson,
-    eventDataFromJson: null,
+    newInstanceBuilder: (_, __) => Container(),
   );
 
   Action.registerSubclass(
     serializationKey: TestActionWithData.serializationKey,
-    type: TestActionWithData,
     actionFromJson: TestActionWithData.fromJson,
-    eventDataFromJson: Data.fromJson,
+    newInstanceBuilder: (_, __) => Container(),
   );
 }
 
-@JsonSerializable()
+// ignore: prefer_void_to_null
 class TestAction extends Action<Null> {
   static const String serializationKey = 'test-action';
 
   final String? id;
+  final Map<String, String>? props;
 
-  TestAction({this.id}) : super(serializationKey: serializationKey);
+  TestAction({this.id, this.props}) : super(serializationKey: serializationKey);
 
   @override
-  Widget buildLogActionWidget(BuildContext context, (DateTime, void)? lastEvent,
-      Persistence persistence) {
+  Widget buildLogActionWidget(
+    BuildContext context,
+    Persistence persistence,
+  ) {
     return _someWidget('log-action');
   }
 
@@ -51,22 +55,18 @@ class TestAction extends Action<Null> {
   }
 
   @override
-  Widget buildReminderListItem(
-      BuildContext context, (DateTime, Null)? lastEvent) {
+  Widget buildReminderListItem(BuildContext context) {
     return _someWidget('reminder-list-item');
   }
 
   @override
-  Widget buildDetailsScreen(
-    BuildContext context,
-    Map<DateTime, void> events,
-  ) {
+  Widget buildDetailsScreen(BuildContext context) {
     return _someWidget('details-screen');
   }
 
   @override
   String toString() {
-    return "test action - $id";
+    return "test action - $id - $props - $events";
   }
 
   @override
@@ -75,20 +75,26 @@ class TestAction extends Action<Null> {
       return false;
     }
 
-    if (id == null) {
-      return hashCode == other.hashCode;
-    } else {
-      return id == other.id;
-    }
+    final serializationKeyEq =
+        getSerializationKey() == other.getSerializationKey();
+    final idEq = id == null
+        // if id is null, check reference equality by calling `super.hashCode`
+        ? super.hashCode == other.hashCode
+        : id == other.id;
+    final propsEq = mapEquals(props, other.props);
+    final eventsEq = mapEquals(events, other.events);
+
+    return serializationKeyEq && idEq && propsEq && eventsEq;
   }
 
   @override
   int get hashCode {
-    if (id == null) {
-      return super.hashCode;
-    } else {
-      return id.hashCode;
-    }
+    var idHash = id == null ? super.hashCode : id.hashCode;
+
+    return getSerializationKey().hashCode +
+        idHash +
+        props.hashCode +
+        events.hashCode;
   }
 
   @override
@@ -96,11 +102,24 @@ class TestAction extends Action<Null> {
 
   @override
   Map<String, dynamic> subclassToJson() {
-    return _$TestActionToJson(this);
+    return {
+      "id": id,
+      if (props != null) "props": jsonEncode(props),
+    };
   }
 
   factory TestAction.fromJson(Map<String, dynamic> json) {
-    return _$TestActionFromJson(json);
+    return TestAction(
+      id: json["id"],
+      props: json["props"] == null
+          ? null
+          : Map<String, String>.from(jsonDecode(json["props"])),
+    );
+  }
+
+  @override
+  Null parseEventData(Map<String, dynamic> json) {
+    throw UnimplementedError();
   }
 }
 
@@ -125,53 +144,64 @@ class TestActionWithData extends Action<Data> {
   }
 
   @override
+  Data parseEventData(Map<String, dynamic> json) {
+    return _$DataFromJson(json);
+  }
+
+  @override
   bool operator ==(Object other) {
     if (other is! TestActionWithData) {
       return false;
     }
 
+    final eventsEq = mapEquals(events, other.events);
+
     if (id == null) {
-      return hashCode == other.hashCode;
+      return eventsEq && hashCode == other.hashCode;
     } else {
-      return id == other.id;
+      return eventsEq && id == other.id;
     }
   }
 
   @override
   int get hashCode {
-    if (id == null) {
-      return super.hashCode;
-    } else {
-      return id.hashCode;
-    }
+    int hash = id == null ? super.hashCode : id.hashCode;
+    hash += events.hashCode;
+
+    return hash;
   }
 
   @override
-  Widget buildLogActionWidget(BuildContext context, (DateTime, Data)? lastEvent,
-      Persistence persistence) {
+  Widget buildLogActionWidget(
+    BuildContext context,
+    Persistence persistence,
+  ) {
     throw UnimplementedError();
   }
 
   @override
-  Widget buildReminderListItem(
-      BuildContext context, (DateTime, Data)? lastEvent) {
+  Widget buildReminderListItem(BuildContext context) {
+    final lastEvent = getLastEvent();
     if (lastEvent == null) {
       return const Text("unknown");
     }
 
-    final Data d = lastEvent.$2;
+    final Data d = lastEvent.$2!;
     return Text(d.someProp);
   }
 
   @override
-  Widget buildDetailsScreen(
-    BuildContext context,
-    Map<DateTime, Data> events,
-  ) {
+  Widget buildDetailsScreen(BuildContext context) {
     throw UnimplementedError();
+  }
+
+  @override
+  String toString() {
+    return "$equalityKey - $id - $events";
   }
 }
 
+@JsonSerializable()
 class Data extends SerializableEventData {
   final String someProp;
 

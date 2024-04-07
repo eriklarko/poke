@@ -7,9 +7,9 @@ import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/persistence.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/screens/action_details_screen/action_details_screen.dart';
 import 'package:poke/utils/nav_service.dart';
 
@@ -58,7 +58,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: ExpandableFab(
         distance: 110,
         children: List.of(
-          Action.registeredActions().values.map((v) {
+          Action.registeredActions().map((v) {
             return ActionButton(
               key: Key('add-new-${v.serializationKey}'),
               icon: const Icon(Icons.new_label),
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void openLogActionDialog(context, reminder) {
+  void openLogActionDialog(BuildContext context, Reminder reminder) {
     showDialog(
       context: context,
       builder: (context) => PokeModal(
@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {
             NavService.instance.push(MaterialPageRoute(builder: (_) {
               return ActionDetailsScreen(
-                actionWithEvents: reminder.actionWithEvents,
+                action: reminder.action,
                 body: reminder.buildDetailsScreen(context),
               );
             }));

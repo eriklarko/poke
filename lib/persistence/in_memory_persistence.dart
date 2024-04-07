@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
-import 'package:poke/models/action.dart';
 
 class InMemoryPersistence implements Persistence {
   // naming stuff is serious okay
-  final Map<Action, ActionWithEvents> jiggers = {};
+  final Map<String, Action> jiggers = {};
 
   final Map<Uri, Uint8List> uploadedData = {};
 
@@ -17,19 +16,21 @@ class InMemoryPersistence implements Persistence {
       StreamController.broadcast();
 
   @override
-  Future<void> logAction<TEventData extends SerializableEventData?,
-          TAction extends Action<TEventData>>(TAction a, DateTime when,
-      {TEventData? eventData}) {
-    final Updating u = PersistenceEvent.updating(actionId: a.equalityKey);
+  Future<void> logAction<TEventData extends SerializableEventData?>(
+    Action<TEventData> action,
+    DateTime when, {
+    TEventData? eventData,
+  }) {
+    final Updating u = PersistenceEvent.updating(actionId: action.equalityKey);
     emitEvent(u);
 
     jiggers.update(
-      a,
-      (dts) => dts.add(when, eventData: eventData),
-      ifAbsent: () {
-        final awe = ActionWithEvents.single(a, when, data: eventData);
-        return awe;
-      },
+      action.equalityKey,
+      (a) => a.withEvent(when, eventData: eventData),
+      ifAbsent: () => action.withEvent(
+        when,
+        eventData: eventData,
+      ),
     );
     emitEvent(PersistenceEvent.finished(u));
 
@@ -37,21 +38,26 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
-  Future<ActionWithEvents?> getAction(String equalityKey) {
+  Future<Action?> getAction(String equalityKey) {
     // Search existing actions for the one with the provided equality key.
     // I'm not using findWhere here because it throws StateError when nothing is
     // found, and I want null
-    for (final awe in jiggers.values) {
-      if (awe.action.equalityKey == equalityKey) {
-        return Future.value(awe.copy());
+    for (final action in jiggers.values) {
+      if (action.equalityKey == equalityKey) {
+        return Future.value(_copy(action));
       }
     }
 
     return Future.value(null);
   }
 
+  Action<T> _copy<T extends SerializableEventData?>(Action<T> a) {
+    final j = a.toJson();
+    return Action.fromJson(j) as Action<T>;
+  }
+
   @override
-  Future<Iterable<ActionWithEvents>> getAllEvents() {
+  Future<Iterable<Action>> getAllEvents() {
     // Any caller could theoretically change the values in the objects returned
     // from this function; like add an event like
     //   final events = await persistence.getAllEvents();
@@ -59,7 +65,7 @@ class InMemoryPersistence implements Persistence {
     //
     // to enforce the use of `persistence.logAction(...)`, this usage is
     // prevented by copying the data in this method.
-    return Future.value(jiggers.values.map((awe) => awe.copy()));
+    return Future.value(jiggers.values.map((a) => _copy(a)));
   }
 
   @override
@@ -67,7 +73,7 @@ class InMemoryPersistence implements Persistence {
     final Updating u = PersistenceEvent.updating(actionId: action.equalityKey);
     emitEvent(u);
 
-    jiggers[action] = ActionWithEvents(action);
+    jiggers[action.equalityKey] = action;
 
     emitEvent(PersistenceEvent.finished(u));
 
@@ -87,8 +93,8 @@ class InMemoryPersistence implements Persistence {
       throw "unknown action $equalityKey";
     }
 
-    jiggers.remove(existingData.action);
-    jiggers[newData] = ActionWithEvents.multiple(newData, existingData.events);
+    jiggers.remove(existingData.equalityKey);
+    jiggers[newData.equalityKey] = newData.withEvents(existingData.events);
 
     emitEvent(PersistenceEvent.finished(u));
     return Future.value(null);
@@ -96,18 +102,20 @@ class InMemoryPersistence implements Persistence {
 
   @override
   Future<void> deleteEvent(
-      Action<SerializableEventData?> a, DateTime eventDate) {
-    if (!jiggers.containsKey(a)) {
+    Action<SerializableEventData?> a,
+    DateTime eventDate,
+  ) {
+    if (!jiggers.containsKey(a.equalityKey)) {
       throw "Could not find action $a";
     }
 
     final Updating u = PersistenceEvent.updating(actionId: a.equalityKey);
     emitEvent(u);
 
-    final events = jiggers[a]!.events;
+    final events = jiggers[a.equalityKey]!.events;
     events.remove(eventDate);
 
-    jiggers[a] = ActionWithEvents.multiple(a, events);
+    jiggers[a.equalityKey] = a.withEvents(events);
 
     emitEvent(PersistenceEvent.finished(u));
     return Future.value(null);

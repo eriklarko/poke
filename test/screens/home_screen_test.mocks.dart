@@ -4,15 +4,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
-import 'dart:typed_data' as _i8;
+import 'dart:typed_data' as _i7;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:poke/models/action.dart' as _i5;
-import 'package:poke/persistence/action_with_events.dart' as _i6;
 import 'package:poke/persistence/persistence.dart' as _i2;
-import 'package:poke/persistence/persistence_event.dart' as _i7;
+import 'package:poke/persistence/persistence_event.dart' as _i6;
 import 'package:poke/persistence/serializable_event_data.dart' as _i4;
-import 'package:poke/predictor/predictor.dart' as _i9;
+import 'package:poke/predictor/predictor.dart' as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -40,9 +39,8 @@ class _FakeUri_0 extends _i1.SmartFake implements Uri {
 /// See the documentation for Mockito's code generation for more information.
 class MockPersistence extends _i1.Mock implements _i2.Persistence {
   @override
-  _i3.Future<void> logAction<TEventData extends _i4.SerializableEventData?,
-          TAction extends _i5.Action<TEventData>>(
-    TAction? action,
+  _i3.Future<void> logAction<TEventData extends _i4.SerializableEventData?>(
+    _i5.Action<TEventData>? action,
     DateTime? when, {
     TEventData? eventData,
   }) =>
@@ -60,50 +58,33 @@ class MockPersistence extends _i1.Mock implements _i2.Persistence {
       ) as _i3.Future<void>);
 
   @override
-  _i3.Future<
-          _i6.ActionWithEvents<_i4.SerializableEventData?,
-              _i5.Action<_i4.SerializableEventData?>>?>
-      getAction(String? equalityKey) => (super.noSuchMethod(
-            Invocation.method(
-              #getAction,
-              [equalityKey],
-            ),
-            returnValue: _i3.Future<
-                _i6.ActionWithEvents<_i4.SerializableEventData?,
-                    _i5.Action<_i4.SerializableEventData?>>?>.value(),
-            returnValueForMissingStub: _i3.Future<
-                _i6.ActionWithEvents<_i4.SerializableEventData?,
-                    _i5.Action<_i4.SerializableEventData?>>?>.value(),
-          ) as _i3.Future<
-              _i6.ActionWithEvents<_i4.SerializableEventData?,
-                  _i5.Action<_i4.SerializableEventData?>>?>);
+  _i3.Future<_i5.Action<_i4.SerializableEventData?>?> getAction(
+          String? equalityKey) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getAction,
+          [equalityKey],
+        ),
+        returnValue:
+            _i3.Future<_i5.Action<_i4.SerializableEventData?>?>.value(),
+        returnValueForMissingStub:
+            _i3.Future<_i5.Action<_i4.SerializableEventData?>?>.value(),
+      ) as _i3.Future<_i5.Action<_i4.SerializableEventData?>?>);
 
   @override
-  _i3.Future<
-      Iterable<
-          _i6.ActionWithEvents<_i4.SerializableEventData?,
-              _i5.Action<_i4.SerializableEventData?>>>> getAllEvents() =>
+  _i3.Future<Iterable<_i5.Action<_i4.SerializableEventData?>>> getAllEvents() =>
       (super.noSuchMethod(
         Invocation.method(
           #getAllEvents,
           [],
         ),
-        returnValue: _i3.Future<
-            Iterable<
-                _i6.ActionWithEvents<_i4.SerializableEventData?,
-                    _i5.Action<_i4.SerializableEventData?>>>>.value(<_i6
-            .ActionWithEvents<_i4.SerializableEventData?,
-                _i5.Action<_i4.SerializableEventData?>>>[]),
-        returnValueForMissingStub: _i3.Future<
-            Iterable<
-                _i6.ActionWithEvents<_i4.SerializableEventData?,
-                    _i5.Action<_i4.SerializableEventData?>>>>.value(<_i6
-            .ActionWithEvents<_i4.SerializableEventData?,
-                _i5.Action<_i4.SerializableEventData?>>>[]),
-      ) as _i3.Future<
-          Iterable<
-              _i6.ActionWithEvents<_i4.SerializableEventData?,
-                  _i5.Action<_i4.SerializableEventData?>>>>);
+        returnValue:
+            _i3.Future<Iterable<_i5.Action<_i4.SerializableEventData?>>>.value(
+                <_i5.Action<_i4.SerializableEventData?>>[]),
+        returnValueForMissingStub:
+            _i3.Future<Iterable<_i5.Action<_i4.SerializableEventData?>>>.value(
+                <_i5.Action<_i4.SerializableEventData?>>[]),
+      ) as _i3.Future<Iterable<_i5.Action<_i4.SerializableEventData?>>>);
 
   @override
   _i3.Future<void> createAction(
@@ -152,19 +133,19 @@ class MockPersistence extends _i1.Mock implements _i2.Persistence {
       ) as _i3.Future<void>);
 
   @override
-  _i3.Stream<_i7.PersistenceEvent> getNotificationStream() =>
+  _i3.Stream<_i6.PersistenceEvent> getNotificationStream() =>
       (super.noSuchMethod(
         Invocation.method(
           #getNotificationStream,
           [],
         ),
-        returnValue: _i3.Stream<_i7.PersistenceEvent>.empty(),
-        returnValueForMissingStub: _i3.Stream<_i7.PersistenceEvent>.empty(),
-      ) as _i3.Stream<_i7.PersistenceEvent>);
+        returnValue: _i3.Stream<_i6.PersistenceEvent>.empty(),
+        returnValueForMissingStub: _i3.Stream<_i6.PersistenceEvent>.empty(),
+      ) as _i3.Stream<_i6.PersistenceEvent>);
 
   @override
   _i3.Future<Uri> uploadData(
-    _i8.Uint8List? bytes,
+    _i7.Uint8List? bytes,
     String? storageKey,
   ) =>
       (super.noSuchMethod(
@@ -198,30 +179,27 @@ class MockPersistence extends _i1.Mock implements _i2.Persistence {
       ) as _i3.Future<Uri>);
 
   @override
-  _i3.Future<_i8.Uint8List?> getUploadedData(String? storageKey) =>
+  _i3.Future<_i7.Uint8List?> getUploadedData(String? storageKey) =>
       (super.noSuchMethod(
         Invocation.method(
           #getUploadedData,
           [storageKey],
         ),
-        returnValue: _i3.Future<_i8.Uint8List?>.value(),
-        returnValueForMissingStub: _i3.Future<_i8.Uint8List?>.value(),
-      ) as _i3.Future<_i8.Uint8List?>);
+        returnValue: _i3.Future<_i7.Uint8List?>.value(),
+        returnValueForMissingStub: _i3.Future<_i7.Uint8List?>.value(),
+      ) as _i3.Future<_i7.Uint8List?>);
 }
 
 /// A class which mocks [Predictor].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPredictor extends _i1.Mock implements _i9.Predictor {
+class MockPredictor extends _i1.Mock implements _i8.Predictor {
   @override
-  DateTime? predictNext(
-          _i6.ActionWithEvents<_i4.SerializableEventData?,
-                  _i5.Action<_i4.SerializableEventData?>>?
-              actionWithEvents) =>
+  DateTime? predictNext(_i5.Action<_i4.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #predictNext,
-          [actionWithEvents],
+          [action],
         ),
         returnValueForMissingStub: null,
       ) as DateTime?);

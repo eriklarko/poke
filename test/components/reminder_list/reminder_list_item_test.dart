@@ -4,7 +4,6 @@ import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/persistence/action_with_events.dart';
 
 import '../../drag_directions.dart';
 import '../../mock_callback.dart';
@@ -16,7 +15,7 @@ void main() {
   testWidgets('renders reminder list item based on the action', (tester) async {
     final action = TestAction(id: '1');
     final reminder = Reminder(
-      actionWithEvents: ActionWithEvents(action),
+      action: action,
       dueDate: null,
     );
 
@@ -35,7 +34,7 @@ void main() {
     testWidgets('shows no icon when reminder is due in the future',
         (tester) async {
       final reminder = Reminder(
-        actionWithEvents: ActionWithEvents(TestAction(id: '1')),
+        action: TestAction(id: '1'),
         // set due date to tomorrow
         dueDate: DateTime.now().add(const Duration(days: 1)),
       );
@@ -53,7 +52,7 @@ void main() {
 
     testWidgets('shows icon when reminder is due', (tester) async {
       final reminder = Reminder(
-        actionWithEvents: ActionWithEvents(TestAction(id: '1')),
+        action: TestAction(id: '1'),
         // set due date to yesterday
         dueDate: DateTime.now().subtract(const Duration(days: 1)),
       );
@@ -72,7 +71,7 @@ void main() {
 
   testWidgets('forwards tap to onTap callback', (tester) async {
     final reminder = Reminder(
-      actionWithEvents: ActionWithEvents(TestAction(id: '1')),
+      action: TestAction(id: '1'),
       dueDate: null,
     );
     final onTap = MockSingleArgCallback<Reminder>();
@@ -92,7 +91,7 @@ void main() {
   testWidgets('renders swipe actions', (tester) async {
     final swipeActionCallback = MockSingleArgCallback();
     final reminder = Reminder(
-      actionWithEvents: ActionWithEvents(TestAction(id: '1')),
+      action: TestAction(id: '1'),
       dueDate: null,
     );
 

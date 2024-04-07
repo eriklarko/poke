@@ -7,11 +7,10 @@ import 'dart:async' as _i4;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:poke/components/reminder_list/reminder_service.dart' as _i3;
-import 'package:poke/models/action.dart' as _i7;
+import 'package:poke/models/action.dart' as _i5;
 import 'package:poke/models/reminder.dart' as _i2;
-import 'package:poke/persistence/action_with_events.dart' as _i5;
 import 'package:poke/persistence/serializable_event_data.dart' as _i6;
-import 'package:poke/predictor/predictor.dart' as _i8;
+import 'package:poke/predictor/predictor.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -50,10 +49,7 @@ class MockReminderService extends _i1.Mock implements _i3.ReminderService {
       ) as _i4.Future<List<_i2.Reminder>>);
 
   @override
-  _i2.Reminder buildReminder(
-          _i5.ActionWithEvents<_i6.SerializableEventData?,
-                  _i7.Action<_i6.SerializableEventData?>>?
-              action) =>
+  _i2.Reminder buildReminder(_i5.Action<_i6.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #buildReminder,
@@ -89,16 +85,13 @@ class MockReminderService extends _i1.Mock implements _i3.ReminderService {
 /// A class which mocks [Predictor].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPredictor extends _i1.Mock implements _i8.Predictor {
+class MockPredictor extends _i1.Mock implements _i7.Predictor {
   @override
-  DateTime? predictNext(
-          _i5.ActionWithEvents<_i6.SerializableEventData?,
-                  _i7.Action<_i6.SerializableEventData?>>?
-              actionWithEvents) =>
+  DateTime? predictNext(_i5.Action<_i6.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #predictNext,
-          [actionWithEvents],
+          [action],
         ),
         returnValueForMissingStub: null,
       ) as DateTime?);

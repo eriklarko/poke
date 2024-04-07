@@ -9,7 +9,6 @@ import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
-import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/predictor/predictor.dart';
@@ -26,7 +25,7 @@ MockReminderService reminderServiceMock(List<Reminder> reminders) {
   final mrf = MockReminderService();
 
   for (final reminder in reminders) {
-    when(mrf.buildReminder(reminder.actionWithEvents)).thenReturn(reminder);
+    when(mrf.buildReminder(reminder.action)).thenReturn(reminder);
   }
 
   when(mrf.buildReminders()).thenAnswer(
@@ -44,13 +43,15 @@ StreamController<ReminderUpdate> addStream(MockReminderService mrf) {
 
 @GenerateNiceMocks([MockSpec<ReminderService>(), MockSpec<Predictor>()])
 void main() {
+  registerTestActions();
+
   final reminder = Reminder(
-    actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-1')),
+    action: TestAction(id: 'test-action-1'),
     // set due date to tomorrow
     dueDate: DateTime.now().add(const Duration(days: 1)),
   );
   final expiredReminder = Reminder(
-    actionWithEvents: ActionWithEvents(TestAction(id: 'test-action-2')),
+    action: TestAction(id: 'test-action-2'),
     // set due date to yesterday
     dueDate: DateTime.now().subtract(const Duration(days: 1)),
   );
@@ -168,7 +169,7 @@ void main() {
     sc.add(ReminderUpdate(
       actionId: newAction.equalityKey,
       reminder: Reminder(
-        actionWithEvents: ActionWithEvents(newAction),
+        action: newAction,
         dueDate: DateTime.now(),
       ),
 
@@ -201,7 +202,7 @@ void main() {
 
     sc.add(ReminderUpdate(
       // this id must match at least one reminder in the reminder service
-      actionId: reminder.actionWithEvents.action.equalityKey,
+      actionId: reminder.action.equalityKey,
       reminder: null,
       type: UpdateType.removed,
     ));
@@ -209,7 +210,7 @@ void main() {
 
     expect(
       find.byKey(
-        Key(reminder.actionWithEvents.action.equalityKey),
+        Key(reminder.action.equalityKey),
       ),
       findsNothing,
     );
@@ -237,7 +238,7 @@ void main() {
     // being updated
     sc.add(
       ReminderUpdate(
-        actionId: reminder.actionWithEvents.action.equalityKey,
+        actionId: reminder.action.equalityKey,
         reminder: null,
         type: UpdateType.updating,
       ),

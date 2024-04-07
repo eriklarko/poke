@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:flutter/material.dart' hide Action;
+import 'package:poke/models/action.dart';
 import 'package:poke/predictor/average_predictor.dart';
 import 'package:poke/predictor/predictor.dart';
 
@@ -11,15 +11,14 @@ class TimeOfDayAwareAveragePredictor extends Predictor {
   final _averagePredictor = AveragePredictor();
 
   @override
-  DateTime? predictNext(ActionWithEvents actionWithEvents) {
-    final avgPrediction = _averagePredictor.predictNext(actionWithEvents);
+  DateTime? predictNext(Action action) {
+    final avgPrediction = _averagePredictor.predictNext(action);
     if (avgPrediction == null) {
       return null;
     }
 
     final predictedDate = DateUtils.dateOnly(avgPrediction);
-    final predictedTimeOfDay =
-        _findMostCommonTimeOfDay(actionWithEvents.events.keys);
+    final predictedTimeOfDay = _findMostCommonTimeOfDay(action.events.keys);
 
     return predictedDate.add(predictedTimeOfDay);
   }

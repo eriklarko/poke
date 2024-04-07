@@ -126,7 +126,7 @@ class _ReminderListState extends State<ReminderList> {
 
   void _removeReminder(String actionId) {
     _reminders.removeWhere(
-      (reminder) => reminder.actionWithEvents.action.equalityKey == actionId,
+      (reminder) => reminder.action.equalityKey == actionId,
     );
     setState(() {/* _reminders updated */});
   }
@@ -161,7 +161,7 @@ class _ReminderListState extends State<ReminderList> {
               itemBuilder: (context, position) {
                 final listItemStream = StreamController<Reminder?>();
                 final reminder = _reminders[position];
-                final actionId = reminder.actionWithEvents.action.equalityKey;
+                final actionId = reminder.action.equalityKey;
 
                 _listItemStreams[actionId] = listItemStream;
 

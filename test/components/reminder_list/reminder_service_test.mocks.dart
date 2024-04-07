@@ -4,8 +4,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:poke/models/action.dart' as _i5;
-import 'package:poke/persistence/action_with_events.dart' as _i3;
+import 'package:poke/models/action.dart' as _i3;
 import 'package:poke/persistence/serializable_event_data.dart' as _i4;
 import 'package:poke/predictor/predictor.dart' as _i2;
 
@@ -25,14 +24,11 @@ import 'package:poke/predictor/predictor.dart' as _i2;
 /// See the documentation for Mockito's code generation for more information.
 class MockPredictor extends _i1.Mock implements _i2.Predictor {
   @override
-  DateTime? predictNext(
-          _i3.ActionWithEvents<_i4.SerializableEventData?,
-                  _i5.Action<_i4.SerializableEventData?>>?
-              actionWithEvents) =>
+  DateTime? predictNext(_i3.Action<_i4.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #predictNext,
-          [actionWithEvents],
+          [action],
         ),
         returnValueForMissingStub: null,
       ) as DateTime?);

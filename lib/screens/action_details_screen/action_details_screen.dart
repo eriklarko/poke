@@ -1,14 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Action;
 import 'package:poke/design_system/poke_app_bar.dart';
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/screens/action_details_screen/event_history.dart';
 
 class ActionDetailsScreen extends StatelessWidget {
-  final ActionWithEvents actionWithEvents;
+  final Action action;
   final Widget body;
 
-  const ActionDetailsScreen(
-      {super.key, required this.body, required this.actionWithEvents});
+  const ActionDetailsScreen({
+    super.key,
+    required this.body,
+    required this.action,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class ActionDetailsScreen extends StatelessWidget {
           children: [
             body,
             Expanded(
-              child: EventHistory(actionWithEvents: actionWithEvents),
+              child: EventHistory(action: action),
             ),
           ],
         ));

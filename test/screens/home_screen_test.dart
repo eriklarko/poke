@@ -14,20 +14,25 @@ import 'home_screen_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Persistence>(), MockSpec<Predictor>()])
 void main() {
+  registerTestActions();
   setDependency<Predictor>(MockPredictor());
 
   testWidgets("tapping a reminder opens the log widget", (tester) async {
+    // create an action so that the reminder list will have one item
     final a = TestAction(id: 'some-action');
     final persistence = InMemoryPersistence();
     persistence.createAction(a);
     setPersistence(persistence);
 
+    // render the screen
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
     await tester.pumpAndSettle();
 
+    // tap the reminder
     await tester.tap(find.byKey(a.getKey('reminder-list-item')));
     await tester.pumpAndSettle();
 
+    // check that the log action widget is rendered
     expect(
       find.byKey(a.getKey('log-action')),
       findsOneWidget,
@@ -40,7 +45,6 @@ void main() {
     final newAction = TestAction(id: 'new-action');
     Action.registerSubclass(
       serializationKey: TestAction.serializationKey,
-      type: TestAction,
       actionFromJson: TestAction.fromJson,
       newInstanceBuilder: (context, persistence) {
         return PokeButton.primary(

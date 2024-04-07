@@ -1,34 +1,27 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 
 class Reminder {
-  final ActionWithEvents actionWithEvents;
+  final Action action;
   final DateTime? dueDate;
 
-  Reminder({required this.actionWithEvents, required this.dueDate});
+  Reminder({required this.action, required this.dueDate});
 
   Widget buildReminderListItem(BuildContext context) {
-    return actionWithEvents.action.buildReminderListItem(
-      context,
-      actionWithEvents.getLastEvent(),
-    );
+    return action.buildReminderListItem(context);
   }
 
   Widget buildLogActionWidget(BuildContext context, Persistence persistence) {
-    return actionWithEvents.action.buildLogActionWidget(
+    return action.buildLogActionWidget(
       context,
-      actionWithEvents.getLastEvent(),
       persistence,
     );
   }
 
   Widget buildDetailsScreen(BuildContext context) {
-    return actionWithEvents.action.buildDetailsScreen(
-      context,
-      actionWithEvents.events,
-    );
+    return action.buildDetailsScreen(context);
   }
 
   @override
@@ -37,18 +30,17 @@ class Reminder {
       return false;
     }
 
-    return other.actionWithEvents == actionWithEvents &&
-        other.dueDate == dueDate;
+    return other.action == action && other.dueDate == dueDate;
   }
 
   @override
   int get hashCode {
-    return actionWithEvents.hashCode + dueDate.hashCode;
+    return action.hashCode + dueDate.hashCode;
   }
 
   @override
   String toString() {
-    return "${actionWithEvents.action} due $dueDate";
+    return "$action due $dueDate";
   }
 
   bool isDue() {

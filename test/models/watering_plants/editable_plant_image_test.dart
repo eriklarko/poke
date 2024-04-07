@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/editable_plant_image.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
@@ -17,6 +18,8 @@ import 'editable_plant_image_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Plant>(), MockSpec<Persistence>()])
 void main() {
+  Action.registerSubclasses();
+
   // The EditablePlantImage widget fills its parent by default, so we need to
   // put it in a context with a known size
   final testApp = pumpInTestAppFactory(

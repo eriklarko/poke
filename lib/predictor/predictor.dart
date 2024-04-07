@@ -1,5 +1,5 @@
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 
 abstract class Predictor {
-  DateTime? predictNext(ActionWithEvents actionWithEvents);
+  DateTime? predictNext(Action action);
 }

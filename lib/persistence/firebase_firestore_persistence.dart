@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/screens/loading/poke_firebase.dart';
 
 class FirebaseFirestorePersistence implements Persistence {
@@ -38,27 +37,31 @@ class FirebaseFirestorePersistence implements Persistence {
     final updatingEvent = PersistenceEvent.updating(actionId: equalityKey);
     notificationStreamController.add(updatingEvent);
 
-    final actionsRef = getActionsCollection();
-    final actionRef = actionsRef.doc(equalityKey);
-
-    final existingData = await actionRef.get();
-    if (!existingData.exists) {
+    final existingData = await getAction(equalityKey);
+    if (existingData == null) {
       throw "No such action $equalityKey";
     }
+
+    final actionsRef = getActionsCollection();
+    final actionRef = actionsRef.doc(equalityKey);
 
     // for some reason I can't get
     //  await actionRef.set(newData.toJson(), SetOptions(mergeFields: ['events']));
     // to write the updated action data while keeping the events intact.
+    newData.events.addAll(existingData.events);
     await actionRef.update(newData.toJson());
 
     notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
   }
 
   @override
-  Future<void> logAction<TEventData extends SerializableEventData?,
-          TAction extends Action<TEventData>>(TAction a, DateTime when,
-      {TEventData? eventData}) async {
-    final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
+  Future<void> logAction<TEventData extends SerializableEventData?>(
+    Action<TEventData> action,
+    DateTime when, {
+    TEventData? eventData,
+  }) async {
+    final updatingEvent =
+        PersistenceEvent.updating(actionId: action.equalityKey);
     notificationStreamController.add(updatingEvent);
 
     /*
@@ -82,9 +85,9 @@ class FirebaseFirestorePersistence implements Persistence {
      */
 
     final actionsRef = getActionsCollection();
-    final actionRef = actionsRef.doc(a.equalityKey);
+    final actionRef = actionsRef.doc(action.equalityKey);
 
-    final actionJson = a.toJson();
+    final actionJson = action.toJson();
     actionJson['events'] = FieldValue.arrayUnion([
       {
         'when': when.toIso8601String(),
@@ -110,7 +113,7 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
-  Future<ActionWithEvents?> getAction(String equalityKey) async {
+  Future<Action?> getAction(String equalityKey) async {
     final docSnapshot = await getActionsCollection().doc(equalityKey).get();
     if (docSnapshot.data() == null) {
       return null;
@@ -118,69 +121,61 @@ class FirebaseFirestorePersistence implements Persistence {
     return parseAction(docSnapshot);
   }
 
-  ActionWithEvents parseAction(DocumentSnapshot<Object?> doc) {
+  Action parseAction(DocumentSnapshot<Object?> doc) {
     final actionJson = doc.data();
     if (actionJson is! Map) {
       throw "data at ${doc.reference.path} is malformed; expected Map<String, dynamic>, got ${actionJson.runtimeType}";
     }
 
-    final action = Action.fromJson(Map<String, dynamic>.from(actionJson));
-    final events = parseEvents(
-      actionJson['events'],
-      action.runtimeType,
-      doc.reference.path,
-    );
-
-    if (events == null) {
-      return ActionWithEvents(action);
-    } else {
-      return ActionWithEvents.multiple(action, events);
+    if (actionJson['events'] is List) {
+      actionJson['events'] = _firebaseMapToFlutterMap<String, dynamic>(
+        actionJson['events'],
+        "${doc.reference.path}/events",
+      );
     }
+
+    return Action.fromJson(Map<String, dynamic>.from(actionJson));
   }
 
-  Map<DateTime, SerializableEventData?>? parseEvents(
-    dynamic eventsJson,
-    Type actionType,
-
-    // used to tell the caller the path to the data if it is malformed in any way.
-    String refPath,
+  // Firebase maps are lists with map entries in them, so we need to convert
+  // them to flutter maps
+  //  [
+  //    {key: "some-key-1", value: "some-value-1"},
+  //    {key: "some-key-2", value: "some-value-2"},
+  //  ] => {
+  //    "some-key-1": "some-value-1",
+  //    "some-key-2": "some-value-2",
+  //  }
+  Map<TKey, TValue> _firebaseMapToFlutterMap<TKey, TValue>(
+    List<dynamic> firebaseMap,
+    // used to tell the user where malformed data is located in case of failure
+    String referencePath,
   ) {
-    if (eventsJson == null) {
-      // not all actions have events yet
-      return null;
-    }
-    if (eventsJson is! Iterable) {
-      throw "event data at $refPath is malformed; expected a list of {when: string, data: Object}, got ${eventsJson.runtimeType}";
-    }
-
-    final Map<DateTime, SerializableEventData?> events = {};
-    for (final eventMap in eventsJson) {
-      if (eventMap is! Map) {
-        throw "";
+    final m = <TKey, TValue>{};
+    for (final mapEntry in firebaseMap) {
+      if (mapEntry is! Map) {
+        throw "data at $referencePath is malformed; expected Map<String, dynamic>, got ${mapEntry.runtimeType}";
       }
 
-      if (!eventMap.containsKey('when')) {
-        throw "";
-      }
-
-      final when = DateTime.parse(eventMap['when']);
-      final SerializableEventData? eventData = Action.eventDataFromJson(
-        actionType: actionType,
-        json: eventMap['data'],
-      );
-
-      events[when] = eventData;
+      // `mapEntry` is a map with two keys, "when" and "data". These strings are
+      // set by the `logAction` function above.
+      // {
+      //    "when": "1963-11-26 01:02:03",
+      //    "data": "some-data",
+      // } =>
+      // m["1963-11-26 01:02:03"] = "some-data"
+      m[mapEntry["when"]] = mapEntry["data"];
     }
-    return events;
+    return m;
   }
 
   @override
-  Future<Iterable<ActionWithEvents>> getAllEvents() async {
-    final List<ActionWithEvents> l = [];
+  Future<Iterable<Action>> getAllEvents() async {
+    final List<Action> l = [];
     await getActionsCollection().get().then((value) {
       for (final doc in value.docs) {
-        final awe = parseAction(doc);
-        l.add(awe);
+        final a = parseAction(doc);
+        l.add(a);
       }
     });
 

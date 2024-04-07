@@ -1,10 +1,10 @@
-import 'package:poke/persistence/action_with_events.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/predictor/predictor.dart';
 
 class AveragePredictor extends Predictor {
   @override
-  DateTime? predictNext(ActionWithEvents actionWithEvents) {
-    final previousOccurrences = List.of(actionWithEvents.events.keys);
+  DateTime? predictNext(Action action) {
+    final previousOccurrences = List.of(action.events.keys);
     return _predictNext(previousOccurrences);
   }
 

@@ -3,7 +3,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/predictor/predictor.dart';
 
@@ -13,18 +12,20 @@ import 'reminder_service_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Predictor>()])
 void main() {
+  registerTestActions();
+
   test('builds reminders for all actions', () async {
-    final a1 = ActionWithEvents(TestAction(id: '1'));
-    final a2 = ActionWithEvents(TestAction(id: '2'));
-    final a3 = ActionWithEvents(TestAction(id: '3'));
+    final a1 = TestAction(id: '1');
+    final a2 = TestAction(id: '2');
+    final a3 = TestAction(id: '3');
     final dd1 = DateTime.parse('1963-11-23');
     final dd2 = DateTime.parse('1989-12-06');
     final dd3 = DateTime.parse('2005-03-26');
 
     final persistence = InMemoryPersistence();
-    persistence.createAction(a1.action);
-    persistence.createAction(a2.action);
-    persistence.createAction(a3.action);
+    persistence.createAction(a1);
+    persistence.createAction(a2);
+    persistence.createAction(a3);
     setPersistence(persistence);
 
     final predictor = MockPredictor();
@@ -37,19 +38,19 @@ void main() {
     expect(
       await sut.buildReminders(),
       equals([
-        Reminder(actionWithEvents: a1, dueDate: dd1),
-        Reminder(actionWithEvents: a2, dueDate: dd2),
-        Reminder(actionWithEvents: a3, dueDate: dd3),
+        Reminder(action: a1, dueDate: dd1),
+        Reminder(action: a2, dueDate: dd2),
+        Reminder(action: a3, dueDate: dd3),
       ]),
     );
   });
 
   test('builds reminder for single action', () async {
-    final a = ActionWithEvents(TestAction(id: '1'));
+    final a = TestAction(id: '1');
     final dd = DateTime.parse('1963-11-23');
 
     final persistence = InMemoryPersistence();
-    persistence.createAction(a.action);
+    persistence.createAction(a);
     setPersistence(persistence);
 
     final predictor = MockPredictor();
@@ -60,7 +61,7 @@ void main() {
     expect(
       sut.buildReminder(a),
       equals(
-        Reminder(actionWithEvents: a, dueDate: dd),
+        Reminder(action: a, dueDate: dd),
       ),
     );
   });

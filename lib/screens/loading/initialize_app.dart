@@ -3,11 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/logger/firebase_logger.dart';
-import 'package:poke/models/action.dart';
-import 'package:poke/models/watering_plants/plant.dart';
-import 'package:poke/models/watering_plants/water_plant.dart';
 
 import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -109,14 +107,4 @@ void registerFirebaseAuthListener(PokeFirebase firebase, NavigatorState nav) {
       ));
     }
   });
-}
-
-Future _addTestEvents(Persistence persistence) async {
-  await persistence.logAction(
-    WaterPlantAction(
-      plant: Plant(id: 'frank', name: 'Frank'),
-    ),
-    DateTime.now(),
-    eventData: WaterEventData(addedFertilizer: false),
-  );
 }

@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/persistence/action_with_events.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/predictor/predictor.dart';
@@ -16,9 +16,9 @@ class ReminderService {
     return List.of(groupedByAction.map(buildReminder));
   }
 
-  Reminder buildReminder(ActionWithEvents action) {
+  Reminder buildReminder(Action action) {
     return Reminder(
-      actionWithEvents: action,
+      action: action,
       dueDate: _predictor.predictNext(action),
     );
   }

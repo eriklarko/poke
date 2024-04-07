@@ -13,6 +13,7 @@ WaterPlantAction _$WaterPlantActionFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$WaterPlantActionToJson(WaterPlantAction instance) =>
     <String, dynamic>{
+      'events': Action.eventsToJson(instance.events),
       'plant': instance.plant.toJson(),
     };
 

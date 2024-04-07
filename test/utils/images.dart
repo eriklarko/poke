@@ -1,13 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-@GenerateNiceMocks([MockSpec<BuildContext>()])
 class Images {
   /// File Info
   /// • Resolution: 24×24
@@ -41,30 +35,4 @@ class Images {
       "i",
     );
   }
-
-  // taken from https://github.com/Baseflow/flutter_cached_network_image/issues/714#issuecomment-1072493110
-  static Future<Uint8List?> getBytes(
-    ImageProvider image, {
-    BuildContext? context,
-    ImageByteFormat format = ImageByteFormat.rawRgba,
-  }) async {
-    final imageStream = image.resolve(createLocalImageConfiguration(
-      context ?? MockBuildContext(),
-    ));
-    final Completer<Uint8List?> completer = Completer<Uint8List?>();
-    final ImageStreamListener listener = ImageStreamListener(
-      (imageInfo, synchronousCall) async {
-        final bytes = await imageInfo.image.toByteData(format: format);
-        if (!completer.isCompleted) {
-          completer.complete(bytes?.buffer.asUint8List());
-        }
-      },
-    );
-    imageStream.addListener(listener);
-    final imageBytes = await completer.future;
-    imageStream.removeListener(listener);
-    return imageBytes;
-  }
 }
-
-class MockBuildContext extends Mock implements BuildContext {}

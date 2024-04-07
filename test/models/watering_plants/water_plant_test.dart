@@ -20,6 +20,7 @@ void main() {
           'name': 'plant-1',
           'imageUri': 'https://placekitten.com/200/200',
         },
+        'events': {},
       }),
     );
   });

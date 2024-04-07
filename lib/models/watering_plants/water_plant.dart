@@ -6,12 +6,12 @@ import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/editable_plant_image.dart';
 import 'package:poke/models/watering_plants/plant_image.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/logger/poke_logger.dart';
-import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/new_instance_widget.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/utils/date_formatter.dart';
@@ -32,8 +32,12 @@ class WaterPlantAction extends Action<WaterEventData> {
       : super(serializationKey: serializationKey);
 
   @override
-  Widget buildReminderListItem(
-      BuildContext context, (DateTime, WaterEventData)? lastEvent) {
+  String get equalityKey => "water-${plant.id}";
+
+  // TODO: Add when it's time to water again
+  @override
+  Widget buildReminderListItem(BuildContext context) {
+    final lastEvent = getLastEvent();
     return Row(
       children: [
         PlantImage.fill(image: plant.image),
@@ -49,7 +53,7 @@ class WaterPlantAction extends Action<WaterEventData> {
                 children: [
                   PokeFinePrint(_buildLastWateredString(lastEvent?.$1)),
                   PokeFinePrint(
-                    lastEvent?.$2.addedFertilizer == true
+                    lastEvent?.$2!.addedFertilizer == true
                         ? 'included fertilizer'
                         : '',
                   ),
@@ -76,9 +80,9 @@ class WaterPlantAction extends Action<WaterEventData> {
   @override
   buildLogActionWidget(
     BuildContext context,
-    (DateTime, WaterEventData)? lastEvent,
     Persistence persistence,
   ) {
+    final lastEvent = getLastEvent();
     final fertilizerCheckbox = PokeCheckbox();
 
     return Column(
@@ -111,7 +115,8 @@ class WaterPlantAction extends Action<WaterEventData> {
                 this,
                 DateTime.now(),
                 eventData: WaterEventData(
-                    addedFertilizer: fertilizerCheckbox.isChecked),
+                  addedFertilizer: fertilizerCheckbox.isChecked,
+                ),
               )
                   .then((_) {
                 _logActionController.setSuccessful();
@@ -145,10 +150,7 @@ class WaterPlantAction extends Action<WaterEventData> {
   }
 
   @override
-  Widget buildDetailsScreen(
-    BuildContext context,
-    Map<DateTime, SerializableEventData?> events,
-  ) {
+  Widget buildDetailsScreen(BuildContext context) {
     return Column(
       children: [
         PokeText("${plant.name} details"),
@@ -157,9 +159,13 @@ class WaterPlantAction extends Action<WaterEventData> {
     );
   }
 
+  factory WaterPlantAction.fromJson(Map<String, dynamic> json) {
+    return _$WaterPlantActionFromJson(json);
+  }
+
   @override
-  String toString() {
-    return "water ${plant.name}";
+  WaterEventData parseEventData(Map<String, dynamic> json) {
+    return WaterEventData.fromJson(json);
   }
 
   @override
@@ -167,12 +173,10 @@ class WaterPlantAction extends Action<WaterEventData> {
     return _$WaterPlantActionToJson(this);
   }
 
-  factory WaterPlantAction.fromJson(Map<String, dynamic> json) {
-    return _$WaterPlantActionFromJson(json);
-  }
-
   @override
-  String get equalityKey => "water-${plant.id}";
+  String toString() {
+    return "water ${plant.name}";
+  }
 
   @override
   bool operator ==(Object other) {
