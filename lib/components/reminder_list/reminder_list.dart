@@ -71,7 +71,7 @@ class _ReminderListState extends State<ReminderList> {
 
     try {
       final newReminders = await widget.reminderService.buildReminders();
-      // TODO: Sort showing plant watered longest ago first
+      newReminders.sort(compareReminders);
 
       if (!mounted) {
         // because of the await above we might have moved into a time where the
@@ -95,6 +95,26 @@ class _ReminderListState extends State<ReminderList> {
         _controller.setErrored(e.toString());
       }
     }
+  }
+
+  int compareReminders(Reminder a, Reminder b) {
+    if (a.dueDate == null) {
+      if (b.dueDate == null) {
+        // if both dates are null, sort according to some other reasonable prop
+        return a.action.equalityKey.compareTo(b.action.equalityKey);
+      }
+
+      // if `a` has no due date, but `b` does; show `b` first
+      return 1;
+    }
+
+    if (b.dueDate == null) {
+      // here we know that `a` has a due date, but `b` doesn't. Show `a` first
+      return -1;
+    }
+
+    // both reminders have due dates, show the oldest due date first
+    return a.dueDate!.compareTo(b.dueDate!);
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {

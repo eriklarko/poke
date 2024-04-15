@@ -290,4 +290,64 @@ void main() {
     // check that this second data is shown
     expect(find.text("second-data"), findsOneWidget);
   });
+
+  testWidgets("renders most due reminders first", (tester) async {
+    // create some reminders, each with different due dates
+    final mostDueReminder = Reminder(
+      action: TestAction(id: 'test-action-1'),
+      // ten days ago
+      dueDate: DateTime.now().subtract(const Duration(days: 10)),
+    );
+    final secondMostDueReminder = Reminder(
+      action: TestAction(id: 'test-action-2'),
+      // five days ago
+      dueDate: DateTime.now().subtract(const Duration(days: 5)),
+    );
+    final leastDueReminder = Reminder(
+      action: TestAction(id: 'test-action-3'),
+      // in ten days
+      dueDate: DateTime.now().add(const Duration(days: 10)),
+    );
+    final reminderWithNoDueDate = Reminder(
+      action: TestAction(id: 'test-action-4'),
+      dueDate: null,
+    );
+
+    // render them
+    await pumpInTestApp(
+      tester,
+      ReminderList(
+        reminderService: reminderServiceMock([
+          // to increase confidence that the test is working as expected, don't
+          // add the reminders in the expected order
+          secondMostDueReminder,
+          reminderWithNoDueDate,
+          leastDueReminder,
+          mostDueReminder,
+        ]),
+        onReminderTapped: ignoreCallback,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // check that they're shown in increasing due date order
+    final renderedRemindersInOrder = tester
+        .widgetList<ReminderListItem>(
+          find.byType(ReminderListItem),
+        )
+        .toList()
+        .map((listItem) => listItem.reminder);
+
+    expect(
+      renderedRemindersInOrder,
+      equals(
+        [
+          mostDueReminder,
+          secondMostDueReminder,
+          leastDueReminder,
+          reminderWithNoDueDate,
+        ],
+      ),
+    );
+  });
 }
