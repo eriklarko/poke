@@ -54,7 +54,7 @@ class Plant {
     if (_imageUri == null) {
       _cachedImage = defaultImage;
     } else {
-      _cachedImage = PokeNetworkImage(
+      _cachedImage = PokeNetworkImage.read(
         _imageUri.toString(),
         debugInfo: {'plant': this},
       );

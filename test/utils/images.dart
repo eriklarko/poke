@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 
 class Images {
@@ -26,12 +27,17 @@ class Images {
   Images._();
 
   static String getNetworkImageSource(Image i) {
-    if (i.image is NetworkImage) {
-      return (i.image as NetworkImage).url;
+    final image = i.image;
+
+    if (image is NetworkImage) {
+      return image.url;
+    }
+    if (image is CachedNetworkImageProvider) {
+      return image.url;
     }
 
     throw ArgumentError(
-      "Unsupported image, passed to getNetworkImageSource. Only NetworkImage is supported, got ${i.image.runtimeType}",
+      "Unsupported image, passed to getNetworkImageSource. Only NetworkImage is supported, got ${image.runtimeType}",
       "i",
     );
   }

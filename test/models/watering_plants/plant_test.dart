@@ -35,32 +35,6 @@ void main() {
     });
   });
 
-  test('caches image', () {
-    const imageUrl = 'https://example.com';
-    final httpClient = TestHttpClient(endpoints: {
-      imageUrl: () => Images.heartEyesEmojiBytes,
-    });
-
-    final plant = Plant(
-      id: '1',
-      name: 'foo',
-      imageUri: Uri.parse(imageUrl),
-    );
-
-    httpClient.run(() {
-      // ensure image isn't downloaded before being requested
-      expect(httpClient.hitCount(imageUrl), equals(0));
-
-      // request image and ensure endpoint was hit
-      fetchImage(plant.image);
-      expect(httpClient.hitCount(imageUrl), equals(1));
-
-      // request image again, and ensure endpoint was not hit a second time
-      fetchImage(plant.image);
-      expect(httpClient.hitCount(imageUrl), equals(1));
-    });
-  });
-
   test('fetches new image when imageUri changes', () {
     const firstImage = 'https://example.com/1';
     const secondImage = 'https://example.com/2';

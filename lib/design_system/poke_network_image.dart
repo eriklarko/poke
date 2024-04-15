@@ -1,58 +1,72 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/logger/poke_logger.dart';
 
-class PokeNetworkImage extends Image {
-  PokeNetworkImage(
+class PokeNetworkImage {
+  static Image read(
     String src, {
-    super.key,
-    Color? color,
+    Key? key,
+    Color? loadingIndicatorColor,
     Map<String, dynamic>? debugInfo,
-  }) : super.network(
-          src,
-          loadingBuilder: (
-            BuildContext context,
-            Widget child,
-            ImageChunkEvent? loadingProgress,
-          ) {
-            if (loadingProgress == null) return child;
+  }) {
+    return Image(
+      image: CachedNetworkImageProvider(src),
+      loadingBuilder: _loadingBuilder(loadingIndicatorColor),
+      errorBuilder: _errorBuilder(src, debugInfo),
+    );
+  }
 
-            double? progress;
-            // if expectedTotalBytes is null we can't know how much progress we've
-            // made, and will display a forever-looping loading indicator by passing
-            // `value: null` to PokeLoadingIndicator
-            if (loadingProgress.expectedTotalBytes != null) {
-              progress = loadingProgress.cumulativeBytesLoaded /
-                  loadingProgress.expectedTotalBytes!;
-            }
+  static ImageLoadingBuilder _loadingBuilder(Color? loadingIndicatorColor) {
+    return (
+      BuildContext context,
+      Widget child,
+      ImageChunkEvent? loadingProgress,
+    ) {
+      if (loadingProgress == null) return child;
 
-            return Center(
-              child: PokeLoadingIndicator.small(
-                value: progress,
-                color: color,
-              ),
-            );
-          },
-          errorBuilder: (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
-            final logData = {
-              'error': error,
-              'stackTrace': stackTrace,
-              'imageUri': src,
-            };
-            if (debugInfo != null) {
-              logData.addAll(debugInfo);
-            }
+      double? progress;
+      // if expectedTotalBytes is null we can't know how much progress we've
+      // made, and will display a forever-looping loading indicator by passing
+      // `value: null` to PokeLoadingIndicator
+      if (loadingProgress.expectedTotalBytes != null) {
+        progress = loadingProgress.cumulativeBytesLoaded /
+            loadingProgress.expectedTotalBytes!;
+      }
 
-            PokeLogger.instance().warn(
-              "Unable to load plant image",
-              data: logData,
-            );
+      return Center(
+        child: PokeLoadingIndicator.small(
+          value: progress,
+          color: loadingIndicatorColor,
+        ),
+      );
+    };
+  }
 
-            return const Icon(Icons.broken_image);
-          },
-        );
+  static ImageErrorWidgetBuilder _errorBuilder(
+    String src,
+    Map<String, dynamic>? debugInfo,
+  ) {
+    return (
+      BuildContext context,
+      Object error,
+      StackTrace? stackTrace,
+    ) {
+      final logData = {
+        'error': error,
+        'stackTrace': stackTrace,
+        'imageUri': src,
+      };
+      if (debugInfo != null) {
+        logData.addAll(debugInfo);
+      }
+
+      PokeLogger.instance().warn(
+        "Unable to load plant image",
+        data: logData,
+      );
+
+      return const Icon(Icons.broken_image);
+    };
+  }
 }
