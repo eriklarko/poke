@@ -22,7 +22,8 @@ class SettingsScreen extends StatelessWidget {
                 PokeText('Hello anonymous')
               else
                 PokeText(
-                    'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}'),
+                  'Hello ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown'}',
+                ),
               if (isAnonymous)
                 PokeAsyncButton.once(
                   text: 'Make permanent',

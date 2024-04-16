@@ -37,7 +37,7 @@ class Plant {
   final String name;
 
   Uri? _imageUri;
-  // TODO: True with ImageProvider instead; this is so that `fit: cover` can be moved to the caller
+  // TODO: Try with ImageProvider instead; this is so that `fit: cover` can be moved to the caller
   Image? _cachedImage;
 
   Plant({
