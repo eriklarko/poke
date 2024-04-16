@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 
@@ -55,7 +56,7 @@ class TestAction extends Action<Null> {
   }
 
   @override
-  Widget buildReminderListItem(BuildContext context) {
+  Widget buildReminderListItem(BuildContext context, Reminder reminder) {
     return _someWidget('reminder-list-item');
   }
 
@@ -180,7 +181,7 @@ class TestActionWithData extends Action<Data> {
   }
 
   @override
-  Widget buildReminderListItem(BuildContext context) {
+  Widget buildReminderListItem(BuildContext context, Reminder reminder) {
     final lastEvent = getLastEvent();
     if (lastEvent == null) {
       return const Text("unknown");

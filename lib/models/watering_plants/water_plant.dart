@@ -7,6 +7,7 @@ import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/editable_plant_image.dart';
 import 'package:poke/models/watering_plants/plant_image.dart';
 import 'package:poke/persistence/persistence.dart';
@@ -34,31 +35,30 @@ class WaterPlantAction extends Action<WaterEventData> {
   @override
   String get equalityKey => "water-${plant.id}";
 
-  // TODO: Add when it's time to water again
   @override
-  Widget buildReminderListItem(BuildContext context) {
+  Widget buildReminderListItem(BuildContext context, Reminder reminder) {
     final lastEvent = getLastEvent();
     return Row(
       children: [
         PlantImage.fill(image: plant.image),
-        PokeConstants.FixedSpacer(),
+        PokeConstants.FixedSpacer(2),
         Expanded(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PokeText(
-                plant.name,
-                center: true,
-              ),
+              PokeText(plant.name),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   PokeFinePrint(
                     key: ValueKey('last-watered-${plant.id}'),
                     _buildLastWateredString(lastEvent?.$1),
                   ),
+                  if (lastEvent?.$2!.addedFertilizer == true)
+                    const PokeFinePrint('included fertilizer'),
                   PokeFinePrint(
-                    lastEvent?.$2!.addedFertilizer == true
-                        ? 'included fertilizer'
-                        : '',
+                    key: ValueKey('due-${plant.id}'),
+                    _buildDueString(reminder),
                   ),
                 ],
               ),
@@ -78,6 +78,18 @@ class WaterPlantAction extends Action<WaterEventData> {
     String dayS = daysSince == 1 ? "day" : "days";
 
     return 'Last watered $daysSince $dayS ago';
+  }
+
+  String _buildDueString(Reminder r) {
+    final dueDate = r.dueDate;
+    if (dueDate == null) {
+      return '';
+    }
+
+    int daysUntil = dueDate.difference(clock.now()).inDays;
+    String dayS = daysUntil == 1 ? "day" : "days";
+
+    return "Will poke in $daysUntil $dayS";
   }
 
   @override
@@ -112,11 +124,10 @@ class WaterPlantAction extends Action<WaterEventData> {
                 data: {'fertCheckboxChecked': fertilizerCheckbox.isChecked},
               );
 
-              // TODO: replace DateTime.now() with something testable
               persistence
                   .logAction(
                 this,
-                DateTime.now(),
+                clock.now(),
                 eventData: WaterEventData(
                   addedFertilizer: fertilizerCheckbox.isChecked,
                 ),

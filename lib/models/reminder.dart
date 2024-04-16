@@ -10,7 +10,7 @@ class Reminder {
   Reminder({required this.action, required this.dueDate});
 
   Widget buildReminderListItem(BuildContext context) {
-    return action.buildReminderListItem(context);
+    return action.buildReminderListItem(context, this);
   }
 
   Widget buildLogActionWidget(BuildContext context, Persistence persistence) {

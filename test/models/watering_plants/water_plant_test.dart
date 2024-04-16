@@ -1,6 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
@@ -25,7 +26,10 @@ void main() {
       // TODO: mock build context
       await pumpInTestApp(
         tester,
-        sut.buildReminderListItem(MockBuildContext()),
+        sut.buildReminderListItem(
+          MockBuildContext(),
+          Reminder(action: sut, dueDate: DateTime.now()),
+        ),
       );
 
       expect(find.text(sut.plant.name), findsOneWidget);
@@ -50,7 +54,10 @@ void main() {
         // TODO: mock build context
         await pumpInTestApp(
           tester,
-          sut.buildReminderListItem(MockBuildContext()),
+          sut.buildReminderListItem(
+            MockBuildContext(),
+            Reminder(action: sut, dueDate: DateTime.now()),
+          ),
         );
 
         final textFinder =
@@ -59,6 +66,39 @@ void main() {
 
         expect(text.data, contains("10 days ago"));
       });
+    });
+
+    testWidgets("shows when to water next", (tester) async {
+      final WaterPlantAction sut = WaterPlantAction(
+        plant: arbitraryPlant,
+      );
+
+      final dueDate = DateTime.parse('1963-11-23');
+
+      final tenDaysBeforeDue = Clock.fixed(
+        dueDate.subtract(const Duration(days: 10)),
+      );
+      await withClock(tenDaysBeforeDue, () async {
+        // TODO: mock build context
+        await pumpInTestApp(
+          tester,
+          sut.buildReminderListItem(
+            MockBuildContext(),
+            Reminder(action: sut, dueDate: dueDate),
+          ),
+        );
+
+        final textFinder = find.byKey(ValueKey("due-${arbitraryPlant.id}"));
+        final Text text = tester.firstWidget(textFinder);
+
+        expect(text.data, contains("in 10 days"));
+      });
+    });
+  });
+
+  group("log action widget", () {
+    testWidgets("...", (tester) async {
+      // TODO: write tests
     });
   });
 
