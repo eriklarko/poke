@@ -51,7 +51,10 @@ class WaterPlantAction extends Action<WaterEventData> {
               ),
               Column(
                 children: [
-                  PokeFinePrint(_buildLastWateredString(lastEvent?.$1)),
+                  PokeFinePrint(
+                    key: ValueKey('last-watered-${plant.id}'),
+                    _buildLastWateredString(lastEvent?.$1),
+                  ),
                   PokeFinePrint(
                     lastEvent?.$2!.addedFertilizer == true
                         ? 'included fertilizer'
