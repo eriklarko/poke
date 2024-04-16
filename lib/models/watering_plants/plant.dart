@@ -37,6 +37,7 @@ class Plant {
   final String name;
 
   Uri? _imageUri;
+  // TODO: True with ImageProvider instead; this is so that `fit: cover` can be moved to the caller
   Image? _cachedImage;
 
   Plant({
@@ -57,6 +58,7 @@ class Plant {
       _cachedImage = PokeNetworkImage.read(
         _imageUri.toString(),
         debugInfo: {'plant': this},
+        fit: BoxFit.cover,
       );
     }
     return _cachedImage!;

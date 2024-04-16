@@ -8,12 +8,14 @@ class PokeNetworkImage {
     String src, {
     Key? key,
     Color? loadingIndicatorColor,
+    BoxFit? fit,
     Map<String, dynamic>? debugInfo,
   }) {
     return Image(
       image: CachedNetworkImageProvider(src),
       loadingBuilder: _loadingBuilder(loadingIndicatorColor),
       errorBuilder: _errorBuilder(src, debugInfo),
+      fit: fit,
     );
   }
 
