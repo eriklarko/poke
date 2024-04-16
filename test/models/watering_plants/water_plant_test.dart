@@ -1,6 +1,8 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/design_system/poke_time_ago.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
@@ -60,10 +62,11 @@ void main() {
           ),
         );
 
-        final textFinder =
-            find.byKey(ValueKey("last-watered-${arbitraryPlant.id}"));
+        final textFinder = find.descendant(
+          of: find.byKey(ValueKey("last-watered-${arbitraryPlant.id}")),
+          matching: find.byType(PokeText),
+        );
         final Text text = tester.firstWidget(textFinder);
-
         expect(text.data, contains("10 days ago"));
       });
     });
@@ -88,10 +91,13 @@ void main() {
           ),
         );
 
-        final textFinder = find.byKey(ValueKey("due-${arbitraryPlant.id}"));
+        final textFinder = find.descendant(
+          of: find.byKey(ValueKey("due-${arbitraryPlant.id}")),
+          matching: find.byType(PokeText),
+        );
         final Text text = tester.firstWidget(textFinder);
 
-        expect(text.data, contains("in 10 days"));
+        expect(text.data, contains("10 days from now"));
       });
     });
   });

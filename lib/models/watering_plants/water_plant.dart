@@ -6,6 +6,7 @@ import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_checkbox.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/design_system/poke_time_ago.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/editable_plant_image.dart';
@@ -50,16 +51,22 @@ class WaterPlantAction extends Action<WaterEventData> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PokeFinePrint(
-                    key: ValueKey('last-watered-${plant.id}'),
-                    _buildLastWateredString(lastEvent?.$1),
-                  ),
+                  if (lastEvent != null)
+                    PokeTimeAgo(
+                      key: ValueKey('last-watered-${plant.id}'),
+                      date: lastEvent.$1,
+                      format: (timeAgo) => "Last watered $timeAgo",
+                    ),
                   if (lastEvent?.$2!.addedFertilizer == true)
                     const PokeFinePrint('included fertilizer'),
-                  PokeFinePrint(
-                    key: ValueKey('due-${plant.id}'),
-                    _buildDueString(reminder),
-                  ),
+                  if (reminder.dueDate != null)
+                    PokeTimeAgo(
+                      key: ValueKey('due-${plant.id}'),
+                      date: reminder.dueDate!,
+                      format: (timeAgo) => reminder.isDue()
+                          ? "Due $timeAgo"
+                          : "Will poke $timeAgo",
+                    ),
                 ],
               ),
             ],
@@ -67,29 +74,6 @@ class WaterPlantAction extends Action<WaterEventData> {
         ),
       ],
     );
-  }
-
-  String _buildLastWateredString(DateTime? lastEvent) {
-    if (lastEvent == null) {
-      return '';
-    }
-
-    int daysSince = clock.now().difference(lastEvent).inDays;
-    String dayS = daysSince == 1 ? "day" : "days";
-
-    return 'Last watered $daysSince $dayS ago';
-  }
-
-  String _buildDueString(Reminder r) {
-    final dueDate = r.dueDate;
-    if (dueDate == null) {
-      return '';
-    }
-
-    int daysUntil = dueDate.difference(clock.now()).inDays;
-    String dayS = daysUntil == 1 ? "day" : "days";
-
-    return "Will poke in $daysUntil $dayS";
   }
 
   @override
