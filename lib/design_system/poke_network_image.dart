@@ -4,22 +4,28 @@ import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/logger/poke_logger.dart';
 
 class PokeNetworkImage {
-  static Image read(
-    String src, {
+  static ImageProvider getImageProvider(String src) {
+    return CachedNetworkImageProvider(src);
+  }
+
+  static Image build({
+    required ImageProvider image,
     Key? key,
     Color? loadingIndicatorColor,
     BoxFit? fit,
     Map<String, dynamic>? debugInfo,
   }) {
     return Image(
-      image: CachedNetworkImageProvider(src),
-      loadingBuilder: _loadingBuilder(loadingIndicatorColor),
-      errorBuilder: _errorBuilder(src, debugInfo),
+      image: image,
+      loadingBuilder: _loadingBuilder(
+        loadingIndicatorColor: loadingIndicatorColor,
+      ),
+      errorBuilder: _errorBuilder(debugInfo: debugInfo),
       fit: fit,
     );
   }
 
-  static ImageLoadingBuilder _loadingBuilder(Color? loadingIndicatorColor) {
+  static ImageLoadingBuilder _loadingBuilder({Color? loadingIndicatorColor}) {
     return (
       BuildContext context,
       Widget child,
@@ -45,10 +51,9 @@ class PokeNetworkImage {
     };
   }
 
-  static ImageErrorWidgetBuilder _errorBuilder(
-    String src,
+  static ImageErrorWidgetBuilder _errorBuilder({
     Map<String, dynamic>? debugInfo,
-  ) {
+  }) {
     return (
       BuildContext context,
       Object error,
@@ -57,7 +62,6 @@ class PokeNetworkImage {
       final logData = {
         'error': error,
         'stackTrace': stackTrace,
-        'imageUri': src,
       };
       if (debugInfo != null) {
         logData.addAll(debugInfo);

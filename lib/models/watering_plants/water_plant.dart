@@ -41,7 +41,7 @@ class WaterPlantAction extends Action<WaterEventData> {
     final lastEvent = getLastEvent();
     return Row(
       children: [
-        PlantImage.fill(image: plant.image),
+        PlantImage.fill(plant.image),
         PokeConstants.FixedSpacer(2),
         Expanded(
           child: Column(
@@ -152,7 +152,7 @@ class WaterPlantAction extends Action<WaterEventData> {
     return Column(
       children: [
         PokeText("${plant.name} details"),
-        plant.image,
+        PlantImage.large(plant.image),
       ],
     );
   }

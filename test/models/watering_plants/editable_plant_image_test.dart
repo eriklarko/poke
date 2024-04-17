@@ -32,7 +32,7 @@ void main() {
   testWidgets('shows the image', (tester) async {
     final action = WaterPlantAction(plant: MockPlant());
 
-    final Image img = Image.memory(Images.heartEyesEmojiBytes);
+    final ImageProvider img = MemoryImage(Images.heartEyesEmojiBytes);
     when(action.plant.image).thenReturn(img);
 
     await testApp(
@@ -42,7 +42,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.image(img.image), findsOneWidget);
+    expect(find.image(img), findsOneWidget);
   });
 
   testWidgets('updates the plant image uri', (tester) async {
@@ -94,7 +94,7 @@ void main() {
     await w.updateImage(Images.heartEyesEmojiBytes);
 
     expect(
-      (plant.image.image as MemoryImage).bytes,
+      (plant.image as MemoryImage).bytes,
       equals(Images.heartEyesEmojiBytes),
     );
   });

@@ -26,9 +26,7 @@ class Images {
 
   Images._();
 
-  static String getNetworkImageSource(Image i) {
-    final image = i.image;
-
+  static String getNetworkImageSource(ImageProvider? image) {
     if (image is NetworkImage) {
       return image.url;
     }

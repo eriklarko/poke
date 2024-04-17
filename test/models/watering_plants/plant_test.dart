@@ -8,16 +8,6 @@ import '../../utils/test_http_client/test_http_client.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('returns default image when imageUri is null', () {
-    final plant = Plant(
-      id: '1',
-      name: 'foo',
-      imageUri: null,
-    );
-
-    expect(plant.image, equals(Plant.defaultImage));
-  });
-
   test('returns image when imageUri is set', () {
     const imageUrl = 'https://example.com/foo.png';
     final httpClient = TestHttpClient(endpoints: {
@@ -31,7 +21,7 @@ void main() {
     );
 
     httpClient.run(() {
-      expect(Images.getNetworkImageSource((plant.image)), equals(imageUrl));
+      expect(Images.getNetworkImageSource(plant.image), equals(imageUrl));
     });
   });
 
@@ -65,6 +55,6 @@ void main() {
   });
 }
 
-void fetchImage(Image i) {
-  i.image.resolve(ImageConfiguration.empty);
+void fetchImage(ImageProvider? i) {
+  i?.resolve(ImageConfiguration.empty);
 }

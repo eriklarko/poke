@@ -6,10 +6,10 @@
 import 'dart:async' as _i5;
 import 'dart:typed_data' as _i9;
 
-import 'package:flutter/material.dart' as _i2;
+import 'package:flutter/material.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:poke/models/action.dart' as _i7;
-import 'package:poke/models/watering_plants/plant.dart' as _i3;
+import 'package:poke/models/watering_plants/plant.dart' as _i2;
 import 'package:poke/persistence/persistence.dart' as _i4;
 import 'package:poke/persistence/persistence_event.dart' as _i8;
 import 'package:poke/persistence/serializable_event_data.dart' as _i6;
@@ -25,22 +25,8 @@ import 'package:poke/persistence/serializable_event_data.dart' as _i6;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeImage_0 extends _i1.SmartFake implements _i2.Image {
-  _FakeImage_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-
-  @override
-  String toString({_i2.DiagnosticLevel? minLevel = _i2.DiagnosticLevel.info}) =>
-      super.toString();
-}
-
-class _FakeUri_1 extends _i1.SmartFake implements Uri {
-  _FakeUri_1(
+class _FakeUri_0 extends _i1.SmartFake implements Uri {
+  _FakeUri_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -52,7 +38,7 @@ class _FakeUri_1 extends _i1.SmartFake implements Uri {
 /// A class which mocks [Plant].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPlant extends _i1.Mock implements _i3.Plant {
+class MockPlant extends _i1.Mock implements _i2.Plant {
   @override
   String get id => (super.noSuchMethod(
         Invocation.getter(#id),
@@ -68,19 +54,6 @@ class MockPlant extends _i1.Mock implements _i3.Plant {
       ) as String);
 
   @override
-  _i2.Image get image => (super.noSuchMethod(
-        Invocation.getter(#image),
-        returnValue: _FakeImage_0(
-          this,
-          Invocation.getter(#image),
-        ),
-        returnValueForMissingStub: _FakeImage_0(
-          this,
-          Invocation.getter(#image),
-        ),
-      ) as _i2.Image);
-
-  @override
   set imageUri(Uri? u) => super.noSuchMethod(
         Invocation.setter(
           #imageUri,
@@ -90,7 +63,7 @@ class MockPlant extends _i1.Mock implements _i3.Plant {
       );
 
   @override
-  set image(_i2.Image? i) => super.noSuchMethod(
+  set image(_i3.ImageProvider<Object>? i) => super.noSuchMethod(
         Invocation.setter(
           #image,
           i,
@@ -231,7 +204,7 @@ class MockPersistence extends _i1.Mock implements _i4.Persistence {
             storageKey,
           ],
         ),
-        returnValue: _i5.Future<Uri>.value(_FakeUri_1(
+        returnValue: _i5.Future<Uri>.value(_FakeUri_0(
           this,
           Invocation.method(
             #uploadData,
@@ -241,7 +214,7 @@ class MockPersistence extends _i1.Mock implements _i4.Persistence {
             ],
           ),
         )),
-        returnValueForMissingStub: _i5.Future<Uri>.value(_FakeUri_1(
+        returnValueForMissingStub: _i5.Future<Uri>.value(_FakeUri_0(
           this,
           Invocation.method(
             #uploadData,

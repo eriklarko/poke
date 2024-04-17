@@ -20,7 +20,7 @@ class EditablePlantImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlantImage.large(
-      image: action.plant.image,
+      action.plant.image,
       onNewImage: updateImage,
     );
   }
@@ -43,6 +43,6 @@ class EditablePlantImage extends StatelessWidget {
     );
 
     // update the image in memory
-    action.plant.image = Image.memory(imgBytes);
+    action.plant.image = MemoryImage(imgBytes);
   }
 }

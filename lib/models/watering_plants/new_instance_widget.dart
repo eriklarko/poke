@@ -36,6 +36,7 @@ class NewInstanceWidgetState extends State<NewInstanceWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         PlantImage.large(
+          null,
           onNewImage: uploadImage,
         ),
         Row(

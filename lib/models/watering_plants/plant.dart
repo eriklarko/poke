@@ -28,17 +28,11 @@ String newPlantImageStorageKey({
 
 @JsonSerializable()
 class Plant {
-  static final Image defaultImage = Image.asset(
-    'assets/cat.jpeg',
-    fit: BoxFit.cover,
-  );
-
   final String id;
   final String name;
 
   Uri? _imageUri;
-  // TODO: Try with ImageProvider instead; this is so that `fit: cover` can be moved to the caller
-  Image? _cachedImage;
+  ImageProvider? _cachedImage;
 
   Plant({
     required this.id,
@@ -47,21 +41,17 @@ class Plant {
   }) : _imageUri = imageUri;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
-  Image get image {
+  ImageProvider? get image {
     if (_cachedImage != null) {
       return _cachedImage!;
     }
 
-    if (_imageUri == null) {
-      _cachedImage = defaultImage;
-    } else {
-      _cachedImage = PokeNetworkImage.read(
+    if (_imageUri != null) {
+      _cachedImage = PokeNetworkImage.getImageProvider(
         _imageUri.toString(),
-        debugInfo: {'plant': this},
-        fit: BoxFit.cover,
       );
     }
-    return _cachedImage!;
+    return _cachedImage;
   }
 
   Uri? get imageUri => _imageUri;
@@ -74,7 +64,7 @@ class Plant {
   // action is updated. Use `set imageUri` instead for that
   //
   // this setter is only useful to change the image optimistically, in memory
-  set image(Image i) {
+  set image(ImageProvider? i) {
     _cachedImage = i;
   }
 
