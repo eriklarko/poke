@@ -1,19 +1,21 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 
-import '../../screens/loading/initialize_app_test.dart';
 import '../../test_app.dart';
+import 'water_plant_test.mocks.dart';
 
 final arbitraryPlant = Plant(
   id: '1337',
   name: 'some random plant',
 );
 
+@GenerateNiceMocks([MockSpec<BuildContext>()])
 void main() {
   group("reminder list item", () {
     testWidgets('shows plant name', (tester) async {
@@ -24,7 +26,6 @@ void main() {
         ),
       );
 
-      // TODO: mock build context
       await pumpInTestApp(
         tester,
         sut.buildReminderListItem(
@@ -52,7 +53,6 @@ void main() {
         eventDate.add(const Duration(days: 10)),
       );
       await withClock(tenDaysFromEvent, () async {
-        // TODO: mock build context
         await pumpInTestApp(
           tester,
           sut.buildReminderListItem(
@@ -81,7 +81,6 @@ void main() {
         dueDate.subtract(const Duration(days: 10)),
       );
       await withClock(tenDaysBeforeDue, () async {
-        // TODO: mock build context
         await pumpInTestApp(
           tester,
           sut.buildReminderListItem(
