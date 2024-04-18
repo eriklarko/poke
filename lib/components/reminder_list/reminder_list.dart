@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:poke/components/reminder_list/reminder_service.dart';
+import 'package:poke/components/updating_widget/stream_updating_widget.dart';
 import 'package:poke/design_system/async_widget/poke_async_widget.dart';
 import 'package:poke/design_system/async_widget/state.dart';
 import 'package:poke/design_system/poke_button.dart';
@@ -12,7 +13,7 @@ import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/reminder.dart';
 
-import 'updating_reminder_list_item.dart';
+import 'reminder_list_item.dart';
 
 /// Renders a list of reminders :)
 class ReminderList extends StatefulWidget {
@@ -189,11 +190,14 @@ class _ReminderListState extends State<ReminderList> {
                   padding: EdgeInsets.only(bottom: PokeConstants.space()),
                   child: SizedBox(
                     height: PokeConstants.space(15),
-                    child: UpdatingReminderListItem(
+                    child: StreamUpdatingWidget<Reminder>(
                       initialData: reminder,
                       dataStream: listItemStream.stream,
-                      onTap: widget.onReminderTapped,
-                      swipeActions: widget.swipeActions,
+                      buildChild: (context, data) => ReminderListItem(
+                        reminder: data,
+                        onTap: widget.onReminderTapped,
+                        swipeActions: widget.swipeActions,
+                      ),
                     ),
                   ),
                 );
