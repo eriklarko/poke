@@ -12,6 +12,8 @@ import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 
+import 'icon_button_with_triangular_background.dart';
+
 // Should be called before calling any `image_picker` APIs
 // see https://pub.dev/packages/image_picker_android#photo-picker
 void enableAndroidPhotoPicker() {
@@ -106,8 +108,16 @@ class _PhotoPickerState extends State<PhotoPicker> {
             child: _image!,
           ),
         ),
+        Container(
+          alignment: Alignment.topRight,
+          child: IconButtonWithTriangularBackground(
+            icon: Icons.edit,
+            size: 20,
+            color: Colors.amber,
+            onPressed: _togglePickerButtons,
+          ),
+        ),
         if (_showPickerButtons) _buildPickerButtons()
-        // TODO: Show a pen icon in one for the corners to give affordance that it can be changed?
       ],
     );
   }

@@ -30,6 +30,7 @@ class EventHistory extends StatelessWidget {
                 data: {"event": entry},
               );
 
+              // TODO: Add confirmation!!!!!
               GetIt.instance.get<Persistence>().deleteEvent(action, date);
             })
           ],
