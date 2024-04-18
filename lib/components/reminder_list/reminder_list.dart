@@ -137,6 +137,17 @@ class _ReminderListState extends State<ReminderList> {
       return;
     }
 
+    // also update the reminder in memory in case the list builder is rerendered
+    if (update.reminder != null) {
+      // find the index in `_reminders` where the action is
+      final i = _reminders.indexWhere((reminder) {
+        return reminder.action.equalityKey ==
+            update.reminder!.action.equalityKey;
+      });
+      // and replace the reminder
+      _reminders[i] = update.reminder!;
+    }
+
     listItemStream.add(update.reminder);
   }
 
