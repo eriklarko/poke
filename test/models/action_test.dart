@@ -56,13 +56,29 @@ void main() {
       });
 
       expect(
-          sut.getLastEvent(),
-          equals(
-            (
-              DateTime.parse('1963-11-28 01:02:03'),
-              Data('third'),
-            ),
-          ));
+        sut.getLastEvent(),
+        equals(
+          (
+            DateTime.parse('1963-11-28 01:02:03'),
+            Data('third'),
+          ),
+        ),
+      );
+    });
+
+    test('remove event', () {
+      final dtToRemove = DateTime.parse('1963-11-27 01:02:03');
+      final sut = TestActionWithData(id: "1").withEvents({
+        DateTime.parse('1963-11-26 01:02:03'): Data('some-value'),
+        dtToRemove: Data('some-other-value'),
+      });
+
+      sut.removeEvent(dtToRemove);
+
+      expect(
+        sut.events,
+        equals({DateTime.parse('1963-11-26 01:02:03'): Data('some-value')}),
+      );
     });
   });
 
@@ -120,6 +136,21 @@ void main() {
         equals(
           (DateTime.parse('1963-11-28 01:02:03'), null),
         ),
+      );
+    });
+
+    test('remove event', () {
+      final dtToRemove = DateTime.parse('1963-11-27 01:02:03');
+      final sut = TestAction(id: "1").withEvents({
+        DateTime.parse('1963-11-26 01:02:03'): null,
+        dtToRemove: null,
+      });
+
+      sut.removeEvent(dtToRemove);
+
+      expect(
+        sut.events,
+        equals({DateTime.parse('1963-11-26 01:02:03'): null}),
       );
     });
   });

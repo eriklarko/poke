@@ -187,10 +187,9 @@ class FirebaseFirestorePersistence implements Persistence {
     final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
     notificationStreamController.add(updatingEvent);
 
+    // get all events as a list
     final actionRef = getActionsCollection().doc(a.equalityKey);
     final actionSnap = await actionRef.get();
-
-    // get all events as a list
     final List events = actionSnap.get('events');
 
     // with the list of events, find the one we want to remove

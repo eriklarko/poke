@@ -30,6 +30,25 @@ class PokeButton extends StatelessWidget {
     );
   }
 
+  factory PokeButton.small({
+    Key? key,
+    required Function()? onPressed,
+    required String text,
+  }) {
+    return PokeButton._(
+      buildChild: (_) => TextButton(
+        key: key,
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.amber,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.all(PokeConstants.space()),
+        ),
+        child: PokeText(text),
+      ),
+    );
+  }
+
   factory PokeButton.icon(
     IconData icon, {
     Key? key,

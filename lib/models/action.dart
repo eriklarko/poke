@@ -92,6 +92,10 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     return (eventTimestamps.first, lastEventData);
   }
 
+  void removeEvent(DateTime eventTime) {
+    events.remove(eventTime);
+  }
+
   //////////////////////////////////////////////////////////////
   /////////////////// WIDGET BUILDERS //////////////////////////
 
