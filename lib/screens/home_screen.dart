@@ -92,7 +92,14 @@ class HomeScreen extends StatelessWidget {
             }));
           },
         ),
-        child: reminder.buildLogActionWidget(context, persistence),
+        child: reminder.buildLogActionWidget(
+          context,
+          persistence,
+          onActionLogged: () {
+            // close the modal
+            Navigator.of(context).pop();
+          },
+        ),
       ),
     );
   }

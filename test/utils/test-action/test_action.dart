@@ -36,8 +36,9 @@ class TestAction extends Action<Null> {
   @override
   Widget buildLogActionWidget(
     BuildContext context,
-    Persistence persistence,
-  ) {
+    Persistence persistence, {
+    Function()? onActionLogged,
+  }) {
     return _someWidget('log-action');
   }
 
@@ -175,8 +176,9 @@ class TestActionWithData extends Action<Data> {
   @override
   Widget buildLogActionWidget(
     BuildContext context,
-    Persistence persistence,
-  ) {
+    Persistence persistence, {
+    Function()? onActionLogged,
+  }) {
     throw UnimplementedError();
   }
 

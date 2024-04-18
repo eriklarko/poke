@@ -79,8 +79,9 @@ class WaterPlantAction extends Action<WaterEventData> {
   @override
   buildLogActionWidget(
     BuildContext context,
-    Persistence persistence,
-  ) {
+    Persistence persistence, {
+    Function()? onActionLogged,
+  }) {
     final lastEvent = getLastEvent();
     final fertilizerCheckbox = PokeCheckbox();
 
@@ -100,6 +101,7 @@ class WaterPlantAction extends Action<WaterEventData> {
         PokeAsyncWidget.simple(
           controller: _logActionController,
           idle: PokeButton.primary(
+            text: 'Watered!',
             onPressed: () {
               _logActionController.setLoading();
 
@@ -118,11 +120,11 @@ class WaterPlantAction extends Action<WaterEventData> {
               )
                   .then((_) {
                 _logActionController.setSuccessful();
+                onActionLogged?.call();
               }).catchError((err) {
                 _logActionController.setErrored(err);
               });
             },
-            text: 'Watered!',
           ),
           success: const Text('done!'),
           loading: const SizedBox(

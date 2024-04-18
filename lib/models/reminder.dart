@@ -13,10 +13,15 @@ class Reminder {
     return action.buildReminderListItem(context, this);
   }
 
-  Widget buildLogActionWidget(BuildContext context, Persistence persistence) {
+  Widget buildLogActionWidget(
+    BuildContext context,
+    Persistence persistence, {
+    Function()? onActionLogged,
+  }) {
     return action.buildLogActionWidget(
       context,
       persistence,
+      onActionLogged: onActionLogged,
     );
   }
 

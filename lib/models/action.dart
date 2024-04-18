@@ -102,8 +102,9 @@ abstract class Action<EventDataType extends SerializableEventData?> {
   // this action. An event in Poke is when an action was performed.
   Widget buildLogActionWidget(
     BuildContext context,
-    Persistence persistence,
-  );
+    Persistence persistence, {
+    Function()? onActionLogged,
+  });
 
   Widget buildDetailsScreen(BuildContext context);
   /////////////////// WIDGET BUILDERS //////////////////////////
