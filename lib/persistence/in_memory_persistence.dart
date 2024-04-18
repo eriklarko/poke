@@ -57,7 +57,7 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
-  Future<Iterable<Action>> getAllEvents() {
+  Future<Iterable<Action>> getAllActions() {
     // Any caller could theoretically change the values in the objects returned
     // from this function; like add an event like
     //   final events = await persistence.getAllEvents();

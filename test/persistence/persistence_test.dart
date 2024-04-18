@@ -58,7 +58,7 @@ void main() {
         await persistenceImpl.logAction(testAction, ts);
 
         // read all logged actions, aka events
-        final events = await persistenceImpl.getAllEvents();
+        final events = await persistenceImpl.getAllActions();
 
         expect(
           events,
@@ -83,7 +83,7 @@ void main() {
         );
 
         // read all logged actions, aka events
-        final events = await persistenceImpl.getAllEvents();
+        final events = await persistenceImpl.getAllActions();
 
         expect(
           events.first,
@@ -112,7 +112,7 @@ void main() {
           a2.withEvent(ts2),
         ];
         expect(
-          await sut.getAllEvents(),
+          await sut.getAllActions(),
           equals(expected),
         );
       });
@@ -126,7 +126,7 @@ void main() {
         await sut.logAction(a, ts);
 
         expect(
-          await sut.getAllEvents(),
+          await sut.getAllActions(),
           equals([
             a.withEvent(ts),
           ]),
@@ -158,7 +158,7 @@ void main() {
           a2.withEvent(ts2),
         ];
         expect(
-          await persistenceImpl.getAllEvents(),
+          await persistenceImpl.getAllActions(),
           equals(expected),
         );
       });
@@ -170,7 +170,7 @@ void main() {
         await persistenceImpl.createAction(testAction);
 
         expect(
-          await persistenceImpl.getAllEvents(),
+          await persistenceImpl.getAllActions(),
           equals([testAction]),
         );
       });
@@ -277,7 +277,7 @@ void main() {
 
         final expected = [TestAction(id: '1').withEvent(ts1)];
         expect(
-          await persistenceImpl.getAllEvents(),
+          await persistenceImpl.getAllActions(),
           equals(expected),
         );
       });

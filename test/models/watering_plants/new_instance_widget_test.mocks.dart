@@ -84,19 +84,19 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
       ) as _i4.Future<_i6.Action<_i5.SerializableEventData?>?>);
 
   @override
-  _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>> getAllEvents() =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getAllEvents,
-          [],
-        ),
-        returnValue:
-            _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
+  _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>
+      getAllActions() => (super.noSuchMethod(
+            Invocation.method(
+              #getAllActions,
+              [],
+            ),
+            returnValue: _i4
+                .Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
                 <_i6.Action<_i5.SerializableEventData?>>[]),
-        returnValueForMissingStub:
-            _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
+            returnValueForMissingStub: _i4
+                .Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
                 <_i6.Action<_i5.SerializableEventData?>>[]),
-      ) as _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>);
+          ) as _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>);
 
   @override
   _i4.Future<void> createAction(

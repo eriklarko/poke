@@ -170,7 +170,7 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
-  Future<Iterable<Action>> getAllEvents() async {
+  Future<Iterable<Action>> getAllActions() async {
     final List<Action> l = [];
     await getActionsCollection().get().then((value) {
       for (final doc in value.docs) {

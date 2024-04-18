@@ -12,8 +12,8 @@ class ReminderService {
   Stream<ReminderUpdate>? _stream;
 
   Future<List<Reminder>> buildReminders() async {
-    final groupedByAction = await _persistence.getAllEvents();
-    return List.of(groupedByAction.map(buildReminder));
+    final actions = await _persistence.getAllActions();
+    return List.of(actions.map(buildReminder));
   }
 
   Reminder buildReminder(Action action) {

@@ -13,8 +13,7 @@ abstract class Persistence {
 
   Future<Action?> getAction(String equalityKey);
 
-  // TODO: rename getAllActions
-  Future<Iterable<Action>> getAllEvents();
+  Future<Iterable<Action>> getAllActions();
 
   Future<void> createAction(Action action);
 
