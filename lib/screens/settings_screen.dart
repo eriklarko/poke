@@ -6,7 +6,9 @@ import 'package:poke/design_system/poke_async_button.dart';
 import 'package:poke/design_system/poke_text.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final _googleSignIn = GoogleSignIn();
+
+  SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,17 @@ class SettingsScreen extends StatelessWidget {
                 // same google account is used next time the user taps "Log in
                 // with Google". Need to clear something so that an account can
                 // be chosen again
-                onPressed: FirebaseAuth.instance.signOut,
+                onPressed: () async {
+                  // Without `GoogleSignIn().disconnect()` the user won't be
+                  // prompted to select google account when logging in again.
+                  final googleCurrentUser =
+                      _googleSignIn.currentUser ?? await _googleSignIn.signIn();
+                  if (googleCurrentUser != null) {
+                    await _googleSignIn.disconnect();
+                  }
+
+                  FirebaseAuth.instance.signOut();
+                },
               )
             ],
           ),
@@ -43,9 +55,8 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<UserCredential> linkWithGoogle() async {
-    final googleSignIn = GoogleSignIn();
     try {
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication? googleAuth =
@@ -64,7 +75,7 @@ class SettingsScreen extends StatelessWidget {
       // indefinitely unless we call `GoogleSignIn.disconnect`. If anything goes
       // wrong we better disconnect and allow the user to try with another google
       // account
-      googleSignIn.disconnect();
+      _googleSignIn.disconnect();
     }
 
     // TODO: handle errors!

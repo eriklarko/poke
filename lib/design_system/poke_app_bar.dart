@@ -15,7 +15,7 @@ class PokeAppBar extends AppBar {
 
           actions: [
             IconButton(
-                onPressed: () => NavService.push(const SettingsScreen()),
+                onPressed: () => NavService.push(SettingsScreen()),
                 icon: const Icon(Icons.settings)),
           ],
         );
