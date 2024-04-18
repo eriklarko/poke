@@ -3,6 +3,7 @@ import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/screens/action_details_screen/event_history.dart';
 
+// TODO: Add delete functionality
 class ActionDetailsScreen extends StatelessWidget {
   final Action action;
   final Widget body;
