@@ -79,7 +79,7 @@ void main() async {
     expectPickerButtonsHidden();
 
     // tap to show buttons
-    await tester.tap(find.byType(PokeTappable));
+    await tester.tap(find.byType(PhotoPicker));
     await tester.pumpAndSettle();
     expectPickerButtonsShown();
 
@@ -114,7 +114,7 @@ void main() async {
     );
 
     // bring up picker buttons
-    await tester.tap(find.byType(PokeTappable));
+    await tester.tap(find.byType(PhotoPicker));
     await tester.pumpAndSettle();
     // select new image
     await tester.tap(find.byIcon(Icons.camera));
@@ -147,7 +147,7 @@ void main() async {
     );
 
     // bring up picker buttons
-    await tester.tap(find.byType(PokeTappable));
+    await tester.tap(find.byType(PhotoPicker));
     await tester.pumpAndSettle();
     // select new image
     await tester.tap(find.byIcon(Icons.camera));
