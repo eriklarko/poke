@@ -65,7 +65,8 @@ class InMemoryPersistence implements Persistence {
     //
     // to enforce the use of `persistence.logAction(...)`, this usage is
     // prevented by copying the data in this method.
-    return Future.value(jiggers.values.map((a) => _copy(a)));
+    final copies = jiggers.values.map((a) => _copy(a));
+    return Future.value(copies);
   }
 
   @override
@@ -81,9 +82,9 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
-  Future<void> updateAction(
+  Future<T> updateAction<T extends Action>(
     String equalityKey,
-    Action<SerializableEventData?> newData,
+    T newData,
   ) async {
     final Updating u = PersistenceEvent.updating(actionId: equalityKey);
     emitEvent(u);
@@ -97,7 +98,8 @@ class InMemoryPersistence implements Persistence {
     jiggers[newData.equalityKey] = newData.withEvents(existingData.events);
 
     emitEvent(PersistenceEvent.finished(u));
-    return Future.value(null);
+
+    return newData;
   }
 
   @override

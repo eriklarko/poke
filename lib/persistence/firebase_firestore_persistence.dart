@@ -30,9 +30,9 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
-  Future<void> updateAction(
+  Future<T> updateAction<T extends Action>(
     String equalityKey,
-    Action<SerializableEventData?> newData,
+    T newData,
   ) async {
     final updatingEvent = PersistenceEvent.updating(actionId: equalityKey);
     notificationStreamController.add(updatingEvent);
@@ -52,6 +52,8 @@ class FirebaseFirestorePersistence implements Persistence {
     await actionRef.update(newData.toJson());
 
     notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
+
+    return newData;
   }
 
   @override
@@ -73,7 +75,7 @@ class FirebaseFirestorePersistence implements Persistence {
      *           - actiondata
      *           / events
      *             - { when: 1963-11-23 13:37:00, data: { ... }
-     *             - { when: 1989-12-23 13:37:00, data: { ... }
+     *             - { when: 1989-12-06 13:37:00, data: { ... }
      * 
      *         /water-frank
      *           / plant

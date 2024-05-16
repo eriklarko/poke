@@ -3,26 +3,30 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/notifications/notification_permission_widget.dart';
+import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
-import 'package:poke/persistence/persistence.dart';
-import 'package:poke/predictor/predictor.dart';
+import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/screens/home_screen.dart';
 
-import '../utils/persistence.dart';
+import '../components/reminder_list/reminder_list_test.dart';
+import '../utils/dependencies.dart';
 import '../utils/test-action/test_action.dart';
 import 'home_screen_test.mocks.dart';
 
-@GenerateNiceMocks([MockSpec<Persistence>(), MockSpec<Predictor>()])
+@GenerateNiceMocks([MockSpec<NotificationService>()])
 void main() {
   registerTestActions();
-  setDependency<Predictor>(MockPredictor());
 
   testWidgets("tapping a reminder opens the log widget", (tester) async {
     // create an action so that the reminder list will have one item
     final a = TestAction(id: 'some-action');
     final persistence = InMemoryPersistence();
-    persistence.createAction(a);
     setPersistence(persistence);
+    persistence.createAction(a);
+
+    await setReminderService();
+    setNotificationService();
 
     // render the screen
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
@@ -40,7 +44,8 @@ void main() {
   });
 
   testWidgets("can add new action", (tester) async {
-    setPersistence(InMemoryPersistence());
+    await setReminderService();
+    setNotificationService();
 
     final newAction = TestAction(id: 'new-action');
     Action.registerSubclass(
@@ -74,6 +79,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(newAction.getKey('reminder-list-item')), findsOneWidget);
+  });
+
+  testWidgets('contains notification permission widget', (tester) async {
+    setDependency<NotificationService>(MockNotificationService());
+    await setUpReminderServiceMock([]);
+
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    expect(find.byType(NotificationPermissionWidget), findsOneWidget);
   });
 
   group('snooze', () {

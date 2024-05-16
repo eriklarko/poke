@@ -9,17 +9,20 @@ class PokeAsyncButton extends StatefulWidget {
   final String text;
   final bool rerunnable;
   final Future Function()? onPressed;
+  final bool usePrimaryButton;
 
   const PokeAsyncButton.once({
     super.key,
     required this.text,
     required this.onPressed,
+    this.usePrimaryButton = true,
   }) : rerunnable = false;
 
   const PokeAsyncButton.rerunnable({
     super.key,
     required this.text,
     required this.onPressed,
+    this.usePrimaryButton = true,
   }) : rerunnable = true;
 
   @override
@@ -31,10 +34,12 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
 
   @override
   Widget build(BuildContext context) {
+    final buttonConstructor =
+        widget.usePrimaryButton ? PokeButton.primary : PokeButton.small;
     return PokeAsyncWidget.simple(
       controller: controller,
 
-      idle: PokeButton.primary(
+      idle: buttonConstructor(
         onPressed: widget.onPressed == null
             ? null
             : () {

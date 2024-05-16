@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:poke/components/expandable_floating_action_button/expandable_floating_action_button.dart';
-import 'package:poke/components/reminder_list/reminder_service.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_button.dart';
@@ -9,6 +8,7 @@ import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/notifications/notification_permission_widget.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/screens/action_details_screen/action_details_screen.dart';
 import 'package:poke/utils/nav_service.dart';
@@ -26,9 +26,9 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           const PokeHeader('hi'),
+          const NotificationPermissionWidget(),
           Expanded(
             child: ReminderList(
-              reminderService: ReminderService(),
               onReminderTapped: (reminder) => openLogActionDialog(
                 context,
                 reminder,

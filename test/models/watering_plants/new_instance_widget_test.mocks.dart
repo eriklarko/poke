@@ -3,17 +3,18 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
-import 'dart:typed_data' as _i8;
+import 'dart:async' as _i2;
+import 'dart:typed_data' as _i9;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i7;
 import 'package:poke/models/action.dart' as _i6;
-import 'package:poke/persistence/persistence.dart' as _i3;
-import 'package:poke/persistence/persistence_event.dart' as _i7;
+import 'package:poke/persistence/persistence.dart' as _i4;
+import 'package:poke/persistence/persistence_event.dart' as _i8;
 import 'package:poke/persistence/serializable_event_data.dart' as _i5;
-import 'package:uuid/data.dart' as _i10;
-import 'package:uuid/uuid.dart' as _i9;
-import 'package:uuid/uuid_value.dart' as _i2;
+import 'package:uuid/data.dart' as _i11;
+import 'package:uuid/uuid.dart' as _i10;
+import 'package:uuid/uuid_value.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -26,8 +27,8 @@ import 'package:uuid/uuid_value.dart' as _i2;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeUri_0 extends _i1.SmartFake implements Uri {
-  _FakeUri_0(
+class _FakeFuture_0<T1> extends _i1.SmartFake implements _i2.Future<T1> {
+  _FakeFuture_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -36,8 +37,18 @@ class _FakeUri_0 extends _i1.SmartFake implements Uri {
         );
 }
 
-class _FakeUuidValue_1 extends _i1.SmartFake implements _i2.UuidValue {
-  _FakeUuidValue_1(
+class _FakeUri_1 extends _i1.SmartFake implements Uri {
+  _FakeUri_1(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeUuidValue_2 extends _i1.SmartFake implements _i3.UuidValue {
+  _FakeUuidValue_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -49,9 +60,9 @@ class _FakeUuidValue_1 extends _i1.SmartFake implements _i2.UuidValue {
 /// A class which mocks [Persistence].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPersistence extends _i1.Mock implements _i3.Persistence {
+class MockPersistence extends _i1.Mock implements _i4.Persistence {
   @override
-  _i4.Future<void> logAction<TEventData extends _i5.SerializableEventData?>(
+  _i2.Future<void> logAction<TEventData extends _i5.SerializableEventData?>(
     _i6.Action<TEventData>? action,
     DateTime? when, {
     TEventData? eventData,
@@ -65,12 +76,12 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
           ],
           {#eventData: eventData},
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i2.Future<void>.value(),
+        returnValueForMissingStub: _i2.Future<void>.value(),
+      ) as _i2.Future<void>);
 
   @override
-  _i4.Future<_i6.Action<_i5.SerializableEventData?>?> getAction(
+  _i2.Future<_i6.Action<_i5.SerializableEventData?>?> getAction(
           String? equalityKey) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -78,42 +89,42 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
           [equalityKey],
         ),
         returnValue:
-            _i4.Future<_i6.Action<_i5.SerializableEventData?>?>.value(),
+            _i2.Future<_i6.Action<_i5.SerializableEventData?>?>.value(),
         returnValueForMissingStub:
-            _i4.Future<_i6.Action<_i5.SerializableEventData?>?>.value(),
-      ) as _i4.Future<_i6.Action<_i5.SerializableEventData?>?>);
+            _i2.Future<_i6.Action<_i5.SerializableEventData?>?>.value(),
+      ) as _i2.Future<_i6.Action<_i5.SerializableEventData?>?>);
 
   @override
-  _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>
+  _i2.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>
       getAllActions() => (super.noSuchMethod(
             Invocation.method(
               #getAllActions,
               [],
             ),
-            returnValue: _i4
+            returnValue: _i2
                 .Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
                 <_i6.Action<_i5.SerializableEventData?>>[]),
-            returnValueForMissingStub: _i4
+            returnValueForMissingStub: _i2
                 .Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>.value(
                 <_i6.Action<_i5.SerializableEventData?>>[]),
-          ) as _i4.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>);
+          ) as _i2.Future<Iterable<_i6.Action<_i5.SerializableEventData?>>>);
 
   @override
-  _i4.Future<void> createAction(
+  _i2.Future<void> createAction(
           _i6.Action<_i5.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #createAction,
           [action],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i2.Future<void>.value(),
+        returnValueForMissingStub: _i2.Future<void>.value(),
+      ) as _i2.Future<void>);
 
   @override
-  _i4.Future<void> updateAction(
+  _i2.Future<T> updateAction<T extends _i6.Action<_i5.SerializableEventData?>>(
     String? equalityKey,
-    _i6.Action<_i5.SerializableEventData?>? action,
+    T? action,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -123,12 +134,56 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
             action,
           ],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i7.ifNotNull(
+              _i7.dummyValueOrNull<T>(
+                this,
+                Invocation.method(
+                  #updateAction,
+                  [
+                    equalityKey,
+                    action,
+                  ],
+                ),
+              ),
+              (T v) => _i2.Future<T>.value(v),
+            ) ??
+            _FakeFuture_0<T>(
+              this,
+              Invocation.method(
+                #updateAction,
+                [
+                  equalityKey,
+                  action,
+                ],
+              ),
+            ),
+        returnValueForMissingStub: _i7.ifNotNull(
+              _i7.dummyValueOrNull<T>(
+                this,
+                Invocation.method(
+                  #updateAction,
+                  [
+                    equalityKey,
+                    action,
+                  ],
+                ),
+              ),
+              (T v) => _i2.Future<T>.value(v),
+            ) ??
+            _FakeFuture_0<T>(
+              this,
+              Invocation.method(
+                #updateAction,
+                [
+                  equalityKey,
+                  action,
+                ],
+              ),
+            ),
+      ) as _i2.Future<T>);
 
   @override
-  _i4.Future<void> deleteEvent(
+  _i2.Future<void> deleteEvent(
     _i6.Action<_i5.SerializableEventData?>? a,
     DateTime? eventDate,
   ) =>
@@ -140,24 +195,24 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
             eventDate,
           ],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i2.Future<void>.value(),
+        returnValueForMissingStub: _i2.Future<void>.value(),
+      ) as _i2.Future<void>);
 
   @override
-  _i4.Stream<_i7.PersistenceEvent> getNotificationStream() =>
+  _i2.Stream<_i8.PersistenceEvent> getNotificationStream() =>
       (super.noSuchMethod(
         Invocation.method(
           #getNotificationStream,
           [],
         ),
-        returnValue: _i4.Stream<_i7.PersistenceEvent>.empty(),
-        returnValueForMissingStub: _i4.Stream<_i7.PersistenceEvent>.empty(),
-      ) as _i4.Stream<_i7.PersistenceEvent>);
+        returnValue: _i2.Stream<_i8.PersistenceEvent>.empty(),
+        returnValueForMissingStub: _i2.Stream<_i8.PersistenceEvent>.empty(),
+      ) as _i2.Stream<_i8.PersistenceEvent>);
 
   @override
-  _i4.Future<Uri> uploadData(
-    _i8.Uint8List? bytes,
+  _i2.Future<Uri> uploadData(
+    _i9.Uint8List? bytes,
     String? storageKey,
   ) =>
       (super.noSuchMethod(
@@ -168,7 +223,7 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
             storageKey,
           ],
         ),
-        returnValue: _i4.Future<Uri>.value(_FakeUri_0(
+        returnValue: _i2.Future<Uri>.value(_FakeUri_1(
           this,
           Invocation.method(
             #uploadData,
@@ -178,7 +233,7 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
             ],
           ),
         )),
-        returnValueForMissingStub: _i4.Future<Uri>.value(_FakeUri_0(
+        returnValueForMissingStub: _i2.Future<Uri>.value(_FakeUri_1(
           this,
           Invocation.method(
             #uploadData,
@@ -188,28 +243,28 @@ class MockPersistence extends _i1.Mock implements _i3.Persistence {
             ],
           ),
         )),
-      ) as _i4.Future<Uri>);
+      ) as _i2.Future<Uri>);
 
   @override
-  _i4.Future<_i8.Uint8List?> getUploadedData(String? storageKey) =>
+  _i2.Future<_i9.Uint8List?> getUploadedData(String? storageKey) =>
       (super.noSuchMethod(
         Invocation.method(
           #getUploadedData,
           [storageKey],
         ),
-        returnValue: _i4.Future<_i8.Uint8List?>.value(),
-        returnValueForMissingStub: _i4.Future<_i8.Uint8List?>.value(),
-      ) as _i4.Future<_i8.Uint8List?>);
+        returnValue: _i2.Future<_i9.Uint8List?>.value(),
+        returnValueForMissingStub: _i2.Future<_i9.Uint8List?>.value(),
+      ) as _i2.Future<_i9.Uint8List?>);
 }
 
 /// A class which mocks [Uuid].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUuid extends _i1.Mock implements _i9.Uuid {
+class MockUuid extends _i1.Mock implements _i10.Uuid {
   @override
   String v1({
     Map<String, dynamic>? options,
-    _i10.V1Options? config,
+    _i11.V1Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -228,7 +283,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
   List<int> v1buffer(
     List<int>? buffer, {
     Map<String, dynamic>? options,
-    _i10.V1Options? config,
+    _i11.V1Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -246,9 +301,9 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v1obj({
+  _i3.UuidValue v1obj({
     Map<String, dynamic>? options,
-    _i10.V1Options? config,
+    _i11.V1Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -259,7 +314,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             #config: config,
           },
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v1obj,
@@ -270,7 +325,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v1obj,
@@ -281,12 +336,12 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 
   @override
   String v4({
     Map<String, dynamic>? options,
-    _i10.V4Options? config,
+    _i11.V4Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -305,7 +360,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
   List<int> v4buffer(
     List<int>? buffer, {
     Map<String, dynamic>? options,
-    _i10.V4Options? config,
+    _i11.V4Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -323,9 +378,9 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v4obj({
+  _i3.UuidValue v4obj({
     Map<String, dynamic>? options,
-    _i10.V4Options? config,
+    _i11.V4Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -336,7 +391,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             #config: config,
           },
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v4obj,
@@ -347,7 +402,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v4obj,
@@ -358,14 +413,14 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 
   @override
   String v5(
     String? namespace,
     String? name, {
     Map<String, dynamic>? options,
-    _i10.V5Options? config,
+    _i11.V5Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -389,7 +444,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
     String? name,
     List<int>? buffer, {
     Map<String, dynamic>? options,
-    _i10.V5Options? config,
+    _i11.V5Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -411,11 +466,11 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v5obj(
+  _i3.UuidValue v5obj(
     String? namespace,
     String? name, {
     Map<String, dynamic>? options,
-    _i10.V5Options? config,
+    _i11.V5Options? config,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -429,7 +484,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             #config: config,
           },
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v5obj,
@@ -443,7 +498,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v5obj,
@@ -457,10 +512,10 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             },
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 
   @override
-  String v6({_i10.V6Options? config}) => (super.noSuchMethod(
+  String v6({_i11.V6Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v6,
           [],
@@ -473,7 +528,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
   @override
   List<int> v6buffer(
     List<int>? buffer, {
-    _i10.V6Options? config,
+    _i11.V6Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -490,13 +545,13 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v6obj({_i10.V6Options? config}) => (super.noSuchMethod(
+  _i3.UuidValue v6obj({_i11.V6Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v6obj,
           [],
           {#config: config},
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v6obj,
@@ -504,7 +559,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v6obj,
@@ -512,10 +567,10 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 
   @override
-  String v7({_i10.V7Options? config}) => (super.noSuchMethod(
+  String v7({_i11.V7Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v7,
           [],
@@ -528,7 +583,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
   @override
   List<int> v7buffer(
     List<int>? buffer, {
-    _i10.V7Options? config,
+    _i11.V7Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -545,13 +600,13 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v7obj({_i10.V7Options? config}) => (super.noSuchMethod(
+  _i3.UuidValue v7obj({_i11.V7Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v7obj,
           [],
           {#config: config},
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v7obj,
@@ -559,7 +614,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v7obj,
@@ -567,10 +622,10 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 
   @override
-  String v8({_i10.V8Options? config}) => (super.noSuchMethod(
+  String v8({_i11.V8Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v8,
           [],
@@ -583,7 +638,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
   @override
   List<int> v8buffer(
     List<int>? buffer, {
-    _i10.V8Options? config,
+    _i11.V8Options? config,
     int? offset = 0,
   }) =>
       (super.noSuchMethod(
@@ -600,13 +655,13 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
       ) as List<int>);
 
   @override
-  _i2.UuidValue v8obj({_i10.V8Options? config}) => (super.noSuchMethod(
+  _i3.UuidValue v8obj({_i11.V8Options? config}) => (super.noSuchMethod(
         Invocation.method(
           #v8obj,
           [],
           {#config: config},
         ),
-        returnValue: _FakeUuidValue_1(
+        returnValue: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v8obj,
@@ -614,7 +669,7 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-        returnValueForMissingStub: _FakeUuidValue_1(
+        returnValueForMissingStub: _FakeUuidValue_2(
           this,
           Invocation.method(
             #v8obj,
@@ -622,5 +677,5 @@ class MockUuid extends _i1.Mock implements _i9.Uuid {
             {#config: config},
           ),
         ),
-      ) as _i2.UuidValue);
+      ) as _i3.UuidValue);
 }

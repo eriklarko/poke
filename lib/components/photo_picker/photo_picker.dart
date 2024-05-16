@@ -102,6 +102,7 @@ class _PhotoPickerState extends State<PhotoPicker> {
       alignment: Alignment.bottomCenter,
       children: [
         PokeTappable(
+          key: const ValueKey('image-container'),
           onTap: () => _togglePickerButtons(),
           child: Container(
             constraints: const BoxConstraints.expand(),

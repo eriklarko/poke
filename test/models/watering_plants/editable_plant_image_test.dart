@@ -13,7 +13,7 @@ import 'package:poke/persistence/persistence.dart';
 
 import '../../test_app.dart';
 import '../../utils/images.dart';
-import '../../utils/persistence.dart';
+import '../../utils/dependencies.dart';
 import 'editable_plant_image_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Plant>(), MockSpec<Persistence>()])
@@ -64,6 +64,8 @@ void main() {
     ).thenAnswer(
       (_) async => Uri.file('updated-image.png'),
     );
+    when(persistence.updateAction(action.equalityKey, action))
+        .thenAnswer((_) async => action);
     setPersistence(persistence);
 
     // update the image

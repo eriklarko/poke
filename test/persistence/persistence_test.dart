@@ -175,6 +175,30 @@ void main() {
         );
       });
 
+      test('events are added when creating action', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        final dt1 = DateTime.parse('1963-11-23 13:37');
+        final dt2 = DateTime.parse('1989-12-06 06:06');
+        final testAction = TestActionWithData(id: '1').withEvents({
+          dt1: Data("first"),
+          dt2: Data("second"),
+        });
+        await persistenceImpl.createAction(testAction);
+
+        final actions = await persistenceImpl.getAllActions();
+        final events = actions
+            .firstWhere((a) => a.equalityKey == testAction.equalityKey)
+            .events;
+        expect(
+          events,
+          equals({
+            dt1: Data("first"),
+            dt2: Data("second"),
+          }),
+        );
+      });
+
       test('can update action', () async {
         final persistenceImpl = persistenceConstructor();
 
@@ -216,6 +240,33 @@ void main() {
             'propToUpdate': '11',
             'unchanged': '3',
             'newProp': '4',
+          }),
+        );
+      });
+
+      test(
+          'a reference to the updated action is returned after updating an action',
+          () async {
+        // TODO: write test
+        final persistenceImpl = persistenceConstructor();
+
+        // create action with some property
+        final testAction = TestAction(id: '1', props: {"foo": "bar"});
+        await persistenceImpl.createAction(testAction);
+
+        // change the foo prop
+        testAction.props!["foo"] = "baz";
+
+        // update the action
+        final updatedAction = await persistenceImpl.updateAction(
+          testAction.equalityKey,
+          testAction,
+        );
+
+        expect(
+          updatedAction.props,
+          equals({
+            "foo": "baz",
           }),
         );
       });

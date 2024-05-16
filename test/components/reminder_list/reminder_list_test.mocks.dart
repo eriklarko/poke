@@ -3,14 +3,15 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i5;
+import 'dart:collection' as _i2;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:poke/components/reminder_list/reminder_service.dart' as _i3;
-import 'package:poke/models/action.dart' as _i5;
-import 'package:poke/models/reminder.dart' as _i2;
-import 'package:poke/persistence/serializable_event_data.dart' as _i6;
-import 'package:poke/predictor/predictor.dart' as _i7;
+import 'package:poke/models/action.dart' as _i6;
+import 'package:poke/models/reminder.dart' as _i3;
+import 'package:poke/persistence/serializable_event_data.dart' as _i7;
+import 'package:poke/predictor/predictor.dart' as _i8;
+import 'package:poke/reminder_service/reminder_service.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -23,8 +24,19 @@ import 'package:poke/predictor/predictor.dart' as _i7;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeReminder_0 extends _i1.SmartFake implements _i2.Reminder {
-  _FakeReminder_0(
+class _FakeUnmodifiableListView_0<E> extends _i1.SmartFake
+    implements _i2.UnmodifiableListView<E> {
+  _FakeUnmodifiableListView_0(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeReminder_1 extends _i1.SmartFake implements _i3.Reminder {
+  _FakeReminder_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -36,58 +48,99 @@ class _FakeReminder_0 extends _i1.SmartFake implements _i2.Reminder {
 /// A class which mocks [ReminderService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockReminderService extends _i1.Mock implements _i3.ReminderService {
+class MockReminderService extends _i1.Mock implements _i4.ReminderService {
   @override
-  _i4.Future<List<_i2.Reminder>> buildReminders() => (super.noSuchMethod(
+  _i5.Future<void> init() => (super.noSuchMethod(
         Invocation.method(
-          #buildReminders,
+          #init,
           [],
         ),
-        returnValue: _i4.Future<List<_i2.Reminder>>.value(<_i2.Reminder>[]),
-        returnValueForMissingStub:
-            _i4.Future<List<_i2.Reminder>>.value(<_i2.Reminder>[]),
-      ) as _i4.Future<List<_i2.Reminder>>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
-  _i2.Reminder buildReminder(_i5.Action<_i6.SerializableEventData?>? action) =>
+  _i5.Future<void> dispose() => (super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  bool knowsAction(String? actionId) => (super.noSuchMethod(
+        Invocation.method(
+          #knowsAction,
+          [actionId],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  _i2.UnmodifiableListView<_i3.Reminder> getReminders() => (super.noSuchMethod(
+        Invocation.method(
+          #getReminders,
+          [],
+        ),
+        returnValue: _FakeUnmodifiableListView_0<_i3.Reminder>(
+          this,
+          Invocation.method(
+            #getReminders,
+            [],
+          ),
+        ),
+        returnValueForMissingStub: _FakeUnmodifiableListView_0<_i3.Reminder>(
+          this,
+          Invocation.method(
+            #getReminders,
+            [],
+          ),
+        ),
+      ) as _i2.UnmodifiableListView<_i3.Reminder>);
+
+  @override
+  _i3.Reminder buildReminder(_i6.Action<_i7.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #buildReminder,
           [action],
         ),
-        returnValue: _FakeReminder_0(
+        returnValue: _FakeReminder_1(
           this,
           Invocation.method(
             #buildReminder,
             [action],
           ),
         ),
-        returnValueForMissingStub: _FakeReminder_0(
+        returnValueForMissingStub: _FakeReminder_1(
           this,
           Invocation.method(
             #buildReminder,
             [action],
           ),
         ),
-      ) as _i2.Reminder);
+      ) as _i3.Reminder);
 
   @override
-  _i4.Stream<_i3.ReminderUpdate> updatesStream() => (super.noSuchMethod(
+  _i5.Stream<_i4.ReminderUpdate> updatesStream() => (super.noSuchMethod(
         Invocation.method(
           #updatesStream,
           [],
         ),
-        returnValue: _i4.Stream<_i3.ReminderUpdate>.empty(),
-        returnValueForMissingStub: _i4.Stream<_i3.ReminderUpdate>.empty(),
-      ) as _i4.Stream<_i3.ReminderUpdate>);
+        returnValue: _i5.Stream<_i4.ReminderUpdate>.empty(),
+        returnValueForMissingStub: _i5.Stream<_i4.ReminderUpdate>.empty(),
+      ) as _i5.Stream<_i4.ReminderUpdate>);
 }
 
 /// A class which mocks [Predictor].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPredictor extends _i1.Mock implements _i7.Predictor {
+class MockPredictor extends _i1.Mock implements _i8.Predictor {
   @override
-  DateTime? predictNext(_i5.Action<_i6.SerializableEventData?>? action) =>
+  DateTime? predictNext(_i6.Action<_i7.SerializableEventData?>? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #predictNext,

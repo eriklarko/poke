@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/photo_picker/photo_picker.dart';
-import 'package:poke/design_system/poke_tappable.dart';
 
 import '../../mock_callback.dart';
 import '../../test_app.dart';

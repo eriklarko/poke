@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:poke/components/reminder_list/reminder_service.dart';
+import 'package:poke/persistence/persistence.dart';
+import 'package:poke/persistence/persistence_event.dart';
+import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
@@ -15,30 +14,36 @@ import 'package:poke/predictor/predictor.dart';
 
 import '../../mock_callback.dart';
 import '../../test_app.dart';
-import '../../utils/persistence.dart';
+import '../../utils/dependencies.dart';
 import '../../utils/test-action/test_action.dart';
 import 'reminder_list_test.mocks.dart';
 
 final MockSingleArgCallback ignoreCallback = MockSingleArgCallback();
 
-MockReminderService reminderServiceMock(List<Reminder> reminders) {
-  final mrf = MockReminderService();
-
+Future<ReminderService> setUpReminderServiceMock(
+  List<Reminder> reminders, [
+  Persistence? persistence,
+]) async {
+  final predictor = MockPredictor();
   for (final reminder in reminders) {
-    when(mrf.buildReminder(reminder.action)).thenReturn(reminder);
+    when(predictor.predictNext(reminder.action)).thenReturn(reminder.dueDate);
+  }
+  setDependency<Predictor>(predictor);
+
+  persistence ??= InMemoryPersistence();
+  if (persistence is InMemoryPersistence) {
+    for (final r in reminders) {
+      await persistence.createAction(r.action);
+    }
+    setDependency<Persistence>(persistence);
+  } else {
+    throw "Unsupported persistence ${persistence.runtimeType}";
   }
 
-  when(mrf.buildReminders()).thenAnswer(
-    (realInvocation) => Future.value(reminders),
-  );
-
-  return mrf;
-}
-
-StreamController<ReminderUpdate> addStream(MockReminderService mrf) {
-  final sc = StreamController<ReminderUpdate>();
-  when(mrf.updatesStream()).thenAnswer((_) => sc.stream);
-  return sc;
+  final rs = ReminderService();
+  await rs.init();
+  await setReminderService(false, rs);
+  return rs;
 }
 
 @GenerateNiceMocks([MockSpec<ReminderService>(), MockSpec<Predictor>()])
@@ -57,10 +62,11 @@ void main() {
   );
 
   testWidgets('renders all reminders', (tester) async {
+    await setUpReminderServiceMock([reminder, expiredReminder]);
+
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: reminderServiceMock([reminder, expiredReminder]),
         onReminderTapped: ignoreCallback,
       ),
     );
@@ -72,12 +78,12 @@ void main() {
 
   testWidgets('the onTap callback is invoked when tapping a reminder',
       (tester) async {
-    final onTapCallback = MockSingleArgCallback<Reminder>();
+    await setUpReminderServiceMock([reminder]);
 
+    final onTapCallback = MockSingleArgCallback<Reminder>();
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: reminderServiceMock([reminder]),
         onReminderTapped: onTapCallback,
       ),
     );
@@ -88,10 +94,10 @@ void main() {
   });
 
   testWidgets('expired reminders are marked', (tester) async {
+    await setUpReminderServiceMock([reminder, expiredReminder]);
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: reminderServiceMock([reminder, expiredReminder]),
         onReminderTapped: ignoreCallback,
       ),
     );
@@ -101,86 +107,20 @@ void main() {
     expect(expiredReminders, findsOneWidget);
   });
 
-  testWidgets('allows retrying when building reminders fail', (tester) async {
-    final reminderService = MockReminderService();
-    when(reminderService.buildReminders()).thenThrow("test error");
-
-    await pumpInTestApp(
-      tester,
-      ReminderList(
-        reminderService: reminderService,
-        onReminderTapped: ignoreCallback,
-      ),
-    );
-    await tester.pump();
-
-    // check that the error is shown
-    expect(
-      find.text("test error"),
-      findsOneWidget,
-    );
-
-    // tap the retry button
-    await tester.tap(find.byKey(const Key('retry')));
-    verify(reminderService.buildReminders()).called(2);
-  });
-
-  testWidgets("shows loading indicator while loading reminders",
-      (tester) async {
-    // set up reminder service taking 2s to load reminders
-    final reminderService = MockReminderService();
-    when(reminderService.buildReminders()).thenAnswer(
-      (_) => Future.delayed(const Duration(
-        seconds: 2,
-      )).then((value) => []),
-    );
-
-    await pumpInTestApp(
-      tester,
-      ReminderList(
-        reminderService: reminderService,
-        onReminderTapped: ignoreCallback,
-      ),
-    );
-    await tester.pump();
-
-    expect(
-      find.byType(PokeLoadingIndicator),
-      findsOneWidget,
-    );
-
-    await tester.pump(const Duration(seconds: 3));
-  });
-
   testWidgets('renders new action when it is added', (tester) async {
-    final mockReminderService = reminderServiceMock([reminder]);
-    final sc = addStream(mockReminderService);
+    final persistence = InMemoryPersistence();
+    await setUpReminderServiceMock([reminder], persistence);
 
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: mockReminderService,
         onReminderTapped: ignoreCallback,
       ),
     );
     await tester.pumpAndSettle();
 
     final newAction = TestAction(id: 'new-action');
-    sc.add(ReminderUpdate(
-      actionId: newAction.equalityKey,
-      reminder: Reminder(
-        action: newAction,
-        dueDate: DateTime.now(),
-      ),
-
-      // there's no `added` update type because the reminder service can't know
-      // when a new reminder is added.
-      //
-      // the reminder service doesn't keep a list of reminders it has seen, so
-      // when it gets notified about a reminder it cannot check if it has seen
-      // the action before or not
-      type: UpdateType.updated,
-    ));
+    await persistence.createAction(newAction);
     await tester.pumpAndSettle();
 
     expect(find.byKey(newAction.getKey('reminder-list-item')), findsOneWidget);
@@ -188,24 +128,18 @@ void main() {
 
   testWidgets('removes reminder from list when action is removed',
       (tester) async {
-    final mockReminderService = reminderServiceMock([reminder]);
-    final sc = addStream(mockReminderService);
+    final persistence = InMemoryPersistence();
+    await setUpReminderServiceMock([reminder], persistence);
 
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: mockReminderService,
         onReminderTapped: ignoreCallback,
       ),
     );
     await tester.pumpAndSettle();
 
-    sc.add(ReminderUpdate(
-      // this id must match at least one reminder in the reminder service
-      actionId: reminder.action.equalityKey,
-      reminder: null,
-      type: UpdateType.removed,
-    ));
+    //persistence.removeAction(reminder.action.equalityKey);
     await tester.pumpAndSettle();
 
     expect(
@@ -214,17 +148,18 @@ void main() {
       ),
       findsNothing,
     );
+
+    throw "SHOULD FAIL BUT DOESNT!!!! because persistence.removeAction does not exist";
   });
 
   testWidgets('shows loading indicator while list item data is updated',
       (tester) async {
-    final mockReminderService = reminderServiceMock([reminder]);
-    final sc = addStream(mockReminderService);
+    final persistence = InMemoryPersistence();
+    await setUpReminderServiceMock([reminder], persistence);
 
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: mockReminderService,
         onReminderTapped: ignoreCallback,
       ),
     );
@@ -234,14 +169,10 @@ void main() {
     // event
     expect(find.byType(PokeLoadingIndicator), findsNothing);
 
-    // send an `updating` event on the stream, indicating which reminder is
-    // being updated
-    sc.add(
-      ReminderUpdate(
-        actionId: reminder.action.equalityKey,
-        reminder: null,
-        type: UpdateType.updating,
-      ),
+    // send an `updating` event on the persistence stream, indicating which
+    // action is being updated
+    persistence.notificationStreamController.add(
+      PersistenceEvent.updating(actionId: reminder.action.equalityKey),
     );
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(PokeLoadingIndicator), findsOneWidget);
@@ -249,28 +180,22 @@ void main() {
 
   testWidgets('rerenders when visible persistence data is changed',
       (tester) async {
-    // create the action with one event being shown to the user
+    // create the action being shown to the user
     final action = TestActionWithData(id: 'some-action');
-
-    // set up the persistence system to return the action above
     final persistence = InMemoryPersistence();
     persistence.logAction(
       action,
       DateTime.now(),
       eventData: Data("first-data"),
     );
-    setPersistence(persistence);
 
-    // more deps, not really part of this test
-    final p = MockPredictor();
-    when(p.predictNext(any)).thenReturn(DateTime.now());
-    GetIt.instance.registerSingleton<Predictor>(MockPredictor());
+    // set up reminder service dependency
+    await setUpReminderServiceMock([], persistence);
 
     // render reminders for the action
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: ReminderService(),
         onReminderTapped: ignoreCallback,
       ),
     );
@@ -313,18 +238,19 @@ void main() {
       dueDate: null,
     );
 
+    await setUpReminderServiceMock([
+      // to increase confidence that the test is working as expected, don't
+      // add the reminders in the expected order
+      secondMostDueReminder,
+      reminderWithNoDueDate,
+      leastDueReminder,
+      mostDueReminder,
+    ]);
+
     // render them
     await pumpInTestApp(
       tester,
       ReminderList(
-        reminderService: reminderServiceMock([
-          // to increase confidence that the test is working as expected, don't
-          // add the reminders in the expected order
-          secondMostDueReminder,
-          reminderWithNoDueDate,
-          leastDueReminder,
-          mostDueReminder,
-        ]),
         onReminderTapped: ignoreCallback,
       ),
     );

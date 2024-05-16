@@ -17,7 +17,7 @@ abstract class Persistence {
 
   Future<void> createAction(Action action);
 
-  Future<void> updateAction(String equalityKey, Action action);
+  Future<T> updateAction<T extends Action>(String equalityKey, T action);
 
   Future<void> deleteEvent(Action a, DateTime eventDate);
 

@@ -12,7 +12,7 @@ import 'package:poke/persistence/persistence.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../test_app.dart';
-import '../../utils/persistence.dart';
+import '../../utils/dependencies.dart';
 import 'new_instance_widget_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Persistence>(), MockSpec<Uuid>()])

@@ -16,6 +16,7 @@ class ActionDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Show if notification is scheduled
     return Scaffold(
         appBar: PokeAppBar(context),
         body: Column(

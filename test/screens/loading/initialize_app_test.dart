@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
+import 'package:clock/clock.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -9,12 +11,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:poke/notifications/awesome_notifications.dart';
+import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/screens/auth/login_screen.dart';
 import 'package:poke/screens/home_screen.dart';
 import 'package:poke/screens/loading/poke_firebase.dart';
 import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../notifications/in_memory_notification_platform.dart';
+import '../../utils/dependencies.dart';
+import '../../utils/test-action/test_action.dart';
 import 'initialize_app_test.mocks.dart';
 
 (MockPokeFirebase, StreamController<User?>) mockFirebase() {
@@ -22,6 +30,7 @@ import 'initialize_app_test.mocks.dart';
 
   // auth
   final mockAuth = MockFirebaseAuth();
+  when(mockAuth.currentUser).thenReturn(MockUser());
   final userStreamController = StreamController<User?>();
   when(mockAuth.userChanges()).thenAnswer((_) => userStreamController.stream);
   when(mockFirebase.auth()).thenReturn(mockAuth);
@@ -31,7 +40,7 @@ import 'initialize_app_test.mocks.dart';
   when(mockFirebase.crashlytics()).thenReturn(mockCrashlytics);
 
   // firestore
-  final mockFirestore = MockFirebaseFirestore();
+  final mockFirestore = FakeFirebaseFirestore();
   when(mockFirebase.firestore()).thenReturn(mockFirestore);
 
   // app check
@@ -41,22 +50,22 @@ import 'initialize_app_test.mocks.dart';
   return (mockFirebase, userStreamController);
 }
 
-@GenerateMocks([
-  PokeFirebase,
-  FirebaseAuth,
-  User,
-  FirebaseCrashlytics,
-  FirebaseFirestore,
-  FirebaseAppCheck,
-], customMocks: [
-  MockSpec<NavigatorState>(onMissingStub: OnMissingStub.returnDefault)
+@GenerateNiceMocks([
+  MockSpec<PokeFirebase>(),
+  MockSpec<FirebaseAuth>(),
+  MockSpec<User>(),
+  MockSpec<FirebaseCrashlytics>(),
+  MockSpec<FirebaseAppCheck>(),
+  MockSpec<NavigatorState>(onMissingStub: OnMissingStub.returnDefault),
 ])
 void main() {
   GetIt.instance.allowReassignment = true;
+  SharedPreferences.setMockInitialValues({});
 
   test('initializes firebase', () async {
     final (m, _) = mockFirebase();
     when(m.initializeApp()).thenAnswer((_) => Future.value(null));
+
     await initializeApp(firebase: m, nav: MockNavigatorState());
 
     verify(m.initializeApp()).called(1);
@@ -157,6 +166,60 @@ void main() {
 
     final c = firebaseMock.crashlytics();
     verify(c.recordError(error, StackTrace.empty, fatal: true)).called(1);
+  });
+
+  test('registers notifications', () async {
+    //
+    // create action with enough data for reminders
+    registerTestActions();
+    final action = TestAction(id: '1');
+
+    final (firebaseMock, userStream) = mockFirebase();
+    await FirebaseFirestorePersistence(firebaseMock)
+        .createAction(action.withEvents({
+      DateTime.parse('1963-11-23 13:37'): null,
+      DateTime.parse('1989-12-06 06:06'): null,
+    }));
+
+    //
+    // Log in
+    userStream.add(MockUser());
+
+    //
+    // allow notifications
+    setUpDevicePersistence();
+    await setReminderService();
+    AwesomeNotificationsPlatform.instance = InMemoryNotificationPlatform();
+    final notificationService = AwesomeNotificationsService();
+    await notificationService.initialize();
+    await notificationService.decidePermissionsToSendNotifications();
+
+    //
+    // act, with a clock that returns a time before both timestamps above so
+    // that the notifications aren't removed because the due date has passed
+    await withClock(Clock.fixed(DateTime.parse("1900-01-01")), () async {
+      await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+      // wait until listeners have had a chance to react
+      await Future.delayed(Duration.zero);
+    });
+
+    //
+    // check that notifications are registered
+    final notifications =
+        await notificationService.getAllScheduledNotifications();
+    final actionsWithNotifications = notifications.map((n) => n.$1);
+    expect(
+      actionsWithNotifications,
+      equals([action.equalityKey]),
+    );
+  });
+
+  test('can be retried', () async {
+    final (firebaseMock, _) = mockFirebase();
+    final nav = MockNavigatorState();
+
+    await initializeApp(firebase: firebaseMock, nav: nav);
+    await initializeApp(firebase: firebaseMock, nav: nav);
   });
 }
 
