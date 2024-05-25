@@ -185,6 +185,16 @@ class FirebaseFirestorePersistence implements Persistence {
   }
 
   @override
+  Future<void> deleteAction(String equalityKey) async {
+    final updatingEvent = PersistenceEvent.updating(actionId: equalityKey);
+    notificationStreamController.add(updatingEvent);
+
+    await getActionsCollection().doc(equalityKey).delete();
+
+    notificationStreamController.add(PersistenceEvent.finished(updatingEvent));
+  }
+
+  @override
   Future<void> deleteEvent(Action a, DateTime eventDate) async {
     final updatingEvent = PersistenceEvent.updating(actionId: a.equalityKey);
     notificationStreamController.add(updatingEvent);

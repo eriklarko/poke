@@ -103,6 +103,17 @@ class InMemoryPersistence implements Persistence {
   }
 
   @override
+  Future<void> deleteAction(String equalityKey) {
+    final Updating u = PersistenceEvent.updating(actionId: equalityKey);
+    emitEvent(u);
+
+    jiggers.removeWhere((key, value) => key == equalityKey);
+
+    emitEvent(PersistenceEvent.finished(u));
+    return Future.value(null);
+  }
+
+  @override
   Future<void> deleteEvent(
     Action<SerializableEventData?> a,
     DateTime eventDate,

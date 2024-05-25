@@ -314,6 +314,24 @@ void main() {
         );
       });
 
+      test('can delete action', () async {
+        final persistenceImpl = persistenceConstructor();
+
+        // create two actions
+        final a1 = TestAction(id: '1');
+        final a2 = TestAction(id: '2');
+        await persistenceImpl.createAction(a1);
+        await persistenceImpl.createAction(a2);
+
+        // and delete one of them
+        await persistenceImpl.deleteAction(a2.equalityKey);
+
+        expect(
+          await persistenceImpl.getAllActions(),
+          equals([a1]),
+        );
+      });
+
       test('can remove events', () async {
         final persistenceImpl = persistenceConstructor();
 
@@ -393,6 +411,27 @@ void main() {
           );
 
           await persistenceImpl.createAction(testAction);
+        });
+
+        test('sends events when an action is deleted', () async {
+          final persistenceImpl = persistenceConstructor();
+
+          // create the action to delete
+          final testAction = TestAction(id: '1');
+          await persistenceImpl.createAction(testAction);
+
+          KeyFactory.setGlobalKey(GlobalKey());
+
+          final updatingEvent = Updating(testAction.equalityKey);
+          expectLater(
+            persistenceImpl.getNotificationStream(),
+            emitsInOrder([
+              updatingEvent,
+              FinishedUpdating(updatingEvent),
+            ]),
+          );
+
+          await persistenceImpl.deleteAction(testAction.equalityKey);
         });
 
         test('sends events when a new log is added', () async {
