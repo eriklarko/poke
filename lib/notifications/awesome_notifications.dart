@@ -149,14 +149,31 @@ class AwesomeNotificationsService extends NotificationService {
     await _ensureChannelExists(action);
 
     final actionData = action.getNotificationData();
+
     await _i.createNotification(
       content: _createNotificationContent(
         action,
         actionData,
         dueDate,
       ),
-      schedule: NotificationCalendar.fromDate(date: dueDate),
+      schedule: _createScheduleFromDueDate(dueDate),
       actionButtons: actionData.actionButtons,
+    );
+  }
+
+  NotificationSchedule _createScheduleFromDueDate(DateTime dueDate) {
+    // notifications are not created if they're scheduled in the past, but we
+    // want notifications to show up even if the due date has passed, so here we
+    // make sure the notification is scheduled in the future
+    final now = clock.now();
+    if (dueDate.isBefore(now)) {
+      return NotificationCalendar.fromDate(
+        date: now.add(const Duration(seconds: 1)),
+      );
+    }
+
+    return NotificationCalendar.fromDate(
+      date: dueDate,
     );
   }
 

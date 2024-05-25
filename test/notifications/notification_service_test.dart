@@ -193,6 +193,28 @@ void main() {
         );
       });
 
+      test('schedules reminders even when the due date has passed', () async {
+        final action = TestAction(id: '1');
+        final dueDate = DateTime.parse("1963-11-23");
+
+        await setUpReminderServiceMock([
+          Reminder(action: action, dueDate: dueDate),
+        ]);
+        final (sut, _) = constructor();
+
+        final dayAfterDueDate = dueDate.add(const Duration(days: 1));
+        await withClock(Clock.fixed(dayAfterDueDate), () async {
+          await sut.setUpReminderNotifications();
+        });
+
+        expect(
+          await sut.getAllScheduledNotifications(),
+          equals([
+            (action.equalityKey, dueDate),
+          ]),
+        );
+      });
+
       test('cleans up orphaned reminders when setting up reminders', () async {
         // wire up dependencies to return reminders for one action
         final a = TestAction(id: '1');

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:clock/clock.dart';
 import 'package:fixnum/fixnum.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -90,6 +91,13 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
       throw "channel ${content.channelKey} does not exist";
     }
 
+    // Mimic AwesomeNotifications' platforms that reject schedules in the past
+    if (schedule is NotificationCalendar &&
+        _toDate(schedule).isBefore(clock.now())) {
+      print("notification ignored because it is scheduled in the past");
+      return Future.value(false);
+    }
+
     final notif = NotificationModel(
       content: content,
       schedule: schedule,
@@ -104,6 +112,17 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
     );
 
     return Future.value(true);
+  }
+
+  DateTime _toDate(NotificationCalendar c) {
+    return DateTime(
+      c.year ?? 0,
+      c.month ?? 0,
+      c.day ?? 0,
+      c.hour ?? 0,
+      c.minute ?? 0,
+      c.second ?? 0,
+    );
   }
 
   bool _is32Bit(int i) {
