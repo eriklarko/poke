@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
+import 'package:poke/notifications/notification_data.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 
@@ -95,6 +96,8 @@ abstract class Action<EventDataType extends SerializableEventData?> {
   void removeEvent(DateTime eventTime) {
     events.remove(eventTime);
   }
+
+  NotificationData getNotificationData();
 
   //////////////////////////////////////////////////////////////
   /////////////////// WIDGET BUILDERS //////////////////////////

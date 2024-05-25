@@ -23,8 +23,6 @@ abstract class NotificationService {
     final futures = allReminders
         // filter out those without due dates
         .where((reminder) => reminder.dueDate != null)
-        // filter out past ones
-        .where((reminder) => reminder.dueDate!.isAfter(clock.now()))
         // schedule notifications for all reminders with due dates
         .map(
           (reminder) => scheduleReminder(reminder.action, reminder.dueDate!),

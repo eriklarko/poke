@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
@@ -11,6 +12,7 @@ import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/editable_plant_image.dart';
 import 'package:poke/models/watering_plants/plant_image.dart';
+import 'package:poke/notifications/notification_data.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -35,6 +37,16 @@ class WaterPlantAction extends Action<WaterEventData> {
 
   @override
   String get equalityKey => "water-${plant.id}";
+
+  @override
+  NotificationData getNotificationData() {
+    // TODO: get the reminder here from GetIt so that the body can say "watering due 2 days ago"
+    return NotificationData(
+      title: "Time to water ${plant.name}",
+      body: "You gots to show ${plant.name} some luv",
+      bigPictureUrl: plant.imageUri?.toString(),
+    );
+  }
 
   @override
   Widget buildReminderListItem(BuildContext context, Reminder reminder) {

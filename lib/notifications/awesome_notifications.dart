@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:clock/clock.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
@@ -147,7 +148,9 @@ class AwesomeNotificationsService extends NotificationService {
     await _ensureChannelExists(action);
     await _i.createNotification(
       content: _createNotificationContent(
-          action, "TODO title", "TODO body", dueDate),
+        action,
+        dueDate,
+      ),
       schedule: NotificationCalendar.fromDate(date: dueDate),
     );
   }
@@ -173,16 +176,15 @@ class AwesomeNotificationsService extends NotificationService {
 
   NotificationContent _createNotificationContent(
     Action action,
-    String title,
-    String message, [
-    DateTime? scheduleDate,
-  ]) {
+    DateTime scheduleDate,
+  ) {
+    final actionData = action.getNotificationData();
     return NotificationContent(
       id: _getNotificationId(action),
       channelKey: _getChannelKey(action),
       actionType: ActionType.Default,
-      title: title,
-      body: message,
+      title: actionData.title,
+      body: actionData.body,
       payload: {
         'action-id': action.equalityKey,
         // There's nothing in the AweomseNotifications API to get the date when
@@ -190,9 +192,9 @@ class AwesomeNotificationsService extends NotificationService {
         // be set here :(
         'when': scheduleDate?.toIso8601String(),
       },
-      // TODO: icon, set by the action? Watering can for watering events
-      // TODO: big picture, plant picture?
-      // TODO: look into action buttons. Watered eg?
+      bigPicture: actionData.bigPictureUrl,
+      autoDismissible:
+          actionData.persistentWhenOverdue && clock.now().isAfter(scheduleDate),
     );
   }
 
