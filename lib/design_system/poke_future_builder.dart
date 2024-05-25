@@ -32,13 +32,15 @@ class PokeFutureBuilder<T> extends StatelessWidget {
     return FutureBuilder<T>(
       future: future,
       builder: (buildContext, snapshot) {
-        if (snapshot.hasData) {
-          return child(snapshot.data as T);
-        } else if (snapshot.hasError) {
-          return error(snapshot.error!, future);
-        } else {
-          return loadingWidget;
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return error(snapshot.error!, future);
+          } else {
+            return child(snapshot.data as T);
+          }
         }
+
+        return loadingWidget;
       },
     );
   }
