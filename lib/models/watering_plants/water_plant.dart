@@ -45,6 +45,9 @@ class WaterPlantAction extends Action<WaterEventData> {
       title: "Time to water ${plant.name}",
       body: "You gots to show ${plant.name} some luv",
       bigPictureUrl: plant.imageUri?.toString(),
+      actionButtons: [
+        NotificationActionButton(key: equalityKey, label: "watered"),
+      ],
     );
   }
 

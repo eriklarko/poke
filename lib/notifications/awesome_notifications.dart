@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/notifications/notification_data.dart';
 import 'package:poke/persistence/device_persistence.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
 import "package:collection/collection.dart";
@@ -146,12 +147,16 @@ class AwesomeNotificationsService extends NotificationService {
   @override
   FutureOr<void> scheduleReminder(Action action, DateTime dueDate) async {
     await _ensureChannelExists(action);
+
+    final actionData = action.getNotificationData();
     await _i.createNotification(
       content: _createNotificationContent(
         action,
+        actionData,
         dueDate,
       ),
       schedule: NotificationCalendar.fromDate(date: dueDate),
+      actionButtons: actionData.actionButtons,
     );
   }
 
@@ -176,9 +181,9 @@ class AwesomeNotificationsService extends NotificationService {
 
   NotificationContent _createNotificationContent(
     Action action,
+    NotificationData actionData,
     DateTime scheduleDate,
   ) {
-    final actionData = action.getNotificationData();
     return NotificationContent(
       id: _getNotificationId(action),
       channelKey: _getChannelKey(action),
@@ -190,7 +195,7 @@ class AwesomeNotificationsService extends NotificationService {
         // There's nothing in the AweomseNotifications API to get the date when
         // a notification was scheduled, so because it's used in the app it must
         // be set here :(
-        'when': scheduleDate?.toIso8601String(),
+        'when': scheduleDate.toIso8601String(),
       },
       bigPicture: actionData.bigPictureUrl,
       autoDismissible:
@@ -285,6 +290,7 @@ class AwesomeNotificationsService extends NotificationService {
     ReceivedAction receivedAction,
   ) async {
     // Your code goes here
+    // TODO: NotificationActionButtons end up here. Route them back to whatever listener they need to go to
 
     PokeLogger.instance().debug(
       "onActionReceivedMethod",
