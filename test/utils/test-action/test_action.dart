@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
+import 'package:poke/notifications/notification_data.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 
@@ -123,6 +124,11 @@ class TestAction extends Action<Null> {
   Null parseEventData(Map<String, dynamic> json) {
     throw UnimplementedError();
   }
+
+  @override
+  NotificationData getNotificationData() {
+    return NotificationData(title: toString(), body: toString());
+  }
 }
 
 @JsonSerializable()
@@ -201,6 +207,11 @@ class TestActionWithData extends Action<Data> {
   @override
   String toString() {
     return "$equalityKey - $id - $events";
+  }
+
+  @override
+  NotificationData getNotificationData() {
+    return NotificationData(title: toString(), body: toString());
   }
 }
 
