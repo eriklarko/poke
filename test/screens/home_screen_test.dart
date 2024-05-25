@@ -6,7 +6,6 @@ import 'package:poke/models/action.dart';
 import 'package:poke/notifications/notification_permission_widget.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
-import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/screens/home_screen.dart';
 
 import '../components/reminder_list/reminder_list_test.dart';
