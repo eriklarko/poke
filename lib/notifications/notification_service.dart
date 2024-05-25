@@ -1,9 +1,11 @@
 import 'dart:async';
 
-import 'package:clock/clock.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poke/models/action.dart';
+import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
+
+typedef ScheduledNotification = (String /* action id */, DateTime);
 
 abstract class NotificationService {
   FutureOr<void> initialize();
@@ -36,8 +38,11 @@ abstract class NotificationService {
 
   FutureOr<void> removeAllReminders();
 
-  FutureOr<Iterable<(String /* action id */, DateTime)>>
-      getAllScheduledNotifications();
+  FutureOr<Iterable<ScheduledNotification>> getAllScheduledNotifications();
+
+  FutureOr<ScheduledNotification?> getScheduledNotificationForAction(
+    Action action,
+  );
 }
 
 enum PermissionResponse {

@@ -162,8 +162,7 @@ void main() {
         throw "not implemented yet";
       });
 
-      test('schedules reminders for all actions with due dates in the future',
-          () async {
+      test('schedules reminders for all actions with due dates', () async {
         // set up actions and due dates
         final a1 = TestAction(id: '1');
         final a2 = TestAction(id: '2');
@@ -171,31 +170,27 @@ void main() {
 
         final dt1 = DateTime.parse("1963-11-23");
         final dt2 = DateTime.parse("1989-12-06");
-        final dt3 = DateTime.parse("2005-03-26");
 
-        // set up a clock that returns dt2 as the current time
-        await withClock(Clock.fixed(dt2), () async {
-          // wire up dependencies to return reminders for the actions defined
-          // above
-          await setUpReminderServiceMock([
-            Reminder(action: a1, dueDate: dt1),
-            Reminder(action: a2, dueDate: dt2),
-            Reminder(action: a3, dueDate: dt3),
-          ]);
-          final (sut, _) = constructor();
+        // wire up dependencies to return reminders for the actions defined
+        // above
+        await setUpReminderServiceMock([
+          Reminder(action: a1, dueDate: dt1),
+          Reminder(action: a2, dueDate: dt2),
+          Reminder(action: a3, dueDate: null),
+        ]);
+        final (sut, _) = constructor();
 
-          // act
-          await sut.setUpReminderNotifications();
+        // act
+        await sut.setUpReminderNotifications();
 
-          // assert
-          expect(
-            await sut.getAllScheduledNotifications(),
-            equals([
-              // only dt3 is after dt2, so only one reminder is to be expected
-              (a3.equalityKey, dt3),
-            ]),
-          );
-        });
+        // assert
+        expect(
+          await sut.getAllScheduledNotifications(),
+          equals([
+            (a1.equalityKey, dt1),
+            (a2.equalityKey, dt2),
+          ]),
+        );
       });
 
       test('cleans up orphaned reminders when setting up reminders', () async {

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
-import 'package:clock/clock.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -194,14 +193,9 @@ void main() {
     await notificationService.initialize();
     await notificationService.decidePermissionsToSendNotifications();
 
-    //
-    // act, with a clock that returns a time before both timestamps above so
-    // that the notifications aren't removed because the due date has passed
-    await withClock(Clock.fixed(DateTime.parse("1900-01-01")), () async {
-      await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
-      // wait until listeners have had a chance to react
-      await Future.delayed(Duration.zero);
-    });
+    await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+    // wait until listeners have had a chance to react
+    await Future.delayed(Duration.zero);
 
     //
     // check that notifications are registered

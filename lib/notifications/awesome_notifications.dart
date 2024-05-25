@@ -216,7 +216,7 @@ class AwesomeNotificationsService extends NotificationService {
   }
 
   @override
-  FutureOr<Iterable<(String /*action id*/, DateTime)>>
+  FutureOr<Iterable<ScheduledNotification>>
       getAllScheduledNotifications() async {
     final notifications = await _i.listScheduledNotifications();
     return notifications.map((notification) {
@@ -227,6 +227,17 @@ class AwesomeNotificationsService extends NotificationService {
 
       return (payload['action-id']!, DateTime.parse(payload['when']!));
     }).whereNotNull();
+  }
+
+  @override
+  FutureOr<ScheduledNotification?> getScheduledNotificationForAction(
+    Action action,
+  ) async {
+    final allNotifications = await getAllScheduledNotifications();
+
+    return allNotifications.firstWhereOrNull(
+      (tuple) => tuple.$1 == action.equalityKey,
+    );
   }
 
   @override
