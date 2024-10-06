@@ -63,12 +63,9 @@ class HomeScreen extends StatelessWidget {
               key: Key('add-new-${v.serializationKey}'),
               icon: const Icon(Icons.new_label),
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => PokeModal(
-                    child: v.newInstanceBuilder(context, persistence),
-                  ),
-                );
+                PokeModal(
+                  child: v.newInstanceBuilder(context, persistence),
+                ).show(context);
               },
             );
           }),

@@ -7,6 +7,7 @@ import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/persistence/persistence.dart';
 
+// TODO: turn into some nice plot showing the dates instead of a stupid list
 class EventHistory extends StatelessWidget {
   final Action action;
 

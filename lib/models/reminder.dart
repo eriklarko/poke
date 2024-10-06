@@ -21,7 +21,10 @@ class Reminder {
     return action.buildLogActionWidget(
       context,
       persistence,
-      onActionLogged: onActionLogged,
+      onActionLogged: () {
+        // TODO: remove any active notification for the action
+        onActionLogged?.call();
+      },
     );
   }
 

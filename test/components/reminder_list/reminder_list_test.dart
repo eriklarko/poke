@@ -128,28 +128,32 @@ void main() {
 
   testWidgets('removes reminder from list when action is removed',
       (tester) async {
-    final persistence = InMemoryPersistence();
-    await setUpReminderServiceMock([reminder], persistence);
+    await tester.runAsync(() async {
+      final persistence = InMemoryPersistence();
+      await setUpReminderServiceMock([reminder], persistence);
+      final action = reminder.action as TestAction;
 
-    await pumpInTestApp(
-      tester,
-      ReminderList(
-        onReminderTapped: ignoreCallback,
-      ),
-    );
-    await tester.pumpAndSettle();
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(action.getKey('reminder-list-item')),
+        findsOneWidget,
+      );
 
-    //persistence.removeAction(reminder.action.equalityKey);
-    await tester.pumpAndSettle();
+      print("DELETING EVENT");
+      await persistence.deleteAction(reminder.action.equalityKey);
+      await pumpEventQueue();
 
-    expect(
-      find.byKey(
-        Key(reminder.action.equalityKey),
-      ),
-      findsNothing,
-    );
-
-    throw "SHOULD FAIL BUT DOESNT!!!! because persistence.removeAction does not exist";
+      expect(
+        find.byKey(action.getKey('reminder-list-item')),
+        findsNothing,
+      );
+    });
   });
 
   testWidgets('shows loading indicator while list item data is updated',

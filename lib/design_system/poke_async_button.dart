@@ -5,25 +5,45 @@ import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/logger/poke_logger.dart';
 
+typedef OnPressed = Future Function();
+typedef ButtonConstructor = PokeButton Function({
+  Key? key,
+  required String text,
+  required Function()? onPressed,
+});
+
 class PokeAsyncButton extends StatefulWidget {
   final String text;
   final bool rerunnable;
-  final Future Function()? onPressed;
-  final bool usePrimaryButton;
+  final OnPressed? onPressed;
+  final ButtonConstructor buttonConstructor;
 
   const PokeAsyncButton.once({
     super.key,
     required this.text,
     required this.onPressed,
-    this.usePrimaryButton = true,
+    this.buttonConstructor = PokeButton.primary,
   }) : rerunnable = false;
 
   const PokeAsyncButton.rerunnable({
     super.key,
     required this.text,
     required this.onPressed,
-    this.usePrimaryButton = true,
+    this.buttonConstructor = PokeButton.primary,
   }) : rerunnable = true;
+
+  factory PokeAsyncButton.primaryDangerous({
+    Key? key,
+    required String text,
+    required OnPressed? onPressed,
+  }) {
+    return PokeAsyncButton.once(
+      key: key,
+      text: text,
+      onPressed: onPressed,
+      buttonConstructor: PokeButton.primaryDangerous,
+    );
+  }
 
   @override
   State<PokeAsyncButton> createState() => _PokeAsyncButtonState();
@@ -34,12 +54,10 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
 
   @override
   Widget build(BuildContext context) {
-    final buttonConstructor =
-        widget.usePrimaryButton ? PokeButton.primary : PokeButton.small;
     return PokeAsyncWidget.simple(
       controller: controller,
 
-      idle: buttonConstructor(
+      idle: widget.buttonConstructor(
         onPressed: widget.onPressed == null
             ? null
             : () {

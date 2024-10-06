@@ -7,7 +7,6 @@ sealed class PersistenceEvent {
   PersistenceEvent({required this.actionId});
 
   static Updating updating({required String actionId}) => Updating(actionId);
-
   static FinishedUpdating finished(Updating u) => FinishedUpdating(u);
 
   @override

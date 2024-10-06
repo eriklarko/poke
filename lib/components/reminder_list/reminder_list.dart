@@ -64,6 +64,9 @@ class _ReminderListState extends State<ReminderList> {
           update.type == UpdateType.added) {
         // this action hasn't been seen before, time to trigger a rerender
         setState(() {/* reminders has changed */});
+      } else if (update.type == UpdateType.removed) {
+        print("reminder list got removed event");
+        setState(() {/* reminders has changed */});
       }
     } else {
       listItemStream.add(update.reminder);
@@ -72,6 +75,7 @@ class _ReminderListState extends State<ReminderList> {
 
   @override
   Widget build(BuildContext context) {
+    print("rendering reminder list");
     final reminders = List.of(widget.reminderService.getReminders());
     reminders.sort(compareReminders);
 

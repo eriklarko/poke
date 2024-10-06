@@ -16,13 +16,43 @@ class PokeButton extends StatelessWidget {
     required Function()? onPressed,
     required String text,
   }) {
+    return PokeButton._primary(
+      key: key,
+      text: text,
+      onPressed: onPressed,
+      background: Colors.amber,
+      foreground: Colors.white,
+    );
+  }
+
+  factory PokeButton.primaryDangerous({
+    Key? key,
+    required Function()? onPressed,
+    required String text,
+  }) {
+    return PokeButton._primary(
+      key: key,
+      text: text,
+      onPressed: onPressed,
+      background: Colors.red,
+      foreground: Colors.white,
+    );
+  }
+
+  factory PokeButton._primary({
+    Key? key,
+    required Function()? onPressed,
+    required String text,
+    required Color background,
+    required Color foreground,
+  }) {
     return PokeButton._(
       buildChild: (_) => TextButton(
         key: key,
         onPressed: onPressed,
         style: TextButton.styleFrom(
-          backgroundColor: Colors.amber,
-          foregroundColor: Colors.white,
+          backgroundColor: background,
+          foregroundColor: foreground,
           padding: EdgeInsets.all(PokeConstants.space(4)),
         ),
         child: PokeText(text),

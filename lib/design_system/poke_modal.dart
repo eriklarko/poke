@@ -3,6 +3,12 @@ import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 
 class PokeModal extends Dialog {
+  BuildContext? _shownInContext;
+
+  // creates a new modal showing `child`, and an optional "actionButton" at the
+  // top left side of the modal.
+  //
+  // The modal then needs to be shown by calling `modal.show(context)`.
   PokeModal({super.key, required child, PokeButton? actionButton})
       : super(
           shape: RoundedRectangleBorder(
@@ -27,4 +33,19 @@ class PokeModal extends Dialog {
             ),
           ),
         );
+
+  void show(BuildContext context) {
+    _shownInContext = context;
+
+    showDialog(
+      context: context,
+      builder: (context) => build(context),
+    );
+  }
+
+  void dismiss() {
+    if (_shownInContext != null) {
+      Navigator.of(_shownInContext!).pop();
+    }
+  }
 }

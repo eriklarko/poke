@@ -40,6 +40,7 @@ class ReminderService {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
+    print("reminder service got update ${update}");
     if (update.type == UpdateType.removed) {
       // reminder removed
       _removeReminder(update.actionId);
@@ -99,6 +100,8 @@ class ReminderService {
   }
 
   Future<ReminderUpdate> _toReminderUpdate(PersistenceEvent pe) async {
+    print("reminder service got persistence event ${pe}");
+
     if (pe is Updating) {
       return ReminderUpdate(
         actionId: pe.actionId,

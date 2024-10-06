@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poke/design_system/poke_async_button.dart';
+import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
 import 'package:poke/design_system/poke_text.dart';
@@ -117,7 +118,7 @@ class _NotificationPermissionWidgetState
             _rerender();
           },
           text: "Decide!",
-          usePrimaryButton: false,
+          buttonConstructor: PokeButton.small,
         ),
       ],
     );
