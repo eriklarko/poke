@@ -16,6 +16,8 @@ class ReminderService {
   StreamController<ReminderUpdate>? _publicStream;
   StreamSubscription? _reminderUpdateStreamSubscription;
 
+  ReminderService();
+
   Future<void> init() async {
     final actions = await _persistence.getAllActions();
     _reminders = List.of(actions.map(buildReminder));
@@ -72,6 +74,7 @@ class ReminderService {
     _reminders.removeWhere(
       (reminder) => reminder.action.equalityKey == actionId,
     );
+    print("reminders after removing $actionId: $_reminders");
   }
 
   void _updateReminder(Reminder reminder) {
@@ -100,7 +103,7 @@ class ReminderService {
   }
 
   Future<ReminderUpdate> _toReminderUpdate(PersistenceEvent pe) async {
-    print("reminder service got persistence event ${pe}");
+    print("reminder service is mapping persistence event ${pe}");
 
     if (pe is Updating) {
       return ReminderUpdate(
@@ -114,9 +117,17 @@ class ReminderService {
     if (updatedAction == null) {
       // The action doesn't exist in persitent storage anymore, assume it's been
       // deleted
+      var reminder = null;
+      for (var r in _reminders) {
+        if (r.action.equalityKey == pe.actionId) {
+          reminder = r;
+          break;
+        }
+      }
+
       return ReminderUpdate(
         actionId: pe.actionId,
-        reminder: null,
+        reminder: reminder,
         type: UpdateType.removed,
       );
     }

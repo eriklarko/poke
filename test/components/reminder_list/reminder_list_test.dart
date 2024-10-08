@@ -41,7 +41,6 @@ Future<ReminderService> setUpReminderServiceMock(
   }
 
   final rs = ReminderService();
-  await rs.init();
   await setReminderService(false, rs);
   return rs;
 }
@@ -148,6 +147,7 @@ void main() {
       print("DELETING EVENT");
       await persistence.deleteAction(reminder.action.equalityKey);
       await pumpEventQueue();
+      await tester.pumpAndSettle();
 
       expect(
         find.byKey(action.getKey('reminder-list-item')),

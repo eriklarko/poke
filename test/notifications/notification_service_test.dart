@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/notifications/awesome_notifications.dart';
 import 'package:poke/notifications/notification_service.dart';
@@ -64,7 +65,7 @@ void main() {
         );
       });
 
-      test('scheduleNotification only schedules one notification per action',
+      test('scheduleReminder only schedules one notification per action',
           () async {
         final (sut, _) = constructor();
         final action = TestAction(id: '1');
@@ -159,7 +160,26 @@ void main() {
       });
 
       test('notification removed when action is removed', () async {
-        throw "not implemented yet";
+        final persistence = InMemoryPersistence();
+        setDependency<Persistence>(persistence);
+        await setReminderService();
+
+        final (sut, _) = constructor();
+        await sut.initialize();
+
+        // schedule a reminder fo the action
+        final action = TestAction(id: '1');
+        await sut.scheduleReminder(action, DateTime.parse('1963-11-23'));
+
+        // remove the action
+        await persistence.deleteAction(action.equalityKey);
+        await pumpEventQueue();
+
+        // assert that the reminder is gone
+        expect(
+          await sut.getAllScheduledNotifications(),
+          isEmpty,
+        );
       });
 
       test('schedules reminders for all actions with due dates', () async {
@@ -193,6 +213,9 @@ void main() {
         );
       });
 
+      // This test makes sure that notifications are sent even when the due date
+      // has passed. This is important because the user might not have opened
+      // the app for a while, and we still want to remind them of the action.
       test('schedules reminders even when the due date has passed', () async {
         final action = TestAction(id: '1');
         final dueDate = DateTime.parse("1963-11-23");
@@ -244,6 +267,49 @@ void main() {
             (a.equalityKey, dueDate),
           ]),
         );
+      });
+
+      test('cancelScheduledNotificationForAction cancels notification',
+          () async {
+        // set up actions and due dates
+        final a1 = TestAction(id: '1');
+        final a2 = TestAction(id: '2');
+
+        // wire up dependencies to return reminders for the actions defined
+        // above
+        await setUpReminderServiceMock([
+          Reminder(action: a1, dueDate: DateTime.parse("1963-11-23")),
+          Reminder(action: a2, dueDate: DateTime.parse("1989-12-06")),
+        ]);
+        final (sut, _) = constructor();
+        await sut.setUpReminderNotifications();
+
+        // act
+        await sut.cancelScheduledNotificationForAction(a1.equalityKey);
+
+        // assert
+        expect(
+          (await sut.getAllScheduledNotifications()).map((tuple) => tuple.$1),
+          equals([
+            a2.equalityKey,
+          ]),
+        );
+      });
+
+      test("can't cancel notification for action that doesn't exist", () async {
+        final action = TestAction(id: '1');
+
+        await setUpReminderServiceMock([
+          Reminder(action: action, dueDate: null),
+        ]);
+        final (sut, _) = constructor();
+        await sut.setUpReminderNotifications();
+
+        // test doesn't throw if there's no notification to cancel
+        await sut.cancelScheduledNotificationForAction(action.equalityKey);
+
+        // test doesn't throw on non-existent action
+        await sut.cancelScheduledNotificationForAction('non-existent-action');
       });
     });
   }

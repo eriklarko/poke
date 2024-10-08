@@ -16,10 +16,15 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<void> cancel(int id) {
-    _notifications.remove(id);
+    final value = _notifications.remove(id);
+    if (value == null) {
+      return Future.error("notification $id does not exist");
+    }
+
     for (var notificationIds in _channels.values) {
       notificationIds.remove(id);
     }
+
     return Future.value(null);
   }
 
@@ -49,7 +54,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<void> cancelSchedule(int id) {
-    throw UnimplementedError();
+    return cancel(id);
   }
 
   @override

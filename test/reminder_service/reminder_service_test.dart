@@ -69,7 +69,7 @@ void main() {
 
   // TODO: test getReminders returns updated reminder
   //   1. set up reminder service with one action
-  //   2. update the action
+  //   2. update the action (like change name or add an event)
   //   3. verify that getReminders returns the updated action and that the due date has been updated
 
   group('updates stream', () {
@@ -98,6 +98,7 @@ void main() {
 
     test('forwards delete events', () async {
       final persistence = InMemoryPersistence();
+      persistence.createAction(TestAction(id: '1'));
       setPersistence(persistence);
 
       final sut = ReminderService();
@@ -111,8 +112,7 @@ void main() {
       );
 
       // trigger remove event
-      //await persistence.deleteAction('1');
-      fail('persistence.removeAction not implemented yet');
+      await persistence.deleteAction('1');
     });
   });
 }

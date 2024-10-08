@@ -47,11 +47,14 @@ class FirebaseLogger extends LocalLogger {
       case Level.warning:
       case Level.error:
       case Level.fatal:
-        final d = data ?? {};
+        final d = Map<String, Object>.from(data ?? {});
         d['__msg'] = msg;
-        d['__error'] = error;
 
-        final String event = d.remove('event') ?? 'unknown';
+        if (error != null) {
+          d['__error'] = error;
+        }
+
+        final String event = d.remove('event')?.toString() ?? 'unknown';
 
         return firebase
             .analytics()

@@ -27,7 +27,7 @@ class ReminderList extends StatefulWidget {
 }
 
 class _ReminderListState extends State<ReminderList> {
-  /// maps each action to the stream used to send messages to the list item.
+  /// maps each action to a stream used to send messages to the list item.
   /// these streams are used to tell the list item to render a loading indicator
   /// while an action is updated, like when a new event is logged eg.
   ///
@@ -62,12 +62,18 @@ class _ReminderListState extends State<ReminderList> {
     if (listItemStream == null) {
       if (update.type == UpdateType.updated ||
           update.type == UpdateType.added) {
-        // this action hasn't been seen before, time to trigger a rerender
-        setState(() {/* reminders has changed */});
-      } else if (update.type == UpdateType.removed) {
-        print("reminder list got removed event");
+        // this action hasn't been seen before, time to trigger a rerender. The
+        // build method reads its state from the reminder service directly so we
+        // don't need to do anything here.
         setState(() {/* reminders has changed */});
       }
+
+      return;
+    }
+
+    if (update.type == UpdateType.removed) {
+      print("reminder list got removed event");
+      setState(() {/* reminders has changed */});
     } else {
       listItemStream.add(update.reminder);
     }
@@ -78,6 +84,7 @@ class _ReminderListState extends State<ReminderList> {
     print("rendering reminder list");
     final reminders = List.of(widget.reminderService.getReminders());
     reminders.sort(compareReminders);
+    print("reminders: ${reminders}");
 
     // remove any existing list item controllers as we'll be creating new ones
     _listItemStreams.forEach((_, stream) => stream.close());

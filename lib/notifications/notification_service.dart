@@ -40,8 +40,10 @@ abstract class NotificationService {
   FutureOr<Iterable<ScheduledNotification>> getAllScheduledNotifications();
 
   FutureOr<ScheduledNotification?> getScheduledNotificationForAction(
-    Action action,
+    String actionId,
   );
+
+  FutureOr<void> cancelScheduledNotificationForAction(String actionId);
 }
 
 enum PermissionResponse {

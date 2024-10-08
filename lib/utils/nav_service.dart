@@ -45,4 +45,11 @@ class NavService {
       MaterialPageRoute(builder: (_) => w),
     );
   }
+
+  static void reset(Widget w) {
+    instance.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => w),
+      (_) => false,
+    );
+  }
 }

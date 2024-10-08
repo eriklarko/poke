@@ -55,9 +55,14 @@ class AwesomeNotificationsService extends NotificationService {
       onDismissActionReceivedMethod: _onDismissActionReceivedMethod,
     );
 
-    _remindersListener =
-        GetIt.instance.get<ReminderService>().updatesStream().listen((event) {
+    _remindersListener = GetIt.instance
+        .get<ReminderService>()
+        .updatesStream()
+        .listen((event) async {
       switch (event.type) {
+        case UpdateType.updating:
+          // nothing to do here
+          break;
         case UpdateType.added:
         case UpdateType.updated:
           final reminder = event.reminder;
@@ -70,10 +75,22 @@ class AwesomeNotificationsService extends NotificationService {
             return;
           }
 
-          scheduleReminder(reminder.action, reminder.dueDate!);
+          await scheduleReminder(reminder.action, reminder.dueDate!);
+
+        case UpdateType.removed:
+          print("awesome_notifications got removed event: ${event}");
+          cancelScheduledNotificationForAction(event.actionId);
         default:
+          PokeLogger.instance().warn(
+            "awesome_notifications got an unknown event type",
+            data: {
+              'event': event,
+            },
+          );
       }
     });
+
+    print("reminder service listener registered");
   }
 
   @override
@@ -221,8 +238,12 @@ class AwesomeNotificationsService extends NotificationService {
   }
 
   int _getNotificationId(Action action) {
+    return _getNotificationIdFromActionId(action.equalityKey);
+  }
+
+  int _getNotificationIdFromActionId(String actionId) {
     // generate data unique to the action
-    final uniqueData = action.equalityKey;
+    final uniqueData = actionId;
 
     // convert it to a hash
     final hash = md5.convert(uniqueData.codeUnits);
@@ -248,18 +269,29 @@ class AwesomeNotificationsService extends NotificationService {
 
   @override
   FutureOr<ScheduledNotification?> getScheduledNotificationForAction(
-    Action action,
+    String actionId,
   ) async {
     final allNotifications = await getAllScheduledNotifications();
 
     return allNotifications.firstWhereOrNull(
-      (tuple) => tuple.$1 == action.equalityKey,
+      (tuple) => tuple.$1 == actionId,
     );
   }
 
   @override
   FutureOr<void> removeAllReminders() {
     return _i.cancelAllSchedules();
+  }
+
+  @override
+  FutureOr<void> cancelScheduledNotificationForAction(String actionId) async {
+    final notifs = await getAllScheduledNotifications();
+    final hasScheduledNotification =
+        notifs.any((tuple) => tuple.$1 == actionId);
+
+    if (hasScheduledNotification) {
+      await _i.cancelSchedule(_getNotificationIdFromActionId(actionId));
+    }
   }
 
   ///////////////////////////////

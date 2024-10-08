@@ -12,7 +12,9 @@ import 'package:poke/models/action.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/screens/action_details_screen/event_history.dart';
+import 'package:poke/screens/home_screen.dart';
 import 'package:poke/utils/future_helpers.dart';
+import 'package:poke/utils/nav_service.dart';
 
 class ActionDetailsScreen extends StatelessWidget {
   final notificationService = GetIt.instance.get<NotificationService>();
@@ -42,7 +44,8 @@ class ActionDetailsScreen extends StatelessWidget {
             PokeConstants.FixedSpacer(),
             PokeFutureBuilder<ScheduledNotification?>(
               future: asFuture(
-                notificationService.getScheduledNotificationForAction(action),
+                notificationService
+                    .getScheduledNotificationForAction(action.equalityKey),
               ),
               child: (notification) {
                 if (notification == null) {
@@ -81,6 +84,9 @@ class ActionDetailsScreen extends StatelessWidget {
                     "actionId": action.equalityKey,
                   },
                 );
+                // This isn't great, and kind of a crash. Off ya go to the home
+                // screen
+                NavService.reset(HomeScreen());
               } else {
                 onceDeleted();
               }
