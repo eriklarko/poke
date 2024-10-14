@@ -25,8 +25,8 @@ class ActionDetailsScreen extends StatelessWidget {
 
   ActionDetailsScreen({
     super.key,
-    required this.body,
     required this.action,
+    required this.body,
   });
 
   @override
@@ -84,12 +84,12 @@ class ActionDetailsScreen extends StatelessWidget {
                     "actionId": action.equalityKey,
                   },
                 );
-                // This isn't great, and kind of a crash. Off ya go to the home
-                // screen
-                NavService.reset(HomeScreen());
               } else {
                 onceDeleted();
               }
+
+              // Take the user back home
+              NavService.reset(HomeScreen());
             },
           ),
         ],
