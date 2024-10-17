@@ -35,6 +35,11 @@ abstract interface class PokeLogger {
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       return LocalLogger();
     }
+    if (!GetIt.instance.isRegistered<PokeLogger>()) {
+      final logger = LocalLogger();
+      logger.warn('PokeLogger not registered in GetIt. this is odd.');
+      return logger;
+    }
     return GetIt.instance.get<PokeLogger>();
   }
 }
