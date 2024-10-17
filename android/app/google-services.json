@@ -15,16 +15,12 @@
       },
       "oauth_client": [
         {
-          "client_id": "201274280583-gk13sck00quesefb6a97b4dakrhfk29c.apps.googleusercontent.com",
+          "client_id": "201274280583-cl3efjp78ft81i242r9j5vh1bvh8s5va.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.poke",
-            "certificate_hash": "a7cce4a8d194be990c2123a23bd9de061c695b24"
+            "certificate_hash": "0e75848631cdad19d5a483b0a9424ca8dee18e0f"
           }
-        },
-        {
-          "client_id": "201274280583-5oelsa9jm8lcpe3sspitrtnbs1h1rgqn.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
@@ -34,19 +30,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "201274280583-5oelsa9jm8lcpe3sspitrtnbs1h1rgqn.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "201274280583-eih81te6e0ibj1g5ort2fbtemn600esj.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.poke"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     },
@@ -57,40 +41,15 @@
           "package_name": "com.plantreminder"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "201274280583-t4m3q567i1m9jsdkrh3kvjqogfpgn9ah.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.plantreminder",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "201274280583-5oelsa9jm8lcpe3sspitrtnbs1h1rgqn.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCiTrb9EFwZPxsem-HRPfz-LI_bjl0mYDw"
+          "current_key": "AIzaSyCo2Jlq9WdIpchjg2MxyNfP7CKUFPtvMEw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "201274280583-5oelsa9jm8lcpe3sspitrtnbs1h1rgqn.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "201274280583-eih81te6e0ibj1g5ort2fbtemn600esj.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.poke"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

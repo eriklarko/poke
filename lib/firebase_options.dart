@@ -58,6 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:201274280583:android:4e1807ba30673f5095c622',
     messagingSenderId: '201274280583',
     projectId: 'plant-reminder-90745',
+    databaseURL: 'https://plant-reminder-90745-default-rtdb.firebaseio.com',
     storageBucket: 'plant-reminder-90745.appspot.com',
   );
 
@@ -67,8 +68,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '201274280583',
     projectId: 'plant-reminder-90745',
     storageBucket: 'plant-reminder-90745.appspot.com',
-    androidClientId: '201274280583-t4m3q567i1m9jsdkrh3kvjqogfpgn9ah.apps.googleusercontent.com',
-    iosClientId: '201274280583-eih81te6e0ibj1g5ort2fbtemn600esj.apps.googleusercontent.com',
+    androidClientId:
+        '201274280583-t4m3q567i1m9jsdkrh3kvjqogfpgn9ah.apps.googleusercontent.com',
+    iosClientId:
+        '201274280583-eih81te6e0ibj1g5ort2fbtemn600esj.apps.googleusercontent.com',
     iosBundleId: 'com.example.poke',
   );
 
@@ -78,8 +81,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '201274280583',
     projectId: 'plant-reminder-90745',
     storageBucket: 'plant-reminder-90745.appspot.com',
-    androidClientId: '201274280583-t4m3q567i1m9jsdkrh3kvjqogfpgn9ah.apps.googleusercontent.com',
-    iosClientId: '201274280583-omsslj48liinsdaqviebjilcasp670qs.apps.googleusercontent.com',
+    androidClientId:
+        '201274280583-t4m3q567i1m9jsdkrh3kvjqogfpgn9ah.apps.googleusercontent.com',
+    iosClientId:
+        '201274280583-omsslj48liinsdaqviebjilcasp670qs.apps.googleusercontent.com',
     iosBundleId: 'com.example.poke.RunnerTests',
   );
 }
