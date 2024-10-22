@@ -54,8 +54,12 @@ Future<void> setReminderService([
   setDependency<ReminderService>(reminderService);
 }
 
-void setNotificationService() {
+AwesomeNotificationsService setNotificationService() {
   setUpDevicePersistence();
+
   AwesomeNotificationsPlatform.instance = InMemoryNotificationPlatform();
-  setDependency<NotificationService>(AwesomeNotificationsService());
+
+  final service = AwesomeNotificationsService();
+  setDependency<NotificationService>(service);
+  return service;
 }

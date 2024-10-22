@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_async_button.dart';
+import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_text.dart';
+import 'package:poke/screens/notifications_list/notifications_list_screen.dart';
+import 'package:poke/utils/nav_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   final _googleSignIn = GoogleSignIn();
@@ -31,6 +34,12 @@ class SettingsScreen extends StatelessWidget {
                   text: 'Make permanent',
                   onPressed: linkWithGoogle,
                 ),
+              PokeButton.small(
+                text: "Show scheduled notifications",
+                onPressed: () {
+                  NavService.push(NotificationsListScreen());
+                },
+              ),
               PokeAsyncButton.rerunnable(
                 text: 'Log out',
                 onPressed: () async {
