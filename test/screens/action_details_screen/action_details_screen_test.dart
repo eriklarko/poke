@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
@@ -13,9 +11,7 @@ import 'package:poke/utils/nav_service.dart';
 import '../../test_app.dart';
 import '../../utils/dependencies.dart';
 import '../../utils/test-action/test_action.dart';
-import 'action_details_screen_test.mocks.dart';
 
-@GenerateNiceMocks([MockSpec<NavigatorObserver>()])
 void main() {
   testWidgets('shows when the next notification is scheduled', (tester) async {
     //// Set up state for the test

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poke/utils/nav_service.dart';
 
 // pumpInTestAppFactory is used to ensure a widget under test has the context
 // flutter needs to properly render it. Seems like this should be part of the
