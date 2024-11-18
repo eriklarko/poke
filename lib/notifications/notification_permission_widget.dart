@@ -97,30 +97,38 @@ class _NotificationPermissionWidgetState
       return Container();
     }
 
-    return Column(
-      key: NotificationPermissionWidget.widgetKey,
-      children: [
-        Row(
-          children: [
-            const Icon(Icons.warning),
-            PokeConstants.FixedSpacer(),
-            Expanded(
-              child: PokeText(
-                "Poke wants to send notifications to remind you of things.",
+    return Padding(
+      padding: EdgeInsets.all(PokeConstants.space()),
+      child: Column(
+        key: NotificationPermissionWidget.widgetKey,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: PokeConstants.space() / 2),
+                child: const Icon(Icons.warning),
               ),
-            ),
-          ],
-        ),
-        PokeAsyncButton.once(
-          key: const ValueKey('decide-button'),
-          onPressed: () async {
-            await _notificationService.decidePermissionsToSendNotifications();
-            _rerender();
-          },
-          text: "Decide!",
-          buttonConstructor: PokeButton.small,
-        ),
-      ],
+              PokeConstants.FixedSpacer(2),
+              Expanded(
+                child: PokeText(
+                  "Poke wants to send notifications to remind you of things.",
+                ),
+              ),
+            ],
+          ),
+          PokeAsyncButton.once(
+            key: const ValueKey('decide-button'),
+            onPressed: () async {
+              await _notificationService.decidePermissionsToSendNotifications();
+              _rerender();
+            },
+            text: "Decide!",
+            buttonConstructor: PokeButton.small,
+          ),
+          PokeConstants.FixedSpacer(2),
+        ],
+      ),
     );
   }
 }

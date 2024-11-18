@@ -90,31 +90,32 @@ class _ReminderListState extends State<ReminderList> {
     _listItemStreams.forEach((_, stream) => stream.close());
     _listItemStreams.clear();
 
-    return ListView.builder(
-      itemCount: reminders.length,
-      itemBuilder: (context, position) {
-        final listItemStream = StreamController<Reminder?>();
-        final reminder = reminders[position];
-        final actionId = reminder.action.equalityKey;
+    final listItems = reminders.map((reminder) {
+      final listItemStream = StreamController<Reminder?>();
+      final actionId = reminder.action.equalityKey;
 
-        _listItemStreams[actionId] = listItemStream;
+      _listItemStreams[actionId] = listItemStream;
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: PokeConstants.space()),
-          child: SizedBox(
-            height: PokeConstants.space(15),
-            child: StreamUpdatingWidget<Reminder>(
-              initialData: reminder,
-              dataStream: listItemStream.stream,
-              buildChild: (context, data) => ReminderListItem(
-                reminder: data,
-                onTap: widget.onReminderTapped,
-                swipeActions: widget.swipeActions,
-              ),
+      return Padding(
+        padding: EdgeInsets.only(bottom: PokeConstants.space()),
+        child: SizedBox(
+          height: PokeConstants.space(15),
+          child: StreamUpdatingWidget<Reminder>(
+            initialData: reminder,
+            dataStream: listItemStream.stream,
+            buildChild: (context, data) => ReminderListItem(
+              reminder: data,
+              onTap: widget.onReminderTapped,
+              swipeActions: widget.swipeActions,
             ),
           ),
-        );
-      },
+        ),
+      );
+    }).toList();
+
+    //return Column(children: listItems);
+    return SingleChildScrollView(
+      child: Column(children: listItems),
     );
   }
 
