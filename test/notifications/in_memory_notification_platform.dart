@@ -8,7 +8,12 @@ import 'package:awesome_notifications/awesome_notifications_platform_interface.d
 typedef NotificationId = int;
 
 class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
-  final Map<NotificationId, NotificationModel> _notifications = {};
+  // AwesomeNotifications is supposed to only schedule one notification per id,
+  // so it makes sense to store notifications in a map with the id as the key.
+  // However, from testing in the app, it's clear that this is not the case.
+  // Instead I need to implement this id check myself, and store notifications
+  // as a simple list to allow duplicate ids
+  final List<NotificationModel> _notifications = [];
   final Map<NotificationChannel, List<NotificationId>> _channels = {};
   bool _canSendNotifications = false;
 
@@ -16,10 +21,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<void> cancel(int id) {
-    final value = _notifications.remove(id);
-    if (value == null) {
-      return Future.error("notification $id does not exist");
-    }
+    _notifications.removeWhere((n) => n.content!.id == id);
 
     for (var notificationIds in _channels.values) {
       notificationIds.remove(id);
@@ -110,12 +112,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
       localizations: localizations,
     );
 
-    _notifications.update(
-      content.id!,
-      (value) => notif,
-      ifAbsent: () => notif,
-    );
-
+    _notifications.add(notif);
     return Future.value(true);
   }
 
@@ -244,7 +241,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<List<NotificationModel>> listScheduledNotifications() {
-    final scheduledNotifications = _notifications.values
+    final scheduledNotifications = _notifications
         .where((notification) => notification.schedule != null)
         .toList();
 

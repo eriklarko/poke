@@ -163,8 +163,23 @@ class AwesomeNotificationsService extends NotificationService {
 
   @override
   FutureOr<void> scheduleReminder(Action action, DateTime dueDate) async {
-    await _ensureChannelExists(action);
+    final existingReminder = await getScheduledNotificationForAction(
+      action.equalityKey,
+    );
+    if (existingReminder != null) {
+      PokeLogger.instance().info(
+        "Scheduled reminder already found, updating due date",
+        data: {
+          'action': action,
+          'dueDate': dueDate,
+        },
+      );
 
+      // updating here means deleting the old reminder and creating a new one :)
+      this.cancelScheduledNotificationForAction(action.equalityKey);
+    }
+
+    await _ensureChannelExists(action);
     final actionData = action.getNotificationData();
 
     await _i.createNotification(
