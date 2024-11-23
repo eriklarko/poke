@@ -126,6 +126,11 @@ class TestAction extends Action<Null> {
   }
 
   @override
+  String getHumanReadableName() {
+    return "Test action $id";
+  }
+
+  @override
   NotificationData getNotificationData() {
     return NotificationData(title: toString(), body: toString());
   }
@@ -207,6 +212,11 @@ class TestActionWithData extends Action<Data> {
   @override
   String toString() {
     return "$equalityKey - $id - $events";
+  }
+
+  @override
+  String getHumanReadableName() {
+    return "Test action with data $id";
   }
 
   @override

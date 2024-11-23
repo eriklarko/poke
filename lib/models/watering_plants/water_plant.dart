@@ -39,6 +39,11 @@ class WaterPlantAction extends Action<WaterEventData> {
   String get equalityKey => "water-${plant.id}";
 
   @override
+  String getHumanReadableName() {
+    return plant.name;
+  }
+
+  @override
   NotificationData getNotificationData() {
     // TODO: get the reminder here from GetIt so that the body can say "watering due 2 days ago"
     return NotificationData(

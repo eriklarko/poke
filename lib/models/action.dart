@@ -97,6 +97,8 @@ abstract class Action<EventDataType extends SerializableEventData?> {
     events.remove(eventTime);
   }
 
+  String getHumanReadableName();
+
   NotificationData getNotificationData();
 
   //////////////////////////////////////////////////////////////

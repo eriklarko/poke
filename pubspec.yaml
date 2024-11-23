@@ -60,6 +60,7 @@ dependencies:
   awesome_notifications: any # version set by awesome_notifications_core
   collection: ^1.17.1
   shared_preferences: ^2.2.2
+  calendar_view: ^1.3.0
 
 dev_dependencies:
   flutter_test:
