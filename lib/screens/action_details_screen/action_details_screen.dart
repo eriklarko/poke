@@ -10,19 +10,17 @@ class ActionDetailsScreen extends StatelessWidget {
   final persistence = GetIt.instance.get<Persistence>();
 
   final Action action;
-  final Widget body;
 
   ActionDetailsScreen({
     super.key,
     required this.action,
-    required this.body,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PokeAppBar(context),
-      body: body,
+      body: action.buildDetailsScreen(context),
     );
   }
 }

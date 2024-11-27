@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:poke/design_system/poke_async_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/watering_plants/plant.dart';
-import 'package:poke/models/watering_plants/plant_image.dart';
+import 'package:poke/models/watering_plants/widgets/plant_image.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 import 'package:poke/persistence/persistence.dart';
 
 class NewInstanceWidget extends StatefulWidget {
-  final Persistence persistence;
-  const NewInstanceWidget({super.key, required this.persistence});
+  final persistence = GetIt.instance.get<Persistence>();
+  NewInstanceWidget({super.key});
 
   @override
   State<NewInstanceWidget> createState() => NewInstanceWidgetState();

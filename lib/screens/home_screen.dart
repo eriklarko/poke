@@ -87,7 +87,6 @@ class HomeScreen extends StatelessWidget {
             NavService.instance.push(MaterialPageRoute(builder: (_) {
               return ActionDetailsScreen(
                 action: reminder.action,
-                body: reminder.buildDetailsScreen(context),
               );
             }));
           },

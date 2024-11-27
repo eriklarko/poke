@@ -5,7 +5,7 @@ import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/persistence/persistence.dart';
 
 import 'plant_image.dart';
-import 'water_plant.dart';
+import '../water_plant.dart';
 
 // Shows the image associated with a WaterPlanAction's plant, and allows
 // the user to tap the image to change it.

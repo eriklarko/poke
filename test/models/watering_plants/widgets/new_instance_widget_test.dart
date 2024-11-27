@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:poke/models/watering_plants/new_instance_widget.dart';
+import 'package:poke/models/watering_plants/widgets/new_instance_widget.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../test_app.dart';
-import '../../utils/dependencies.dart';
+import '../../../test_app.dart';
+import '../../../utils/dependencies.dart';
 import 'new_instance_widget_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Persistence>(), MockSpec<Uuid>()])
@@ -26,13 +26,14 @@ void main() {
     when(persistence.uploadData(any, any)).thenAnswer(
       (_) async => Uri.file('/foo'),
     );
+    setPersistence(persistence);
 
     // unfortunate dependency
     setDependency<Uuid>(const Uuid());
 
     await pumpInTestApp(
       tester,
-      NewInstanceWidget(persistence: persistence),
+      NewInstanceWidget(),
     );
 
     // enter plant name
@@ -55,7 +56,7 @@ void main() {
       persistence.createAction(
         WaterPlantAction(
           plant: Plant(
-            id: "some-plant-name".hashCode.toString(),
+            id: "some-plant-name",
             name: "some-plant-name",
             imageUri: Uri.file('/foo'),
           ),
@@ -66,6 +67,7 @@ void main() {
 
   testWidgets("uploads image", (tester) async {
     final persistence = MockPersistence();
+    setPersistence(persistence);
 
     // `newPlantImageStorageKey` uses a uuid (v4) internally. to be able to test
     // the upload we hijack the uuid generation to always return the same id
@@ -75,7 +77,7 @@ void main() {
 
     await pumpInTestApp(
       tester,
-      NewInstanceWidget(persistence: persistence),
+      NewInstanceWidget(),
     );
 
     // set plant image
@@ -92,13 +94,14 @@ void main() {
     when(persistence.uploadData(any, any)).thenAnswer(
       (_) => c.future,
     );
+    setPersistence(persistence);
 
     // unfortunate dependency
     setDependency<Uuid>(const Uuid());
 
     await pumpInTestApp(
       tester,
-      NewInstanceWidget(persistence: persistence),
+      NewInstanceWidget(),
     );
 
     final createButton = find.byType(TextButton);

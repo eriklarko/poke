@@ -5,15 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/models/watering_plants/editable_plant_image.dart';
+import 'package:poke/models/watering_plants/widgets/editable_plant_image.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
 import 'package:poke/persistence/persistence.dart';
 
-import '../../test_app.dart';
-import '../../utils/images.dart';
-import '../../utils/dependencies.dart';
+import '../../../test_app.dart';
+import '../../../utils/images.dart';
+import '../../../utils/dependencies.dart';
 import 'editable_plant_image_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Plant>(), MockSpec<Persistence>()])

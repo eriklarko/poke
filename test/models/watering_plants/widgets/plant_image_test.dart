@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poke/models/watering_plants/plant_image.dart';
+import 'package:poke/models/watering_plants/widgets/plant_image.dart';
 
-import '../../test_app.dart';
-import '../../utils/images.dart';
+import '../../../test_app.dart';
+import '../../../utils/images.dart';
 
 void main() {
   testWidgets('shows the provided image', (tester) async {
