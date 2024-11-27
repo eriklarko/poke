@@ -5,6 +5,7 @@ class AveragePredictor extends Predictor {
   @override
   DateTime? predictNext(Action action) {
     final previousOccurrences = List.of(action.events.keys);
+    previousOccurrences.sort();
     return _predictNext(previousOccurrences);
   }
 
