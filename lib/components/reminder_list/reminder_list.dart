@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/components/updating_widget/stream_updating_widget.dart';
 import 'package:poke/design_system/poke_constants.dart';
@@ -54,6 +55,11 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
+    PokeLogger.instance().debug(
+      'Reminder list received update',
+      data: {'update': update},
+    );
+
     if (!mounted) {
       return;
     }
@@ -72,7 +78,10 @@ class _ReminderListState extends State<ReminderList> {
     }
 
     if (update.type == UpdateType.removed) {
-      print("reminder list got removed event");
+      PokeLogger.instance().debug(
+        'Removing reminder from list',
+        data: {'update': update},
+      );
       setState(() {/* reminders has changed */});
     } else {
       listItemStream.add(update.reminder);
@@ -81,10 +90,12 @@ class _ReminderListState extends State<ReminderList> {
 
   @override
   Widget build(BuildContext context) {
-    print("rendering reminder list");
     final reminders = List.of(widget.reminderService.getReminders());
     reminders.sort(compareReminders);
-    print("reminders: ${reminders}");
+    PokeLogger.instance().debug(
+      'Building reminder list',
+      data: {'reminders': reminders},
+    );
 
     // remove any existing list item controllers as we'll be creating new ones
     _listItemStreams.forEach((_, stream) => stream.close());
@@ -96,14 +107,20 @@ class _ReminderListState extends State<ReminderList> {
 
       _listItemStreams[actionId] = listItemStream;
 
+      PokeLogger.instance().debug(
+        'Creating reminder list item',
+        data: {'reminder': reminder},
+      );
       return Padding(
         padding: EdgeInsets.only(bottom: PokeConstants.space()),
         child: SizedBox(
           height: PokeConstants.space(15),
           child: StreamUpdatingWidget<Reminder>(
+            key: ValueKey(actionId),
             initialData: reminder,
             dataStream: listItemStream.stream,
             buildChild: (context, data) => ReminderListItem(
+              key: ValueKey(actionId),
               reminder: data,
               onTap: widget.onReminderTapped,
               swipeActions: widget.swipeActions,

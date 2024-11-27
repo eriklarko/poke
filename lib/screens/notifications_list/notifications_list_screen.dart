@@ -44,7 +44,8 @@ class NotificationsListScreen extends StatelessWidget {
   }
 
   Iterable<(T, DateTime)> sortDateAsc<T>(
-      Iterable<(T, DateTime)> notifications) {
+    Iterable<(T, DateTime)> notifications,
+  ) {
     return notifications.sorted((a, b) {
       return a.$2.compareTo(b.$2);
     });
@@ -70,10 +71,6 @@ class NotificationsListScreen extends StatelessWidget {
                 )
                 .toList(),
           );
-          PokeLogger.instance().info("Rendering ntoifications", data: {
-            'notifications': notifications,
-            'foo': ec.allEvents,
-          });
 
           final sorted = sortDateAsc(notifications);
           return MonthView(

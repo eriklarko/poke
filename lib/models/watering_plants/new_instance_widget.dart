@@ -63,7 +63,7 @@ class NewInstanceWidgetState extends State<NewInstanceWidget> {
                   return widget.persistence.createAction(
                     WaterPlantAction(
                       plant: Plant(
-                        id: plantNameController.text.hashCode.toString(), // lul
+                        id: plantNameController.text,
                         name: plantNameController.text,
                         imageUri: _imageUri,
                       ),

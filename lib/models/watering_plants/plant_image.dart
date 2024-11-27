@@ -16,6 +16,13 @@ class PlantImage extends StatelessWidget {
   final double maxWidth;
   final double maxHeight;
 
+  const PlantImage.small(
+    this.image, {
+    super.key,
+    this.onNewImage,
+  })  : maxWidth = 100,
+        maxHeight = 100;
+
   const PlantImage.large(
     this.image, {
     super.key,

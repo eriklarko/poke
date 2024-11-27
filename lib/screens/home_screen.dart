@@ -4,6 +4,7 @@ import 'package:poke/components/expandable_floating_action_button/expandable_flo
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
 import 'package:poke/design_system/poke_button.dart';
+import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/action.dart';
@@ -39,7 +40,9 @@ class HomeScreen extends StatelessWidget {
                     print('snoozing $reminder');
                   },
                   Container(
-                    decoration: const BoxDecoration(color: Colors.amber),
+                    decoration: BoxDecoration(
+                      color: PokeConstants.colors.primary,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,

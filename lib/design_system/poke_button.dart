@@ -20,8 +20,8 @@ class PokeButton extends StatelessWidget {
       key: key,
       text: text,
       onPressed: onPressed,
-      background: Colors.amber,
-      foreground: Colors.white,
+      background: PokeConstants.colors.primary,
+      foreground: PokeConstants.colors.onPrimary,
     );
   }
 
@@ -34,8 +34,8 @@ class PokeButton extends StatelessWidget {
       key: key,
       text: text,
       onPressed: onPressed,
-      background: Colors.red,
-      foreground: Colors.white,
+      background: PokeConstants.colors.error,
+      foreground: PokeConstants.colors.onError,
     );
   }
 
@@ -70,8 +70,8 @@ class PokeButton extends StatelessWidget {
         key: key,
         onPressed: onPressed,
         style: TextButton.styleFrom(
-          backgroundColor: Colors.amber,
-          foregroundColor: Colors.white,
+          backgroundColor: PokeConstants.colors.primary,
+          foregroundColor: PokeConstants.colors.onPrimary,
           padding: EdgeInsets.all(PokeConstants.space()),
         ),
         child: PokeText(text),

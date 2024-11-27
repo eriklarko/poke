@@ -156,6 +156,68 @@ void main() {
     });
   });
 
+  testWidgets('shows remaining reminders after action is removed',
+      (tester) async {
+    await tester.runAsync(() async {
+      final r1 = Reminder(
+        action: TestAction(id: 'test-action-1'),
+        // set due date to tomorrow
+        dueDate: null,
+      );
+      final r2 = Reminder(
+        action: TestAction(id: 'test-action-2'),
+        // set due date to tomorrow
+        dueDate: null,
+      );
+      final r3 = Reminder(
+        action: TestAction(id: 'test-action-3'),
+        // set due date to tomorrow
+        dueDate: null,
+      );
+
+      final persistence = InMemoryPersistence();
+      await setUpReminderServiceMock([r1, r2, r3], persistence);
+
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey((r1.action as TestAction).getKey('reminder-list-item')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey((r2.action as TestAction).getKey('reminder-list-item')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey((r3.action as TestAction).getKey('reminder-list-item')),
+        findsOneWidget,
+      );
+
+      print("DELETING EVENT");
+      await persistence.deleteAction(r1.action.equalityKey);
+      await pumpEventQueue();
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey((r1.action as TestAction).getKey('reminder-list-item')),
+        findsNothing,
+      );
+      expect(
+        find.byKey((r2.action as TestAction).getKey('reminder-list-item')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey((r3.action as TestAction).getKey('reminder-list-item')),
+        findsOneWidget,
+      );
+    });
+  });
+
   testWidgets('shows loading indicator while list item data is updated',
       (tester) async {
     final persistence = InMemoryPersistence();

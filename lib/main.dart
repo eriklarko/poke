@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:poke/components/app_lifecycle_listener.dart';
+import 'package:poke/components/year_view/year_view.dart';
+import 'package:poke/models/watering_plants/plant.dart';
+import 'package:poke/models/watering_plants/water_plant.dart';
+import 'package:poke/screens/action_details_screen/event_history.dart';
+import 'package:poke/screens/dev_screen.dart';
 import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:poke/screens/loading/loading_screen.dart';
 import 'package:poke/utils/nav_service.dart';
@@ -36,7 +41,22 @@ class MyApp extends StatelessWidget {
       home: LoadingScreen(
         loadingFuture: initializeApp(),
       ),
-      //home: DevScreen(widget: UpdatingReminderListTestDriver()),
+      /*home: DevScreen(
+        widget: YearView(
+          eventTimes: [
+            DateTime.now(),
+            DateTime.now().subtract(Duration(days: 1)),
+            DateTime.now().subtract(Duration(days: 8)),
+            DateTime.now().subtract(Duration(days: 31)),
+            DateTime.now().subtract(Duration(days: 39)),
+            DateTime.now().subtract(Duration(days: 62)),
+            DateTime.now().subtract(Duration(days: 70)),
+          ],
+          onCellTap: (events, start, end) {
+            print('events: $events, start: $start, end: $end');
+          },
+        ),
+      ),*/
     );
   }
 }

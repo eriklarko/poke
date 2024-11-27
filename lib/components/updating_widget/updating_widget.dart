@@ -99,9 +99,12 @@ class _UpdatingWidgetState extends State<UpdatingWidget> {
   }
 
   Widget _showInfoOnTop(Widget base, Widget info) {
-    return Stack(children: [
-      base,
-      Overlay(child: info),
-    ]);
+    return Stack(
+      key: widget.key,
+      children: [
+        base,
+        Overlay(child: info),
+      ],
+    );
   }
 }

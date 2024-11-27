@@ -114,7 +114,7 @@ class _PhotoPickerState extends State<PhotoPicker> {
           child: IconButtonWithTriangularBackground(
             icon: Icons.edit,
             size: 20,
-            color: Colors.amber,
+            color: PokeConstants.colors.primary,
             onPressed: _togglePickerButtons,
           ),
         ),

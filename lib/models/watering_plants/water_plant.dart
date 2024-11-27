@@ -18,6 +18,8 @@ import 'package:poke/persistence/serializable_event_data.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/watering_plants/new_instance_widget.dart';
 import 'package:poke/models/watering_plants/plant.dart';
+import 'package:poke/screens/action_details_screen/event_history.dart';
+import 'package:poke/services/delete_action.dart';
 import 'package:poke/utils/date_formatter.dart';
 
 part "water_plant.g.dart";
@@ -171,11 +173,75 @@ class WaterPlantAction extends Action<WaterEventData> {
 
   @override
   Widget buildDetailsScreen(BuildContext context) {
-    return Column(
-      children: [
-        PokeText("${plant.name} details"),
-        PlantImage.large(plant.image),
-      ],
+    final lastEvent = getLastEvent();
+    // TODO: How to get next event?
+    final DateTime? nextEvent = DateTime.parse("1963-11-23");
+    final reminder = Reminder(action: this, dueDate: nextEvent);
+
+    // TODO: make this a separate widget
+    // TODO: Add delete button
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(PokeConstants.space()),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PokeText(plant.name),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (lastEvent != null)
+                            PokeTimeAgo(
+                              key: ValueKey('last-watered-${plant.id}'),
+                              date: lastEvent.$1,
+                              format: (timeAgo) => "Last watered $timeAgo",
+                            ),
+                          if (lastEvent?.$2!.addedFertilizer == true)
+                            const PokeFinePrint('included fertilizer'),
+                          if (reminder.dueDate != null)
+                            PokeTimeAgo(
+                              key: ValueKey('due-${plant.id}'),
+                              date: reminder.dueDate!,
+                              format: (timeAgo) => reminder.isDue()
+                                  ? "Due $timeAgo"
+                                  : "Will poke $timeAgo",
+                            ),
+                          PokeConstants.FixedSpacer(2),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 100, child: PlantImage.fill(plant.image)),
+              ],
+            ),
+          ),
+          PokeConstants.FixedSpacer(2),
+          Padding(
+            padding: EdgeInsets.only(left: PokeConstants.space()),
+            child: PokeText("Event History:"),
+          ),
+          PokeConstants.FixedSpacer(),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: 1000,
+            ),
+            child: EventHistory(action: this),
+          ),
+          PokeConstants.FixedSpacer(),
+          PokeButton.primaryDangerous(
+            text: "Delete",
+            onPressed: () => deleteAction(context, this),
+          )
+        ],
+      ),
     );
   }
 
