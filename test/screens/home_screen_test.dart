@@ -91,12 +91,12 @@ void main() {
   group('snooze', () {
     testWidgets("swiping a reminder shows snooze action", (tester) async {
       await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      fail("");
+      fail("not implemented");
     });
 
     testWidgets("tapping snooze action hides reminder", (tester) async {
       await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      fail("");
+      fail("not implemented");
     });
   });
 }

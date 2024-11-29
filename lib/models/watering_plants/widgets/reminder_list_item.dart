@@ -58,6 +58,7 @@ class PlantReminderListItem extends StatelessWidget {
                 ValueKey('due-${a.plant.id}'),
                 Icons.alarm_outlined,
                 reminder.dueDate!,
+                color: reminder.isDue() ? PokeConstants.colors.error : null,
               ),
             ),
         ],
@@ -65,11 +66,12 @@ class PlantReminderListItem extends StatelessWidget {
     );
   }
 
-  Widget _renderIconAndText(Key key, IconData icon, DateTime eventDate) {
+  Widget _renderIconAndText(Key key, IconData icon, DateTime eventDate,
+      {Color? color}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: PokeConstants.colors.primary),
+        Icon(icon, color: color ?? PokeConstants.colors.primary),
         PokeConstants.FixedSpacer(),
         SizedBox(
           width: 75,

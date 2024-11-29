@@ -59,7 +59,14 @@ class TestAction extends Action<Null> {
 
   @override
   Widget buildReminderListItem(BuildContext context, Reminder reminder) {
-    return _someWidget('reminder-list-item');
+    final key = getKey('reminder-list-item');
+    return Column(
+      key: key,
+      children: [
+        Text("$key"),
+        if (reminder.isDue()) Icon(Icons.alarm),
+      ],
+    );
   }
 
   @override

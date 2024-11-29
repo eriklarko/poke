@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_tappable.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -32,24 +31,10 @@ class ReminderListItem extends StatelessWidget {
           key: ObjectKey(reminder),
           value: reminder,
           swipeActions: swipeActions ?? [],
-          child: Stack(
+          child: Row(
             children: [
-              if (reminder.isDue())
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: PokeConstants.space()),
-                      child: const Icon(Icons.alarm, color: Colors.redAccent),
-                    ),
-                  ),
-                ),
-              Row(
-                children: [
-                  Expanded(child: reminder.buildReminderListItem(context)),
-                  const Icon(Icons.chevron_right),
-                ],
-              ),
+              Expanded(child: reminder.buildReminderListItem(context)),
+              const Icon(Icons.chevron_right),
             ],
           ),
         ));

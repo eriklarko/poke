@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
@@ -28,45 +27,6 @@ void main() {
     );
 
     expect(find.byKey(action.getKey('reminder-list-item')), findsOneWidget);
-  });
-
-  group('due indicator', () {
-    testWidgets('shows no icon when reminder is due in the future',
-        (tester) async {
-      final reminder = Reminder(
-        action: TestAction(id: '1'),
-        // set due date to tomorrow
-        dueDate: DateTime.now().add(const Duration(days: 1)),
-      );
-
-      await pumpInTestApp(
-        tester,
-        ReminderListItem(
-          reminder: reminder,
-          onTap: ignoreCallback,
-        ),
-      );
-
-      expect(find.byIcon(Icons.alarm), findsNothing);
-    });
-
-    testWidgets('shows icon when reminder is due', (tester) async {
-      final reminder = Reminder(
-        action: TestAction(id: '1'),
-        // set due date to yesterday
-        dueDate: DateTime.now().subtract(const Duration(days: 1)),
-      );
-
-      await pumpInTestApp(
-        tester,
-        ReminderListItem(
-          reminder: reminder,
-          onTap: ignoreCallback,
-        ),
-      );
-
-      expect(find.byIcon(Icons.alarm), findsOneWidget);
-    });
   });
 
   testWidgets('forwards tap to onTap callback', (tester) async {

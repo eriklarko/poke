@@ -95,6 +95,7 @@ class ReminderService {
   Reminder buildReminder(Action action) {
     return Reminder(
       action: action,
+      // TODO: this should probably be cached
       dueDate: _predictor.predictNext(action),
     );
   }

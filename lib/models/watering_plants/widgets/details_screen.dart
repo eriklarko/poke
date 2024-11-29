@@ -1,28 +1,28 @@
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/design_system/poke_time_ago.dart';
-import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 import 'package:poke/models/watering_plants/widgets/plant_image.dart';
+import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/screens/action_details_screen/event_history.dart';
 import 'package:poke/services/delete_action.dart';
 
 class DetailsScreen extends StatelessWidget {
+  final reminderService = GetIt.instance.get<ReminderService>();
+
   final WaterPlantAction action;
 
-  const DetailsScreen({super.key, required this.action});
+  DetailsScreen({super.key, required this.action});
 
   @override
   Widget build(BuildContext context) {
     final lastEvent = action.getLastEvent();
-    // TODO: How to get next event?
-    final DateTime? nextEvent = DateTime.parse("1963-11-23");
-    final reminder = Reminder(action: action, dueDate: nextEvent);
+    final reminder = reminderService.buildReminder(action);
 
-    // TODO: make this a separate widget
-    // TODO: Add delete button
+    // TODO: make delete button nice
 
     return SingleChildScrollView(
       child: Column(
@@ -36,6 +36,7 @@ class DetailsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // TODO: make editable
                       PokeText(action.plant.name),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +64,10 @@ class DetailsScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                    width: 100, child: PlantImage.fill(action.plant.image)),
+                  width: 100,
+                  // TODO: make editable
+                  child: PlantImage.fill(action.plant.image),
+                ),
               ],
             ),
           ),
