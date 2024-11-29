@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poke/models/reminder.dart';
 
 final sortByDueDate = SortableField<Reminder>(
+  key: ValueKey("sort-by-due-date"),
   icon: Icons.alarm_outlined,
   compareAsc: (a, b) {
     final aDue = a.dueDate;
@@ -27,6 +28,7 @@ final sortByDueDate = SortableField<Reminder>(
 );
 
 final sortByLastEvent = SortableField<Reminder>(
+  key: ValueKey("sort-by-last-event"),
   icon: Icons.water_drop_outlined,
   compareAsc: (a, b) {
     final aLast = a.action.getLastEvent()?.$1;
@@ -52,8 +54,13 @@ final sortByLastEvent = SortableField<Reminder>(
 );
 
 class SortableField<T> {
+  final Key? key;
   final IconData icon;
   final int Function(T a, T b) compareAsc;
 
-  const SortableField({required this.icon, required this.compareAsc});
+  const SortableField({
+    this.key,
+    required this.icon,
+    required this.compareAsc,
+  });
 }

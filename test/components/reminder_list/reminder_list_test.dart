@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:poke/components/reminder_list/sortable_fields.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/persistence_event.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
@@ -285,64 +286,217 @@ void main() {
     expect(find.text("second-data"), findsOneWidget);
   });
 
-  testWidgets("renders most due reminders first", (tester) async {
+  group('sorting', () {
+    final actionWithOldestEvent =
+        TestAction(id: 'action-with-oldest-event').withEvent(
+      DateTime.now().subtract(const Duration(days: 10)),
+    );
+
+    final actionWithSecondOldestEvent =
+        TestAction(id: 'action-with-second-oldest-event').withEvent(
+      DateTime.now().subtract(const Duration(days: 5)),
+    );
+
+    final actionWithNewestEvent =
+        TestAction(id: 'action-with-newest-event').withEvent(DateTime.now());
+
+    final actionWithNoEvents = TestAction(id: 'action-with-no-events');
+
     // create some reminders, each with different due dates
     final mostDueReminder = Reminder(
-      action: TestAction(id: 'test-action-1'),
+      action: actionWithSecondOldestEvent,
       // ten days ago
       dueDate: DateTime.now().subtract(const Duration(days: 10)),
     );
     final secondMostDueReminder = Reminder(
-      action: TestAction(id: 'test-action-2'),
+      action: actionWithOldestEvent,
       // five days ago
       dueDate: DateTime.now().subtract(const Duration(days: 5)),
     );
     final leastDueReminder = Reminder(
-      action: TestAction(id: 'test-action-3'),
+      action: actionWithNoEvents,
       // in ten days
       dueDate: DateTime.now().add(const Duration(days: 10)),
     );
     final reminderWithNoDueDate = Reminder(
-      action: TestAction(id: 'test-action-4'),
+      action: actionWithNewestEvent,
       dueDate: null,
     );
 
-    await setUpReminderServiceMock([
-      // to increase confidence that the test is working as expected, don't
-      // add the reminders in the expected order
-      secondMostDueReminder,
-      reminderWithNoDueDate,
-      leastDueReminder,
-      mostDueReminder,
-    ]);
+    Iterable<Reminder> getRenderOrder(WidgetTester tester) {
+      return tester
+          .widgetList<ReminderListItem>(
+            find.byType(ReminderListItem),
+          )
+          .toList()
+          .map((listItem) => listItem.reminder);
+    }
 
-    // render them
-    await pumpInTestApp(
-      tester,
-      ReminderList(
-        onReminderTapped: ignoreCallback,
-      ),
-    );
-    await tester.pumpAndSettle();
+    testWidgets("renders most due reminders first by default", (tester) async {
+      await setUpReminderServiceMock([
+        // to increase confidence that the test is working as expected, don't
+        // add the reminders in the expected order
+        secondMostDueReminder,
+        reminderWithNoDueDate,
+        leastDueReminder,
+        mostDueReminder,
+      ]);
 
-    // check that they're shown in increasing due date order
-    final renderedRemindersInOrder = tester
-        .widgetList<ReminderListItem>(
-          find.byType(ReminderListItem),
-        )
-        .toList()
-        .map((listItem) => listItem.reminder);
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(
-      renderedRemindersInOrder,
-      equals(
-        [
-          mostDueReminder,
-          secondMostDueReminder,
-          leastDueReminder,
-          reminderWithNoDueDate,
-        ],
-      ),
-    );
+      // check that reminders are shown in increasing due date order
+      expect(
+        getRenderOrder(tester),
+        equals(
+          [
+            mostDueReminder,
+            secondMostDueReminder,
+            leastDueReminder,
+            reminderWithNoDueDate,
+          ],
+        ),
+      );
+    });
+
+    testWidgets(
+        'after tapping sort-by-due-date - renders least due reminders first',
+        (tester) async {
+      await setUpReminderServiceMock([
+        secondMostDueReminder,
+        reminderWithNoDueDate,
+        leastDueReminder,
+        mostDueReminder,
+      ]);
+
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(sortByDueDate.key!));
+      await tester.pumpAndSettle();
+
+      expect(
+        getRenderOrder(tester),
+        equals(
+          [
+            reminderWithNoDueDate,
+            leastDueReminder,
+            secondMostDueReminder,
+            mostDueReminder,
+          ],
+        ),
+      );
+    });
+
+    testWidgets(
+        'after tapping sort-by-last-event - renders action with oldest event first',
+        (tester) async {
+      await setUpReminderServiceMock([
+        secondMostDueReminder,
+        reminderWithNoDueDate,
+        leastDueReminder,
+        mostDueReminder,
+      ]);
+
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // tap the sort by last event button
+      await tester.tap(find.byKey(sortByLastEvent.key!));
+      await tester.pumpAndSettle();
+
+      final renderedActionsInOrder =
+          getRenderOrder(tester).map((r) => r.action);
+      expect(
+        renderedActionsInOrder,
+        equals(
+          [
+            actionWithOldestEvent,
+            actionWithSecondOldestEvent,
+            actionWithNewestEvent,
+            actionWithNoEvents,
+          ],
+        ),
+      );
+    });
+
+    testWidgets(
+        'after tapping sort-by-last-event twice - renders action with newest event first',
+        (tester) async {
+      await setUpReminderServiceMock([
+        secondMostDueReminder,
+        reminderWithNoDueDate,
+        leastDueReminder,
+        mostDueReminder,
+      ]);
+
+      await pumpInTestApp(
+        tester,
+        ReminderList(
+          onReminderTapped: ignoreCallback,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // tap the sort by last event button twice!
+      await tester.tap(find.byKey(sortByLastEvent.key!));
+      await tester.tap(find.byKey(sortByLastEvent.key!));
+      await tester.pumpAndSettle();
+
+      final renderedActionsInOrder =
+          getRenderOrder(tester).map((r) => r.action);
+      expect(
+        renderedActionsInOrder,
+        equals(
+          [
+            actionWithNoEvents,
+            actionWithNewestEvent,
+            actionWithSecondOldestEvent,
+            actionWithOldestEvent,
+          ],
+        ),
+      );
+    });
   });
+}
+
+void expectSortOrder(
+    WidgetTester tester,
+    Reminder mostDueReminder,
+    Reminder secondMostDueReminder,
+    Reminder leastDueReminder,
+    Reminder reminderWithNoDueDate) {
+  final renderedRemindersInOrder = tester
+      .widgetList<ReminderListItem>(
+        find.byType(ReminderListItem),
+      )
+      .toList()
+      .map((listItem) => listItem.reminder);
+
+  expect(
+    renderedRemindersInOrder,
+    equals(
+      [
+        mostDueReminder,
+        secondMostDueReminder,
+        leastDueReminder,
+        reminderWithNoDueDate,
+      ],
+    ),
+  );
 }

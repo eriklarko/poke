@@ -3,6 +3,20 @@ import 'package:poke/components/reminder_list/sortable_fields.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 
+// Renders a row of buttons that allow the user to select a field to sort by.
+// The selected field will be highlighted by an arrow indicating the sort
+// direction.
+//
+// The `onSort` callback will be called whenever the user selects a field to
+// sort by. The callback will receive the selected field and the sort direction.
+//
+// The `initialSort` parameter can be used to set the initial sort field and
+// direction.
+//
+// Example sorting by some field B in descending order:
+//   +-----------------------+
+//   | [SortByA] [SortByB] V |
+//   +-----------------------+
 class SortOrderSelector<T> extends StatefulWidget {
   final Iterable<SortableField<T>> sortFields;
   final (SortableField<T> field, SortDirection direction)? initialSort;
@@ -38,6 +52,7 @@ class _SortOrderSelectorState<T> extends State<SortOrderSelector<T>> {
       children.add(
         PokeButton.icon(
           field.icon,
+          key: field.key,
           onPressed: () => _onFieldSelected(field),
           color: PokeConstants.colors.primary,
           iconSize: 30,
