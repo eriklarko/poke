@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:poke/components/updating_widget/updating_widget.dart';
-import 'package:poke/logger/poke_logger.dart';
 
 class StreamUpdatingWidget<T> extends StatefulWidget {
   final T initialData;
@@ -30,10 +29,6 @@ class _StreamUpdatingWidgetState<T> extends State<StreamUpdatingWidget<T>> {
   void initState() {
     super.initState();
     _lastKnownData = widget.initialData;
-    PokeLogger.instance().debug(
-      'StreamUpdatingWidget initialized with initial data',
-      data: {'initialData': _lastKnownData},
-    );
 
     _streamSubscription = widget.dataStream.listen(
       (event) {
@@ -41,10 +36,6 @@ class _StreamUpdatingWidgetState<T> extends State<StreamUpdatingWidget<T>> {
           _controller.setLoading();
         } else {
           _lastKnownData = event;
-          PokeLogger.instance().debug(
-            'StreamUpdatingWidget received new data',
-            data: {'data': _lastKnownData},
-          );
           _controller.setDone();
         }
       },
@@ -63,10 +54,6 @@ class _StreamUpdatingWidgetState<T> extends State<StreamUpdatingWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    PokeLogger.instance().debug(
-      'Building StreamUpdatingWidget',
-      data: {'lastKnownData': _lastKnownData},
-    );
     return UpdatingWidget(
       key: widget.key,
       controller: _controller,

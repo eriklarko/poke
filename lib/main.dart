@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:poke/components/app_lifecycle_listener.dart';
-import 'package:poke/components/year_view/year_view.dart';
-import 'package:poke/models/watering_plants/plant.dart';
-import 'package:poke/models/watering_plants/water_plant.dart';
-import 'package:poke/screens/action_details_screen/event_history.dart';
-import 'package:poke/screens/dev_screen.dart';
 import 'package:poke/screens/loading/initialize_app.dart';
 import 'package:poke/screens/loading/loading_screen.dart';
 import 'package:poke/utils/nav_service.dart';

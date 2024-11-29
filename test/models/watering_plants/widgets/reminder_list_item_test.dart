@@ -94,7 +94,7 @@ void main() {
       );
       final Text text = tester.firstWidget(textFinder);
 
-      expect(text.data, contains("10 days from now"));
+      expect(text.data, contains("In 10 days"));
     });
   });
 }

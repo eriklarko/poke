@@ -16,12 +16,12 @@ class PlantReminderListItem extends StatelessWidget {
     final a = reminder.action as WaterPlantAction;
 
     final plant = a.plant;
-    final lastEvent = a.getLastEvent();
-
     return Row(
-      key: ValueKey('reminder-list-item-${reminder.action.equalityKey}'),
       children: [
-        PlantImage.fill(plant.image),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 250),
+          child: PlantImage.fill(plant.image),
+        ),
         PokeConstants.FixedSpacer(2),
         Expanded(
           child: Column(
@@ -29,29 +29,7 @@ class PlantReminderListItem extends StatelessWidget {
             children: [
               PokeText(plant.name),
               PokeConstants.FixedSpacer(),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (lastEvent != null)
-                      _renderIconAndText(
-                        ValueKey('last-watered-${plant.id}'),
-                        Icons.water_drop_outlined,
-                        lastEvent.$1,
-                      ),
-                    Expanded(child: Container()),
-                    if (reminder.dueDate != null)
-                      Padding(
-                        padding: EdgeInsets.only(right: PokeConstants.space(2)),
-                        child: _renderIconAndText(
-                          ValueKey('due-${plant.id}'),
-                          Icons.alarm_outlined,
-                          reminder.dueDate!,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              _renderActionData(a),
             ],
           ),
         ),
@@ -59,13 +37,42 @@ class PlantReminderListItem extends StatelessWidget {
     );
   }
 
+  Widget _renderActionData(WaterPlantAction a) {
+    final lastEvent = a.getLastEvent();
+
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (lastEvent != null)
+            _renderIconAndText(
+              ValueKey('last-watered-${a.plant.id}'),
+              Icons.water_drop_outlined,
+              lastEvent.$1,
+            ),
+          Expanded(child: Container()),
+          if (reminder.dueDate != null)
+            Padding(
+              padding: EdgeInsets.only(right: PokeConstants.space()),
+              child: _renderIconAndText(
+                ValueKey('due-${a.plant.id}'),
+                Icons.alarm_outlined,
+                reminder.dueDate!,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _renderIconAndText(Key key, IconData icon, DateTime eventDate) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, color: PokeConstants.colors.primary),
         PokeConstants.FixedSpacer(),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 75),
+        SizedBox(
+          width: 75,
           child: PokeTimeAgo(
             key: key,
             date: eventDate,

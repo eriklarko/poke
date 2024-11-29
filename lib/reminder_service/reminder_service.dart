@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:get_it/get_it.dart';
-import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/persistence.dart';
@@ -20,8 +19,7 @@ class ReminderService {
   ReminderService();
 
   Future<void> init() async {
-    final actions = await _persistence.getAllActions();
-    _reminders = List.of(actions.map(buildReminder));
+    await syncWithPersistence();
 
     if (!_persistenceStreamRegistered()) {
       _reminderUpdateStreamSubscription = _persistence
@@ -29,6 +27,11 @@ class ReminderService {
           .asyncMap(_toReminderUpdate)
           .listen(_onUpdateReceived);
     }
+  }
+
+  Future<void> syncWithPersistence() async {
+    final actions = await _persistence.getAllActions();
+    _reminders = List.of(actions.map(buildReminder));
   }
 
   bool _persistenceStreamRegistered() {
@@ -43,11 +46,6 @@ class ReminderService {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
-    PokeLogger.instance().debug(
-      'Reminder service received update',
-      data: {'update': update},
-    );
-
     if (update.type == UpdateType.removed) {
       // reminder removed
       _removeReminder(update.actionId);
@@ -79,11 +77,6 @@ class ReminderService {
     _reminders.removeWhere(
       (reminder) => reminder.action.equalityKey == actionId,
     );
-
-    PokeLogger.instance().debug(
-      'Removed reminder',
-      data: {'actionId': actionId, "reminders-after": _reminders},
-    );
   }
 
   void _updateReminder(Reminder reminder) {
@@ -112,11 +105,6 @@ class ReminderService {
   }
 
   Future<ReminderUpdate> _toReminderUpdate(PersistenceEvent pe) async {
-    PokeLogger.instance().debug(
-      'ReminderService converting persistence event to reminder update',
-      data: {'pe': pe},
-    );
-
     if (pe is Updating) {
       return ReminderUpdate(
         actionId: pe.actionId,

@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(context) {
     return Scaffold(
       key: const ValueKey('home-screen'),
-      appBar: PokeAppBar(context, title: 'hiyo'),
+      appBar: PokeAppBar(context, title: 'Poke'),
       body: Column(
         children: [
           const PokeHeader('hi'),

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:poke/components/reminder_list/sort_order_selector.dart';
+import 'package:poke/components/reminder_list/sortable_fields.dart';
 import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
 import 'package:poke/components/updating_widget/stream_updating_widget.dart';
@@ -37,11 +39,20 @@ class _ReminderListState extends State<ReminderList> {
   final Map<String /*action id*/, StreamController<Reminder?>>
       _listItemStreams = {};
 
+  List<Reminder> _reminders = [];
   StreamSubscription? _reminderUpdateStreamSubscription;
+
+  (SortableField<Reminder>, SortDirection) _sortOrder = (
+    sortByDueDate,
+    SortDirection.ascending,
+  );
 
   @override
   void initState() {
     super.initState();
+
+    _reminders = List.of(widget.reminderService.getReminders());
+    _reminders.sort(compareReminders);
 
     _reminderUpdateStreamSubscription =
         widget.reminderService.updatesStream().listen(_onUpdateReceived);
@@ -55,11 +66,6 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
-    PokeLogger.instance().debug(
-      'Reminder list received update',
-      data: {'update': update},
-    );
-
     if (!mounted) {
       return;
     }
@@ -68,21 +74,28 @@ class _ReminderListState extends State<ReminderList> {
     if (listItemStream == null) {
       if (update.type == UpdateType.updated ||
           update.type == UpdateType.added) {
-        // this action hasn't been seen before, time to trigger a rerender. The
-        // build method reads its state from the reminder service directly so we
-        // don't need to do anything here.
-        setState(() {/* reminders has changed */});
+        // this action hasn't been seen before, time to trigger a rerender
+        setState(() {
+          _reminders.add(update.reminder!);
+          _reminders.sort(compareReminders);
+        });
       }
 
       return;
     }
 
     if (update.type == UpdateType.removed) {
-      PokeLogger.instance().debug(
-        'Removing reminder from list',
-        data: {'update': update},
-      );
-      setState(() {/* reminders has changed */});
+      setState(() {
+        final wasRemoved = _reminders.remove(update.reminder!);
+        _reminders.sort(compareReminders);
+
+        if (!wasRemoved) {
+          PokeLogger.instance().warn(
+            'Tried to remove reminder that was not in list',
+            data: {'reminder': update.reminder},
+          );
+        }
+      });
     } else {
       listItemStream.add(update.reminder);
     }
@@ -90,27 +103,52 @@ class _ReminderListState extends State<ReminderList> {
 
   @override
   Widget build(BuildContext context) {
-    final reminders = List.of(widget.reminderService.getReminders());
-    reminders.sort(compareReminders);
     PokeLogger.instance().debug(
       'Building reminder list',
-      data: {'reminders': reminders},
+      data: {'reminders': _reminders},
     );
 
+    Iterable<Widget> listItems = renderListItems(_reminders);
+
+    return RefreshIndicator.adaptive(
+      onRefresh: () async {
+        await widget.reminderService.syncWithPersistence();
+        setState(() {});
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SortOrderSelector(
+              sortFields: [sortByLastEvent, sortByDueDate],
+              initialSort: _sortOrder,
+              onSort: (field, direction) {
+                PokeLogger.instance().debug(
+                  'Sorting reminders',
+                  data: {'field': field, 'direction': direction},
+                );
+
+                setSort(field, direction);
+              },
+            ),
+            PokeConstants.FixedSpacer(),
+            ...listItems,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Iterable<Widget> renderListItems(Iterable<Reminder> reminders) {
     // remove any existing list item controllers as we'll be creating new ones
     _listItemStreams.forEach((_, stream) => stream.close());
     _listItemStreams.clear();
 
-    final listItems = reminders.map((reminder) {
+    return _reminders.map((reminder) {
       final listItemStream = StreamController<Reminder?>();
       final actionId = reminder.action.equalityKey;
 
       _listItemStreams[actionId] = listItemStream;
 
-      PokeLogger.instance().debug(
-        'Creating reminder list item',
-        data: {'reminder': reminder},
-      );
       return Padding(
         padding: EdgeInsets.only(bottom: PokeConstants.space()),
         child: SizedBox(
@@ -128,31 +166,24 @@ class _ReminderListState extends State<ReminderList> {
           ),
         ),
       );
-    }).toList();
+    });
+  }
 
-    //return Column(children: listItems);
-    return SingleChildScrollView(
-      child: Column(children: listItems),
-    );
+  // TODO: test
+  void setSort(SortableField<Reminder> field, SortDirection direction) {
+    setState(() {
+      _sortOrder = (field, direction);
+      _reminders.sort(compareReminders);
+    });
   }
 
   int compareReminders(Reminder a, Reminder b) {
-    if (a.dueDate == null) {
-      if (b.dueDate == null) {
-        // if both dates are null, sort according to some other reasonable prop
-        return a.action.equalityKey.compareTo(b.action.equalityKey);
-      }
+    final (field, direction) = _sortOrder;
 
-      // if `a` has no due date, but `b` does; show `b` first
-      return 1;
-    }
-
-    if (b.dueDate == null) {
-      // here we know that `a` has a due date, but `b` doesn't. Show `a` first
-      return -1;
-    }
-
-    // both reminders have due dates, show the oldest due date first
-    return a.dueDate!.compareTo(b.dueDate!);
+    final fieldSort = field.compareAsc(a, b);
+    final i = fieldSort == 0
+        ? a.action.equalityKey.compareTo(b.action.equalityKey)
+        : fieldSort;
+    return i * (direction == SortDirection.ascending ? 1 : -1);
   }
 }

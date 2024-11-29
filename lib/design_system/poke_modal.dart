@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_button.dart';
 import 'package:poke/design_system/poke_constants.dart';
 
+// ignore: must_be_immutable
 class PokeModal extends Dialog {
   BuildContext? _shownInContext;
 

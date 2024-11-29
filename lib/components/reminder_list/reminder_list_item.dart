@@ -19,11 +19,6 @@ class ReminderListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PokeLogger.instance().debug(
-      'Building reminder list item',
-      data: {'reminder': reminder},
-    );
-
     return PokeTappable(
         key: key,
         onTap: () {

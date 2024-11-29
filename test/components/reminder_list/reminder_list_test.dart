@@ -102,7 +102,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final expiredReminders = find.byIcon(Icons.alarm);
+    final expiredReminders = find.descendant(
+      of: find.byType(ReminderListItem),
+      matching: find.byIcon(Icons.alarm),
+    );
     expect(expiredReminders, findsOneWidget);
   });
 
