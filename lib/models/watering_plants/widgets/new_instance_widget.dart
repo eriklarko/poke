@@ -44,7 +44,7 @@ class NewInstanceWidgetState extends State<NewInstanceWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             PokeText('Plant'),
-            PokeConstants.FixedSpacer(),
+            PokeConstants.fixedSpacer(),
             Container(
               // TextFields do not like being in rows because they get infinite width.
               // so the size must be limited here
@@ -56,7 +56,7 @@ class NewInstanceWidgetState extends State<NewInstanceWidget> {
             ),
           ],
         ),
-        PokeConstants.FixedSpacer(3),
+        PokeConstants.fixedSpacer(3),
         PokeAsyncButton.once(
           text: 'Create',
           onPressed: _createButtonEnabled

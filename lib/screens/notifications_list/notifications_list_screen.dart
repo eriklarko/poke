@@ -118,7 +118,7 @@ class NotificationsListScreen extends StatelessWidget {
       child: Column(
         children: [
           PokeText("Events on ${date.toIso8601String()}"),
-          PokeConstants.FixedSpacer(2),
+          PokeConstants.fixedSpacer(2),
           ...events.map((action) => PokeText(action.getHumanReadableName())),
         ],
       ),

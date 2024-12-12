@@ -7,7 +7,7 @@ class PokeConstants {
     return gridSize * (multiplier ?? 1);
   }
 
-  static SizedBox FixedSpacer([int? multiplier]) {
+  static SizedBox fixedSpacer([int? multiplier]) {
     double s = space(multiplier);
     return SizedBox(width: s, height: s);
   }

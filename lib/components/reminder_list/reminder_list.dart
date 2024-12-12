@@ -130,7 +130,7 @@ class _ReminderListState extends State<ReminderList> {
                 setSort(field, direction);
               },
             ),
-            PokeConstants.FixedSpacer(),
+            PokeConstants.fixedSpacer(),
             ...listItems,
           ],
         ),
@@ -169,7 +169,6 @@ class _ReminderListState extends State<ReminderList> {
     });
   }
 
-  // TODO: test
   void setSort(SortableField<Reminder> field, SortDirection direction) {
     setState(() {
       _sortOrder = (field, direction);

@@ -69,7 +69,7 @@ class _NotificationPermissionWidgetState
           return Row(
             children: [
               const Icon(Icons.error),
-              PokeConstants.FixedSpacer(),
+              PokeConstants.fixedSpacer(),
               PokeFinePrint(
                   "Failed reading notification permission: ${snapshot.error}"),
             ],
@@ -109,7 +109,7 @@ class _NotificationPermissionWidgetState
                 padding: EdgeInsets.only(top: PokeConstants.space() / 2),
                 child: const Icon(Icons.warning),
               ),
-              PokeConstants.FixedSpacer(2),
+              PokeConstants.fixedSpacer(2),
               Expanded(
                 child: PokeText(
                   "Poke wants to send notifications to remind you of things.",
@@ -126,7 +126,7 @@ class _NotificationPermissionWidgetState
             text: "Decide!",
             buttonConstructor: PokeButton.small,
           ),
-          PokeConstants.FixedSpacer(2),
+          PokeConstants.fixedSpacer(2),
         ],
       ),
     );

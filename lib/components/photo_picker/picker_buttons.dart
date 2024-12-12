@@ -71,7 +71,7 @@ class PickerButtons extends StatelessWidget {
               _openCamera();
             },
           ),
-          PokeConstants.FixedSpacer(4),
+          PokeConstants.fixedSpacer(4),
           PokeButton.icon(
             Icons.photo,
             iconSize: iconSize,

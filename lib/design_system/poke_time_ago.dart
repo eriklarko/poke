@@ -35,10 +35,12 @@ class PokeTimeAgo extends StatelessWidget {
       date: date,
       clock: now,
       allowFromNow: true,
-      builder: (BuildContext context, String timeAgoString) {
-        final s = format == null ? timeAgoString : format!(timeAgoString);
-        return PokeText.withStyle(s, textStyle);
-      },
+      builder: _build,
     );
+  }
+
+  Widget _build(BuildContext context, String timeAgo) {
+    final s = format == null ? timeAgo : format!(timeAgo);
+    return PokeText.withStyle(s, textStyle);
   }
 }

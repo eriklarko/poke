@@ -22,14 +22,16 @@ class PlantReminderListItem extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: 250),
           child: PlantImage.fill(plant.image),
         ),
-        PokeConstants.FixedSpacer(2),
+        PokeConstants.fixedSpacer(2),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               PokeText(plant.name),
-              PokeConstants.FixedSpacer(),
+              PokeConstants.fixedSpacer(),
               _renderActionData(a),
+              Expanded(child: Container()), // just take up the remaining space
             ],
           ),
         ),
@@ -40,45 +42,47 @@ class PlantReminderListItem extends StatelessWidget {
   Widget _renderActionData(WaterPlantAction a) {
     final lastEvent = a.getLastEvent();
 
-    return Expanded(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (lastEvent != null)
-            _renderIconAndText(
-              ValueKey('last-watered-${a.plant.id}'),
-              Icons.water_drop_outlined,
-              lastEvent.$1,
+    return Row(
+      //crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (lastEvent != null)
+          _renderIconAndText(
+            ValueKey('last-watered-${a.plant.id}'),
+            Icons.water_drop_outlined,
+            lastEvent.$1,
+          ),
+        Expanded(child: Container()),
+        if (reminder.dueDate != null)
+          Padding(
+            padding: EdgeInsets.only(right: PokeConstants.space()),
+            child: _renderIconAndText(
+              ValueKey('due-${a.plant.id}'),
+              Icons.alarm_outlined,
+              reminder.dueDate!,
+              color: reminder.isDue() ? PokeConstants.colors.error : null,
             ),
-          Expanded(child: Container()),
-          if (reminder.dueDate != null)
-            Padding(
-              padding: EdgeInsets.only(right: PokeConstants.space()),
-              child: _renderIconAndText(
-                ValueKey('due-${a.plant.id}'),
-                Icons.alarm_outlined,
-                reminder.dueDate!,
-                color: reminder.isDue() ? PokeConstants.colors.error : null,
-              ),
-            ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
   Widget _renderIconAndText(Key key, IconData icon, DateTime eventDate,
       {Color? color}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: color ?? PokeConstants.colors.primary),
-        PokeConstants.FixedSpacer(),
+        PokeConstants.fixedSpacer(),
         SizedBox(
           width: 75,
-          child: PokeTimeAgo(
-            key: key,
-            date: eventDate,
-            format: formatTimeAgo,
+          child: Container(
+            alignment: Alignment.centerLeft,
+            child: PokeTimeAgo(
+              key: key,
+              date: eventDate,
+              format: formatTimeAgo,
+            ),
           ),
         ),
       ],
@@ -86,6 +90,8 @@ class PlantReminderListItem extends StatelessWidget {
   }
 
   // this is the most beautiful function I've ever written
+  // actually, it's a method.
+  // trurd. true turd. beat that, future me
   String formatTimeAgo(String timeAgo) {
     if (timeAgo.contains('from now')) {
       return "In ${timeAgo.replaceAll('from now', '')}";

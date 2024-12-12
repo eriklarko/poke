@@ -57,7 +57,7 @@ class DetailsScreen extends StatelessWidget {
                                   ? "Due $timeAgo"
                                   : "Will poke $timeAgo",
                             ),
-                          PokeConstants.FixedSpacer(2),
+                          PokeConstants.fixedSpacer(2),
                         ],
                       ),
                     ],
@@ -71,19 +71,19 @@ class DetailsScreen extends StatelessWidget {
               ],
             ),
           ),
-          PokeConstants.FixedSpacer(2),
+          PokeConstants.fixedSpacer(2),
           Padding(
             padding: EdgeInsets.only(left: PokeConstants.space()),
             child: PokeText("Event History:"),
           ),
-          PokeConstants.FixedSpacer(),
+          PokeConstants.fixedSpacer(),
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: 1000,
             ),
             child: EventHistory(action: action),
           ),
-          PokeConstants.FixedSpacer(),
+          PokeConstants.fixedSpacer(),
           PokeButton.primaryDangerous(
             text: "Delete",
             onPressed: () => deleteAction(context, action),

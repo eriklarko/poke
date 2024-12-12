@@ -26,7 +26,7 @@ class PokeModal extends Dialog {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [actionButton],
                   ),
-                if (actionButton != null) PokeConstants.FixedSpacer(),
+                if (actionButton != null) PokeConstants.fixedSpacer(),
                 SingleChildScrollView(
                   child: child,
                 ),

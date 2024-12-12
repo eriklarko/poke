@@ -71,7 +71,7 @@ class _SortOrderSelectorState<T> extends State<SortOrderSelector<T>> {
         children.add(Icon(Icons.arrow_drop_down, color: Colors.transparent));
       }
 
-      children.add(PokeConstants.FixedSpacer());
+      children.add(PokeConstants.fixedSpacer());
     }
     children.removeLast();
 

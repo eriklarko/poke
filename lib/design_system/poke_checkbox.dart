@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class PokeCheckbox extends StatefulWidget {
   final _PokeCheckboxState _state = _PokeCheckboxState();
 
-  PokeCheckbox({Key? key}) : super(key: key);
+  PokeCheckbox({super.key});
 
   @override
   // ignore: no_logic_in_create_state

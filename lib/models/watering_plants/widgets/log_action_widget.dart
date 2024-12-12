@@ -43,7 +43,7 @@ class LogWaterActionWidget extends StatelessWidget {
             fertilizerCheckbox,
           ],
         ),
-        PokeConstants.FixedSpacer(2),
+        PokeConstants.fixedSpacer(2),
         PokeAsyncWidget.simple(
           controller: _logActionController,
           idle: PokeButton.primary(
