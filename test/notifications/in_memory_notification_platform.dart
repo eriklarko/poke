@@ -15,6 +15,10 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
   // as a simple list to allow duplicate ids
   final List<NotificationModel> _notifications = [];
   final Map<NotificationChannel, List<NotificationId>> _channels = {};
+
+  // This is a list of notifications that are currently shown on the device.
+  final List<NotificationId> _activeNotifications = [];
+
   bool _canSendNotifications = false;
 
   InMemoryNotificationPlatform();
@@ -93,14 +97,17 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
       throw "id must be 32 bit";
     }
 
-    if (!_channels.keys
-        .any((channel) => channel.channelKey == content.channelKey)) {
+    if (!_channels.keys.any(
+      (channel) => channel.channelKey == content.channelKey,
+    )) {
       throw "channel ${content.channelKey} does not exist";
     }
 
     // Mimic AwesomeNotifications' platforms that reject schedules in the past
     if (schedule is NotificationCalendar &&
-        _toDate(schedule).isBefore(clock.now())) {
+        _toDate(schedule).isBefore(
+          clock.now(),
+        )) {
       print("notification ignored because it is scheduled in the past");
       return Future.value(false);
     }
@@ -113,7 +120,38 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
     );
 
     _notifications.add(notif);
+
+    if (schedule == null) {
+      // This is a notification we want to show immediately
+      _activeNotifications.add(content.id!);
+    }
+
     return Future.value(true);
+  }
+
+  // This method is not part of the AwesomeNotifications interface, but it's
+  // required for this implementation to work.
+  // Call it after creating a notification to simulate the clock on the device
+  // and showing any notifications that are scheduled to be shown.
+  Future<void> processScheduledNotifications(DateTime now) async {
+    for (final notification in _notifications) {
+      if (notification.schedule == null) {
+        continue;
+      }
+
+      final schedule = notification.schedule!;
+
+      if (schedule is NotificationCalendar) {
+        final date = _toDate(schedule);
+        final isActive = await isNotificationActiveOnStatusBar(
+          id: notification.content!.id!,
+        );
+
+        if (date.isBefore(now) && !isActive) {
+          _activeNotifications.add(notification.content!.id!);
+        }
+      }
+    }
   }
 
   DateTime _toDate(NotificationCalendar c) {
@@ -170,7 +208,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<List<int>> getAllActiveNotificationIdsOnStatusBar() {
-    throw UnimplementedError();
+    return Future.value(List.of(_activeNotifications));
   }
 
   @override
@@ -231,7 +269,7 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
 
   @override
   Future<bool> isNotificationActiveOnStatusBar({required int id}) {
-    throw UnimplementedError();
+    return Future.value(_activeNotifications.contains(id));
   }
 
   @override

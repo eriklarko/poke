@@ -108,7 +108,7 @@ class TestAction extends Action<Null> {
   }
 
   @override
-  String get equalityKey => id ?? "unknown";
+  String get equalityKey => id ?? "unknown-test-action";
 
   @override
   Map<String, dynamic> subclassToJson() {

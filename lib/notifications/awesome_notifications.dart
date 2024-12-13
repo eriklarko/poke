@@ -71,7 +71,10 @@ class AwesomeNotificationsService extends NotificationService {
           }
 
           if (reminder.dueDate == null) {
-            // nothing to schedule because there's no  due date
+            // cancel any scheduled notification for this action
+            await cancelScheduledNotificationForAction(
+              reminder.action.equalityKey,
+            );
             return;
           }
 
@@ -89,8 +92,6 @@ class AwesomeNotificationsService extends NotificationService {
           );
       }
     });
-
-    print("reminder service listener registered");
   }
 
   @override
@@ -168,15 +169,16 @@ class AwesomeNotificationsService extends NotificationService {
     );
     if (existingReminder != null) {
       PokeLogger.instance().info(
-        "Scheduled reminder already found, updating due date",
+        "Scheduled reminder found, removing it and creating a new one",
         data: {
           'action': action,
-          'dueDate': dueDate,
+          'existingDueDate': existingReminder.$2,
+          'newDueDate': dueDate,
         },
       );
 
       // updating here means deleting the old reminder and creating a new one :)
-      this.cancelScheduledNotificationForAction(action.equalityKey);
+      await cancelScheduledNotificationForAction(action.equalityKey);
     }
 
     await _ensureChannelExists(action);
@@ -272,6 +274,12 @@ class AwesomeNotificationsService extends NotificationService {
   FutureOr<Iterable<ScheduledNotification>>
       getAllScheduledNotifications() async {
     final notifications = await _i.listScheduledNotifications();
+    return _mapExternalModelFromInternal(notifications);
+  }
+
+  Iterable<ScheduledNotification> _mapExternalModelFromInternal(
+    Iterable<NotificationModel> notifications,
+  ) {
     return notifications.map((notification) {
       final payload = notification.content!.payload!;
       if (!payload.containsKey('action-id')) {
@@ -291,6 +299,21 @@ class AwesomeNotificationsService extends NotificationService {
     return allNotifications.firstWhereOrNull(
       (tuple) => tuple.$1 == actionId,
     );
+  }
+
+  FutureOr<Iterable<String>> getActiveNotifications() async {
+    final notifications = await _i.listScheduledNotifications();
+    final activeNotificationIds =
+        await _i.getAllActiveNotificationIdsOnStatusBar();
+
+    final activeNotifications = notifications.where(
+      (notification) =>
+          activeNotificationIds.contains(notification.content!.id!),
+    );
+
+    return activeNotifications
+        .map((notification) => notification.content?.payload?['action-id'])
+        .whereNotNull();
   }
 
   @override
