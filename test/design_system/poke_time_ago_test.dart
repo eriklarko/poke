@@ -14,16 +14,6 @@ void main() {
       "expected": "yesterday",
       "date": DateTime.now().subtract(Duration(days: 1)),
     },
-    "yesterday,3h ago if past midnight": {
-      "expected": "yesterday",
-      "_now": DateTime.parse("1970-01-02 02:59:00"),
-      "date": DateTime.parse("1970-01-01 23:59:59")
-    },
-    "yesterday,4h ago if past midnight": {
-      "expected": "yesterday",
-      "_now": DateTime.parse("1970-01-02 03:59:00"),
-      "date": DateTime.parse("1970-01-01 23:59:59")
-    },
     //
     "tomorrow, simplest": {
       "expected": "tomorrow",

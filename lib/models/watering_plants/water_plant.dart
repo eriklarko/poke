@@ -3,7 +3,7 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
-import 'package:poke/models/watering_plants/widgets/details_screen.dart';
+import 'package:poke/models/watering_plants/widgets/details_screen/details_screen.dart';
 import 'package:poke/models/watering_plants/widgets/log_action_widget.dart';
 import 'package:poke/models/watering_plants/widgets/reminder_list_item.dart';
 import 'package:poke/notifications/notification_data.dart';

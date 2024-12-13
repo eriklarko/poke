@@ -12,45 +12,74 @@ typedef ButtonConstructor = PokeButton Function({
   required Function()? onPressed,
 });
 
-class PokeAsyncButton extends StatefulWidget {
+class PokeAsyncButton<TError> extends StatefulWidget {
   final String text;
   final bool rerunnable;
+  final bool retryable;
   final OnPressed? onPressed;
   final ButtonConstructor buttonConstructor;
+
+  final Widget Function(TError)? error;
 
   const PokeAsyncButton.once({
     super.key,
     required this.text,
     required this.onPressed,
+    this.error,
     this.buttonConstructor = PokeButton.primary,
-  }) : rerunnable = false;
+  })  : rerunnable = false,
+        retryable = false;
 
   const PokeAsyncButton.rerunnable({
     super.key,
     required this.text,
     required this.onPressed,
+    this.error,
     this.buttonConstructor = PokeButton.primary,
-  }) : rerunnable = true;
+  })  : rerunnable = true,
+        retryable = false;
 
-  factory PokeAsyncButton.primaryDangerous({
+  const PokeAsyncButton.primaryDangerous({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.error,
+    this.buttonConstructor = PokeButton.primaryDangerous,
+  })  : rerunnable = false,
+        retryable = false;
+
+  factory PokeAsyncButton.icon({
     Key? key,
-    required String text,
+    required IconData icon,
     required OnPressed? onPressed,
+    IconData errorIcon = Icons.error,
+    double? iconSize,
+    bool rerunnable = true,
   }) {
-    return PokeAsyncButton.once(
+    final ctor = rerunnable ? PokeAsyncButton.rerunnable : PokeAsyncButton.once;
+    return ctor(
       key: key,
-      text: text,
+      text: '',
       onPressed: onPressed,
-      buttonConstructor: PokeButton.primaryDangerous,
+      error: (_) => Icon(errorIcon),
+      buttonConstructor: ({key, required onPressed, required text}) {
+        return PokeButton.icon(
+          icon,
+          key: key,
+          onPressed: onPressed,
+          iconSize: iconSize,
+        );
+      },
     );
   }
 
   @override
-  State<PokeAsyncButton> createState() => _PokeAsyncButtonState();
+  State<PokeAsyncButton<TError>> createState() =>
+      _PokeAsyncButtonState<TError>();
 }
 
-class _PokeAsyncButtonState extends State<PokeAsyncButton> {
-  final controller = PokeAsyncWidgetController();
+class _PokeAsyncButtonState<TError> extends State<PokeAsyncButton<TError>> {
+  final controller = PokeAsyncWidgetController<TError>();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +99,7 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
 
                   PokeLogger.instance().error(
                     'Async button encountered error',
-                    data: {'btn-text': widget.text},
+                    data: {'key': widget.key, 'btn-text': widget.text},
                     error: error,
                   );
                 });
@@ -80,7 +109,15 @@ class _PokeAsyncButtonState extends State<PokeAsyncButton> {
 
       loading: const PokeLoadingIndicator.small(),
 
-      error: (error) => PokeText(error.toString()),
+      error: (error) {
+        if (widget.retryable) {
+          controller.setIdle();
+        } else if (widget.error != null) {
+          return widget.error!(error);
+        }
+
+        return PokeText(error.toString());
+      },
 
       // once the button's action has been executed we can either show the idle
       // state again, or show a success indicator.
