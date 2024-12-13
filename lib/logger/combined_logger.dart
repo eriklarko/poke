@@ -14,10 +14,9 @@ class CombinedLogger extends PokeLogger {
     return forAllLoggers((logger) => logger.logAppForegrounded());
   }
 
-  FutureOr<Iterable<void>> combine(Iterable<FutureOr<void>> futures) {
-    return Future.wait(futures.map(
-      (v) => v is Future ? v : Future.value(null),
-    ));
+  @override
+  FutureOr<void> doLog(Level level, PokeLogEntry log) {
+    return forAllLoggers((logger) => logger.doLog(level, log));
   }
 
   FutureOr<void> forAllLoggers(
@@ -25,11 +24,8 @@ class CombinedLogger extends PokeLogger {
   ) {
     final Iterable<FutureOr<void>> futs = loggers.map((logger) => cb(logger));
 
-    final allFuturesAreConstant = futs.every((fut) => fut! is Future);
-    if (allFuturesAreConstant) {
-      // no need to await anything
-      return null;
-    } else {
+    final hasAsyncLogger = futs.any((fut) => fut is Future);
+    if (hasAsyncLogger) {
       // at least one of the loggers is async, so need to make this call async
       final f = Future.wait(
         futs.map(
@@ -37,27 +33,9 @@ class CombinedLogger extends PokeLogger {
         ),
       );
       return f;
+    } else {
+      // no need to await anything
+      return null;
     }
-  }
-
-  @override
-  FutureOr<void> log(
-    Level level,
-    String msg, {
-    Map<String, dynamic>? data,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
-    return combine(
-      loggers.map(
-        (logger) => logger.log(
-          level,
-          msg,
-          data: data,
-          error: error,
-          stackTrace: stackTrace,
-        ),
-      ),
-    );
   }
 }

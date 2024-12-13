@@ -17,29 +17,23 @@ class FirebaseLogger extends PokeLogger {
   }
 
   @override
-  Future log(
+  Future doLog(
     Level level,
-    String msg, {
-    Map<String, dynamic>? data,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
+    PokeLogEntry log,
+  ) {
     if (!levels.contains(level)) {
       return Future.value(null);
     }
 
-    final d = Map<String, Object>.from(data ?? {});
-    d['__level'] = level.toString();
-    d['__msg'] = msg;
-
-    if (error != null) {
-      d['__error'] = error;
+    if (log.error == null) {
+      return firebase.crashlytics().log(log.toString());
+    } else {
+      return firebase.crashlytics().recordError(
+            log.error!,
+            log.stackTrace,
+            reason: log.message,
+            information: log.data?.entries as Iterable<Object>,
+          );
     }
-
-    if (stackTrace != null) {
-      d['__stackTrace'] = stackTrace;
-    }
-
-    return firebase.crashlytics().log(d.toString());
   }
 }

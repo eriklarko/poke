@@ -7,13 +7,13 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:poke/logger/combined_logger.dart';
+import 'package:poke/logger/google_cloud_logger.dart';
 import 'package:poke/logger/local_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/notifications/awesome_notifications.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/device_persistence.dart';
 import 'package:poke/persistence/persistence.dart';
-import 'package:poke/logger/firebase_logger.dart';
 
 import 'package:poke/persistence/firebase_firestore_persistence.dart';
 import 'package:poke/logger/poke_logger.dart';
@@ -39,7 +39,8 @@ Future initializeApp({
 
   await registerAppCheck(firebase);
 
-  registerServices(firebase);
+  final gcloudLogger = await setUpGoogleCloudLogger();
+  registerServices(firebase, gcloudLogger);
 
   registerFirebaseAuthListener(
     firebase,
@@ -54,9 +55,18 @@ Future<void> registerAppCheck(PokeFirebase firebase) async {
       );
 }
 
-void registerServices(PokeFirebase firebase) {
+Future<GoogleCloudLogger> setUpGoogleCloudLogger() async {
+  final gcloudLogger = GoogleCloudLogger(
+    levels: [Level.debug, Level.info, Level.warning, Level.error, Level.fatal],
+  );
+  await gcloudLogger.initialize();
+  return gcloudLogger;
+}
+
+void registerServices(PokeFirebase firebase, GoogleCloudLogger gcloudLogger) {
   final getIt = GetIt.instance;
 
+  final allowReassignment = getIt.allowReassignment;
   try {
     // because of hot-reloading we need to allow reassignments in debug
     // restore this behavior in `finally`
@@ -64,30 +74,31 @@ void registerServices(PokeFirebase firebase) {
       getIt.allowReassignment = true;
     }
 
-    //getIt.registerSingleton<Persistence>(InMemoryPersistence());
-    getIt
-        .registerSingleton<Persistence>(FirebaseFirestorePersistence(firebase));
+    getIt.registerSingleton<Persistence>(
+      FirebaseFirestorePersistence(firebase),
+    );
+
     getIt.registerSingleton<DevicePersistence>(DevicePersistence());
+    getIt.registerSingleton<NotificationService>(AwesomeNotificationsService());
+
     getIt.registerSingleton<PokeLogger>(
       CombinedLogger([
-        LocalLogger(),
-        FirebaseLogger(firebase, levels: [
-          Level.debug,
-          Level.info,
-          Level.warning,
-          Level.error,
-          Level.fatal,
-        ]),
+        LocalLogger(
+          stackTraceBeginIndex: 10,
+          methodCount: 14,
+        ),
+        gcloudLogger
       ]),
     );
-    getIt.registerSingleton<Predictor>(TimeOfDayAwareAveragePredictor());
 
+    // this depencendy is use to generate uuids. The reason it's a dependency
+    // like this is so that we can mock it in tests
     getIt.registerSingleton<Uuid>(const Uuid());
 
+    getIt.registerSingleton<Predictor>(TimeOfDayAwareAveragePredictor());
     getIt.registerSingleton<ReminderService>(ReminderService());
-    getIt.registerSingleton<NotificationService>(AwesomeNotificationsService());
   } finally {
-    getIt.allowReassignment = false;
+    getIt.allowReassignment = allowReassignment;
   }
 }
 
@@ -132,15 +143,21 @@ void registerFirebaseAuthListener(
   firebase.auth().userChanges().listen((User? user) async {
     if (user == null) {
       PokeLogger.instance().info('User is signed out');
+      PokeLogger.removeStaticData('firebase_user');
+
       await nav.pushReplacement(MaterialPageRoute(
         builder: (_) => const LoginScreen(),
       ));
     } else {
+      PokeLogger.addStaticData('firebase_user', {
+        'uid': user.uid,
+      });
       PokeLogger.instance().info('User is signed in!');
-      final reminderService = GetIt.instance.get<ReminderService>();
+
       // fetch all actions and calculate their due dates
       // and start keeping this list up-to-date in memory
       // TODO: what if this fails? Need a retry
+      final reminderService = GetIt.instance.get<ReminderService>();
       await reminderService.init();
 
       await initializeNotifications();
