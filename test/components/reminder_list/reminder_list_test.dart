@@ -148,7 +148,6 @@ void main() {
         findsOneWidget,
       );
 
-      print("DELETING EVENT");
       await persistence.deleteAction(reminder.action.equalityKey);
       await pumpEventQueue();
       await tester.pumpAndSettle();

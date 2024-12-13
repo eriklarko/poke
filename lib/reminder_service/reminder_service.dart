@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:get_it/get_it.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/persistence/persistence.dart';
@@ -46,6 +47,10 @@ class ReminderService {
   }
 
   void _onUpdateReceived(ReminderUpdate update) async {
+    PokeLogger.instance().debug(
+      "reminder service received update",
+      data: {"update": update},
+    );
     if (update.type == UpdateType.removed) {
       // reminder removed
       _removeReminder(update.actionId);
@@ -71,11 +76,25 @@ class ReminderService {
 
   void _addReminder(Reminder reminder) {
     _reminders.add(reminder);
+    PokeLogger.instance().debug(
+      "reminder service added reminder",
+      data: {
+        "newReminder": reminder,
+        "reminders": _reminders.map((r) => r.action.equalityKey),
+      },
+    );
   }
 
   void _removeReminder(String actionId) {
     _reminders.removeWhere(
       (reminder) => reminder.action.equalityKey == actionId,
+    );
+    PokeLogger.instance().debug(
+      "reminder service removed reminder for action",
+      data: {
+        "actionId": actionId,
+        "reminders": _reminders.map((r) => r.action.equalityKey),
+      },
     );
   }
 
@@ -84,6 +103,15 @@ class ReminderService {
     final i = _reminders.indexWhere((reminder) {
       return reminder.action.equalityKey == reminder.action.equalityKey;
     });
+
+    PokeLogger.instance().debug(
+      "reminder service updating reminder",
+      data: {
+        "newReminder": reminder,
+        "oldReminder": _reminders[i],
+        "reminders": _reminders.map((r) => r.action.equalityKey),
+      },
+    );
     // and replace the reminder
     _reminders[i] = reminder;
   }

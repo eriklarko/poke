@@ -1,11 +1,15 @@
 import 'package:logger/logger.dart';
-import 'package:poke/logger/local_logger.dart';
+import 'package:poke/logger/poke_logger.dart';
 import 'package:poke/screens/loading/poke_firebase.dart';
 
-class FirebaseLogger extends LocalLogger {
+class FirebaseLogger extends PokeLogger {
   final PokeFirebase firebase;
+  final Iterable<Level> levels;
 
-  FirebaseLogger(this.firebase);
+  FirebaseLogger(
+    this.firebase, {
+    this.levels = const [Level.warning, Level.error, Level.fatal],
+  });
 
   @override
   Future logAppForegrounded() {
@@ -20,47 +24,22 @@ class FirebaseLogger extends LocalLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    super.log(
-      level,
-      msg,
-      data: data,
-      error: error,
-      stackTrace: stackTrace,
-    );
-
-    return _logRemotely(
-      level,
-      msg,
-      data: data,
-      error: error,
-    );
-  }
-
-  // ignores trace, debug and info
-  Future _logRemotely(
-    Level level,
-    String msg, {
-    Map<String, dynamic>? data,
-    Object? error,
-  }) {
-    switch (level) {
-      case Level.warning:
-      case Level.error:
-      case Level.fatal:
-        final d = Map<String, Object>.from(data ?? {});
-        d['__msg'] = msg;
-
-        if (error != null) {
-          d['__error'] = error;
-        }
-
-        final String event = d.remove('event')?.toString() ?? 'unknown';
-
-        return firebase
-            .analytics()
-            .logEvent(name: '$level - $event', parameters: d);
-      default:
-        return Future.value(null);
+    if (!levels.contains(level)) {
+      return Future.value(null);
     }
+
+    final d = Map<String, Object>.from(data ?? {});
+    d['__level'] = level.toString();
+    d['__msg'] = msg;
+
+    if (error != null) {
+      d['__error'] = error;
+    }
+
+    if (stackTrace != null) {
+      d['__stackTrace'] = stackTrace;
+    }
+
+    return firebase.crashlytics().log(d.toString());
   }
 }

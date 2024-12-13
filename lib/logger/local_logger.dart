@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:logger/logger.dart';
 import 'package:poke/logger/poke_logger.dart';
 
-class LocalLogger implements PokeLogger {
+class LocalLogger extends PokeLogger {
   final Logger _logger = Logger(
     printer: PrettyPrinter(
       // Skip the frames coming from this logger
@@ -11,54 +13,64 @@ class LocalLogger implements PokeLogger {
   );
 
   @override
-  Future logAppForegrounded() {
+  FutureOr<void> logAppForegrounded() {
     return _log(Level.info, "app foregrounded");
   }
 
   @override
-  Future trace(String msg, {Map<String, dynamic>? data}) {
+  FutureOr<void> trace(String msg, {Map<String, dynamic>? data}) {
     return _log(Level.trace, msg, data: data);
   }
 
   @override
-  Future debug(String msg, {Map<String, dynamic>? data}) {
+  FutureOr<void> debug(String msg, {Map<String, dynamic>? data}) {
     return _log(Level.debug, msg, data: data);
   }
 
   @override
-  Future info(String msg, {Map<String, dynamic>? data}) {
+  FutureOr<void> info(String msg, {Map<String, dynamic>? data}) {
     return _log(Level.info, msg, data: data);
   }
 
   @override
-  Future warn(String msg, {Map<String, dynamic>? data}) {
+  FutureOr<void> warn(String msg, {Map<String, dynamic>? data}) {
     return _log(Level.warning, msg, data: data);
   }
 
   @override
-  Future error(
+  FutureOr<void> error(
     String msg, {
     Map<String, dynamic>? data,
     Object? error,
     StackTrace? stackTrace,
   }) {
-    return _log(Level.error, msg,
-        data: data, error: error, stackTrace: stackTrace);
+    return _log(
+      Level.error,
+      msg,
+      data: data,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   @override
-  Future fatal(
+  FutureOr<void> fatal(
     String msg, {
     Map<String, dynamic>? data,
     Object? error,
     StackTrace? stackTrace,
   }) {
-    return _log(Level.fatal, msg,
-        data: data, error: error, stackTrace: stackTrace);
+    return _log(
+      Level.fatal,
+      msg,
+      data: data,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   @override
-  Future log(
+  FutureOr<void> log(
     Level level,
     String msg, {
     Map<String, dynamic>? data,
@@ -78,13 +90,13 @@ class LocalLogger implements PokeLogger {
     );
   }
 
-  Future _log(
+  FutureOr<void> _log(
     Level level,
     String msg, {
     Map<String, dynamic>? data,
     Object? error,
     StackTrace? stackTrace,
-  }) async {
+  }) {
     dynamic logMessage = msg;
     if (data != null) {
       data['__msg'] = msg;

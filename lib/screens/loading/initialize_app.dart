@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
+import 'package:poke/logger/combined_logger.dart';
+import 'package:poke/logger/local_logger.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/notifications/awesome_notifications.dart';
 import 'package:poke/notifications/notification_service.dart';
@@ -65,7 +68,18 @@ void registerServices(PokeFirebase firebase) {
     getIt
         .registerSingleton<Persistence>(FirebaseFirestorePersistence(firebase));
     getIt.registerSingleton<DevicePersistence>(DevicePersistence());
-    getIt.registerSingleton<PokeLogger>(FirebaseLogger(firebase));
+    getIt.registerSingleton<PokeLogger>(
+      CombinedLogger([
+        LocalLogger(),
+        FirebaseLogger(firebase, levels: [
+          Level.debug,
+          Level.info,
+          Level.warning,
+          Level.error,
+          Level.fatal,
+        ]),
+      ]),
+    );
     getIt.registerSingleton<Predictor>(TimeOfDayAwareAveragePredictor());
 
     getIt.registerSingleton<Uuid>(const Uuid());

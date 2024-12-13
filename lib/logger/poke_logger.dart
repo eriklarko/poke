@@ -1,29 +1,60 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:poke/logger/local_logger.dart';
 
-abstract interface class PokeLogger {
-  Future logAppForegrounded();
+abstract class PokeLogger {
+  FutureOr<void> logAppForegrounded();
 
-  Future trace(String msg, {Map<String, dynamic>? data});
-  Future debug(String msg, {Map<String, dynamic>? data});
-  Future info(String msg, {Map<String, dynamic>? data});
-  Future warn(String msg, {Map<String, dynamic>? data});
-  Future error(
+  FutureOr<void> trace(String msg, {Map<String, dynamic>? data}) {
+    return log(Level.trace, msg, data: data);
+  }
+
+  FutureOr<void> debug(String msg, {Map<String, dynamic>? data}) {
+    return log(Level.debug, msg, data: data);
+  }
+
+  FutureOr<void> info(String msg, {Map<String, dynamic>? data}) {
+    return log(Level.info, msg, data: data);
+  }
+
+  FutureOr<void> warn(String msg, {Map<String, dynamic>? data}) {
+    return log(Level.warning, msg, data: data);
+  }
+
+  FutureOr<void> error(
     String msg, {
-    Map<String, dynamic> data,
+    Map<String, dynamic>? data,
     Object? error,
     StackTrace? stackTrace,
-  });
-  Future fatal(
+  }) {
+    return log(
+      Level.error,
+      msg,
+      data: data,
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  FutureOr<void> fatal(
     String msg, {
-    Map<String, dynamic> data,
+    Map<String, dynamic>? data,
     Object? error,
     StackTrace? stackTrace,
-  });
-  Future log(
+  }) {
+    return log(
+      Level.fatal,
+      msg,
+      data: data,
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  FutureOr<void> log(
     Level level,
     String msg, {
     Map<String, dynamic>? data,
