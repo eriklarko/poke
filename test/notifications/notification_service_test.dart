@@ -94,7 +94,8 @@ void main() {
         // create the test action
         final action = TestAction(id: '1');
 
-        final (sut, _) = constructor();
+        final (sut, p) = constructor();
+        await p.requestPermissionToSendNotifications();
         await sut.initialize();
 
         // not enough data yet
@@ -134,7 +135,8 @@ void main() {
 
         final action = TestAction(id: '1');
 
-        final (sut, _) = constructor();
+        final (sut, p) = constructor();
+        await p.requestPermissionToSendNotifications();
         await sut.initialize();
 
         // create action and provide enough data for a due date
@@ -179,6 +181,42 @@ void main() {
           await sut.getAllScheduledNotifications(),
           isEmpty,
         );
+      });
+
+      test('active notification is dismissed when action is removed', () async {
+        fail("not implemented yet");
+      });
+
+      test('active notification is dimissed when action is logged', () async {
+        final persistence = InMemoryPersistence();
+        setDependency<Persistence>(persistence);
+
+        await setReminderService();
+        final notifService = setNotificationService();
+        await notifService.initialize();
+
+        var action = TestAction();
+        final dueDate = DateTime.now().add(Duration(hours: 1));
+        await notifService.scheduleReminder(action, dueDate);
+
+        // move time forward
+        final platform = AwesomeNotificationsPlatform.instance
+            as InMemoryNotificationPlatform;
+        await platform.processScheduledNotifications(
+          dueDate.add(Duration(seconds: 1)),
+        );
+
+        // ensure notification is showing
+        expect(
+          await notifService.getActiveNotifications(),
+          [action.equalityKey],
+        );
+
+        // log event to dismiss notification
+        await persistence.logAction(action, DateTime.parse("1963-11-26"));
+        await pumpEventQueue();
+
+        expect(await notifService.getActiveNotifications(), []);
       });
 
       test('schedules reminders for all actions with due dates', () async {

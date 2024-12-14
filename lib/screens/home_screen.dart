@@ -3,15 +3,12 @@ import 'package:get_it/get_it.dart';
 import 'package:poke/components/expandable_floating_action_button/expandable_floating_action_button.dart';
 import 'package:poke/components/reminder_list/reminder_list.dart';
 import 'package:poke/design_system/poke_app_bar.dart';
-import 'package:poke/design_system/poke_button.dart';
-import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_modal.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/action.dart';
-import 'package:poke/models/reminder.dart';
 import 'package:poke/notifications/notification_permission_widget.dart';
 import 'package:poke/persistence/persistence.dart';
-import 'package:poke/screens/action_details_screen/action_details_screen.dart';
+import 'package:poke/screens/action_screen/action_screen.dart';
 import 'package:poke/utils/nav_service.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,30 +27,13 @@ class HomeScreen extends StatelessWidget {
           const NotificationPermissionWidget(),
           Expanded(
             child: ReminderList(
-              onReminderTapped: (reminder) => openLogActionDialog(
-                context,
-                reminder,
-              ),
-              swipeActions: [
-                (
-                  (Reminder reminder) {
-                    print('snoozing $reminder');
-                  },
-                  Container(
-                    decoration: BoxDecoration(
-                      color: PokeConstants.colors.primary,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.alarm_off_sharp),
-                        PokeText("snooze"),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              onReminderTapped: (reminder) {
+                NavService.instance.push(MaterialPageRoute(builder: (_) {
+                  return ActionScreen(
+                    action: reminder.action,
+                  );
+                }));
+              },
             ),
           ),
         ],
@@ -72,32 +52,6 @@ class HomeScreen extends StatelessWidget {
               },
             );
           }),
-        ),
-      ),
-    );
-  }
-
-  void openLogActionDialog(BuildContext context, Reminder reminder) {
-    showDialog(
-      context: context,
-      builder: (context) => PokeModal(
-        actionButton: PokeButton.icon(
-          Icons.chevron_right,
-          onPressed: () {
-            NavService.instance.push(MaterialPageRoute(builder: (_) {
-              return ActionDetailsScreen(
-                action: reminder.action,
-              );
-            }));
-          },
-        ),
-        child: reminder.buildLogActionWidget(
-          context,
-          persistence,
-          onActionLogged: () {
-            // close the modal
-            Navigator.of(context).pop();
-          },
         ),
       ),
     );

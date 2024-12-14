@@ -6,8 +6,10 @@ import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
+import 'package:poke/persistence/in_memory_persistence.dart';
 
 import '../../../test_app.dart';
+import '../../../utils/dependencies.dart';
 import 'reminder_list_item_test.mocks.dart';
 
 final arbitraryPlant = Plant(
@@ -17,6 +19,8 @@ final arbitraryPlant = Plant(
 
 @GenerateNiceMocks([MockSpec<BuildContext>()])
 void main() {
+  setPersistence(InMemoryPersistence());
+
   testWidgets('shows plant name', (tester) async {
     final WaterPlantAction sut = WaterPlantAction(
       plant: Plant(

@@ -1,8 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poke/models/watering_plants/plant.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
+import 'package:poke/persistence/in_memory_persistence.dart';
+
+import '../../utils/dependencies.dart';
 
 void main() {
+  setPersistence(InMemoryPersistence());
+
   group("serialization", () {
     test('serializes as expected', () {
       final Plant plant = Plant(

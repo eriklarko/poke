@@ -16,7 +16,9 @@ import "package:collection/collection.dart";
 import 'notification_service.dart';
 
 class AwesomeNotificationsService extends NotificationService {
-  static const _permissionResponseKey = "POKE_ALLOW_NOTIFICATIONS";
+  static const permissionResponseKey = "POKE_ALLOW_NOTIFICATIONS";
+  static const permissionResponseYes = "yes";
+  static const permissionResponseNo = "no";
 
   final _i = AwesomeNotifications();
   final _deviceSettings = GetIt.instance.get<DevicePersistence>();
@@ -76,11 +78,15 @@ class AwesomeNotificationsService extends NotificationService {
               reminder.action.equalityKey,
             );
             // remove any active notification for this action
+            // TODO: Test
             await _i.dismiss(_getNotificationId(reminder.action));
             return;
           }
 
-          await scheduleReminder(reminder.action, reminder.dueDate!);
+          final permission = await hasPermissionToSendNotifications();
+          if (permission == PermissionResponse.allowed) {
+            await scheduleReminder(reminder.action, reminder.dueDate!);
+          }
 
         case UpdateType.removed:
           print("awesome_notifications got removed event: ${event}");
@@ -108,14 +114,14 @@ class AwesomeNotificationsService extends NotificationService {
   // user having denied notifications or if they haven't chosen yet.
   @override
   FutureOr<PermissionResponse> hasPermissionToSendNotifications() async {
-    final persistedDecision = await _deviceSettings.get(_permissionResponseKey);
+    final persistedDecision = await _deviceSettings.get(permissionResponseKey);
     final allowed = await _i.isNotificationAllowed();
 
     if (persistedDecision == null && allowed) {
       // internal storage says user hasn't chosen, but AwesomeNotifications says
       // the user has.
       // update internal storage
-      await _deviceSettings.set(_permissionResponseKey, "yes");
+      await _deviceSettings.set(permissionResponseKey, permissionResponseYes);
       return PermissionResponse.allowed;
     }
 
@@ -126,18 +132,18 @@ class AwesomeNotificationsService extends NotificationService {
       return PermissionResponse.hasNotChosen;
     }
 
-    final persistedBool = persistedDecision == "yes";
+    final persistedBool = persistedDecision == permissionResponseYes;
     if (allowed && !persistedBool) {
       // user has allowed notifications, but the internal storage says no
       // update internal storage
-      await _deviceSettings.set(_permissionResponseKey, "yes");
+      await _deviceSettings.set(permissionResponseKey, permissionResponseYes);
       return PermissionResponse.allowed;
     }
 
     if (!allowed && persistedBool) {
       // user has denied notifications, but the internal storage says yes
       // update insternal storage
-      await _deviceSettings.set(_permissionResponseKey, "no");
+      await _deviceSettings.set(permissionResponseKey, permissionResponseNo);
       return PermissionResponse.denied;
     }
 
@@ -159,8 +165,8 @@ class AwesomeNotificationsService extends NotificationService {
     );
 
     await _deviceSettings.set(
-      _permissionResponseKey,
-      gavePermission ? "yes" : "no",
+      permissionResponseKey,
+      gavePermission ? permissionResponseYes : permissionResponseNo,
     );
   }
 
@@ -270,8 +276,18 @@ class AwesomeNotificationsService extends NotificationService {
     final hash = md5.convert(uniqueData.codeUnits);
     final hashBytes = Int8List.fromList(hash.bytes);
 
-    // and take the first four bytes in the hash
-    return hashBytes.buffer.asByteData().getInt32(0);
+    // awesomenotifications says id must be in range
+    // [1, 2,147,483,647] = [1 - 2^31]. 2,147,483,647 is the max value for a
+    // signed 32-bit integer, so we can take the first four bytes of the hash as
+    // a 32-bit int, and abs it.
+    //
+    // To avoid 0, return 1 if hash is 0. this is a collision, but there are
+    // already collisions possible
+    final id = hashBytes.buffer.asByteData().getInt32(0).abs();
+    if (id == 0) {
+      return 1;
+    }
+    return id;
   }
 
   @override

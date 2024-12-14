@@ -53,7 +53,10 @@ class PokeButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: background,
           foregroundColor: foreground,
-          padding: EdgeInsets.all(PokeConstants.space(4)),
+          padding: EdgeInsets.symmetric(
+            horizontal: PokeConstants.space(4),
+            vertical: PokeConstants.space(2),
+          ),
         ),
         child: PokeText(text),
       ),
@@ -72,7 +75,10 @@ class PokeButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: PokeConstants.colors.primary,
           foregroundColor: PokeConstants.colors.onPrimary,
-          padding: EdgeInsets.all(PokeConstants.space()),
+          padding: EdgeInsets.symmetric(
+            horizontal: PokeConstants.space(2),
+            vertical: PokeConstants.space(1),
+          ),
         ),
         child: PokeText(text),
       ),

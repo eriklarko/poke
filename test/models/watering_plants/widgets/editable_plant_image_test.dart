@@ -18,6 +18,7 @@ import 'editable_plant_image_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Plant>(), MockSpec<Persistence>()])
 void main() {
+  setPersistence(InMemoryPersistence());
   Action.registerSubclasses();
 
   // The EditablePlantImage widget fills its parent by default, so we need to

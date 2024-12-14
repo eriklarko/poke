@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:poke/design_system/poke_async_button.dart';
 import 'package:poke/design_system/poke_button.dart';
+import 'package:poke/design_system/poke_constants.dart';
 import 'package:poke/design_system/poke_text.dart';
 
 class EditableTextField extends StatefulWidget {
@@ -41,6 +42,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
 
   void cancelEditMode() {
     setState(() {
+      _inputController.text = widget.text;
       _editMode = false;
     });
   }
@@ -67,6 +69,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
       mainAxisSize: MainAxisSize.min,
       children: [
         PokeText(_inputController.text),
+        PokeConstants.fixedSpacer(),
         PokeButton.icon(
           Icons.edit,
           onPressed: enterEditMode,
@@ -85,6 +88,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
             controller: _inputController,
           ),
         ),
+        PokeConstants.fixedSpacer(),
         PokeAsyncButton.icon(
           icon: Icons.save,
           iconSize: widget.iconSize,

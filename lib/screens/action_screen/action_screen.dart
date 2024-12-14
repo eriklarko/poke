@@ -5,13 +5,13 @@ import 'package:poke/models/action.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/persistence.dart';
 
-class ActionDetailsScreen extends StatelessWidget {
+class ActionScreen extends StatelessWidget {
   final notificationService = GetIt.instance.get<NotificationService>();
   final persistence = GetIt.instance.get<Persistence>();
 
   final Action action;
 
-  ActionDetailsScreen({
+  ActionScreen({
     super.key,
     required this.action,
   });

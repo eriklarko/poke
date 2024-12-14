@@ -7,13 +7,13 @@ import 'package:poke/models/reminder.dart';
 class ReminderListItem extends StatelessWidget {
   final Reminder reminder;
   final Function(Reminder) onTap;
-  final List<SwipeAction<Reminder>>? swipeActions;
+  final List<SwipeAction<Reminder>> swipeActions;
 
   const ReminderListItem({
     required this.reminder,
     super.key,
     required this.onTap,
-    this.swipeActions,
+    this.swipeActions = const [],
   });
 
   @override
@@ -30,7 +30,7 @@ class ReminderListItem extends StatelessWidget {
         child: PokeSwipeable<Reminder>(
           key: ObjectKey(reminder),
           value: reminder,
-          swipeActions: swipeActions ?? [],
+          swipeActions: swipeActions,
           child: Row(
             children: [
               Expanded(child: reminder.buildReminderListItem(context)),

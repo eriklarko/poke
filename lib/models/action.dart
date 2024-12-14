@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
 import 'package:poke/notifications/notification_data.dart';
@@ -107,13 +108,7 @@ abstract class Action<EventDataType extends SerializableEventData?> {
   // Creates the UI used to show this action in the reminder list
   Widget buildReminderListItem(BuildContext context, Reminder reminder);
 
-  // Creates the UI to use when executing this action, or adding an event of
-  // this action. An event in Poke is when an action was performed.
-  Widget buildLogActionWidget(
-    BuildContext context,
-    Persistence persistence, {
-    Function()? onActionLogged,
-  });
+  List<SwipeAction<Reminder>> get reminderListSwipeActions => [];
 
   Widget buildDetailsScreen(BuildContext context);
   /////////////////// WIDGET BUILDERS //////////////////////////

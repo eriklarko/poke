@@ -220,4 +220,13 @@ class PokeAsyncWidgetController<ErrorType> {
       _state!.setAsyncState(newState);
     }
   }
+
+  listenToFuture(Future f) {
+    setLoading();
+    f.then((_) {
+      setSuccessful();
+    }).catchError((e) {
+      setErrored(e);
+    });
+  }
 }

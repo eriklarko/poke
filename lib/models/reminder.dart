@@ -1,7 +1,6 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:poke/models/action.dart';
-import 'package:poke/persistence/persistence.dart';
 
 class Reminder {
   final Action action;
@@ -11,21 +10,6 @@ class Reminder {
 
   Widget buildReminderListItem(BuildContext context) {
     return action.buildReminderListItem(context, this);
-  }
-
-  Widget buildLogActionWidget(
-    BuildContext context,
-    Persistence persistence, {
-    Function()? onActionLogged,
-  }) {
-    return action.buildLogActionWidget(
-      context,
-      persistence,
-      onActionLogged: () {
-        // TODO: remove any active notification for the action
-        onActionLogged?.call();
-      },
-    );
   }
 
   @override

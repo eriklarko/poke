@@ -6,7 +6,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/reminder.dart';
 import 'package:poke/notifications/notification_data.dart';
-import 'package:poke/persistence/persistence.dart';
 import 'package:poke/persistence/serializable_event_data.dart';
 
 part 'test_action.g.dart';
@@ -33,15 +32,6 @@ class TestAction extends Action<Null> {
   final Map<String, String>? props;
 
   TestAction({this.id, this.props}) : super(serializationKey: serializationKey);
-
-  @override
-  Widget buildLogActionWidget(
-    BuildContext context,
-    Persistence persistence, {
-    Function()? onActionLogged,
-  }) {
-    return _someWidget('log-action');
-  }
 
   Widget _someWidget(String idPrefix) {
     final key = getKey(idPrefix);
@@ -189,15 +179,6 @@ class TestActionWithData extends Action<Data> {
     hash += events.hashCode;
 
     return hash;
-  }
-
-  @override
-  Widget buildLogActionWidget(
-    BuildContext context,
-    Persistence persistence, {
-    Function()? onActionLogged,
-  }) {
-    throw UnimplementedError();
   }
 
   @override

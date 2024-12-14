@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/components/reminder_list/reminder_list_item.dart';
+import 'package:poke/design_system/poke_swipeable.dart';
 import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/models/reminder.dart';
 
@@ -62,9 +63,9 @@ void main() {
         reminder: reminder,
         onTap: ignoreCallback,
         swipeActions: [
-          (
-            swipeActionCallback,
-            PokeText("swipe-action"),
+          SwipeAction(
+            act: swipeActionCallback.call,
+            widget: PokeText("swipe-action"),
           )
         ],
       ),

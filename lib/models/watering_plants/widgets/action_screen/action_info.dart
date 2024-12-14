@@ -5,7 +5,7 @@ import 'package:poke/design_system/poke_text.dart';
 import 'package:poke/design_system/poke_time_ago.dart';
 import 'package:poke/models/action.dart';
 import 'package:poke/models/watering_plants/water_plant.dart';
-import 'package:poke/models/watering_plants/widgets/details_screen/editable_text_field.dart';
+import 'package:poke/models/watering_plants/widgets/action_screen/editable_text_field.dart';
 import 'package:poke/models/watering_plants/widgets/plant_image.dart';
 import 'package:poke/persistence/persistence.dart';
 import 'package:poke/reminder_service/reminder_service.dart';
@@ -27,6 +27,7 @@ class ActionInfo extends StatelessWidget {
             children: [
               EditableTextField(
                 action.plant.name,
+                iconSize: 15,
                 onChanged: (newName) async {
                   // dump copy of action to json and change the plant name
                   final j = action.toJson();

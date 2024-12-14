@@ -17,12 +17,12 @@ import 'reminder_list_item.dart';
 class ReminderList extends StatefulWidget {
   final ReminderService reminderService = GetIt.instance.get<ReminderService>();
   final Function(Reminder) onReminderTapped;
-  final List<SwipeAction<Reminder>>? swipeActions;
+  final List<SwipeAction<Reminder>> swipeActions;
 
   ReminderList({
     super.key,
     required this.onReminderTapped,
-    this.swipeActions,
+    this.swipeActions = const [],
   });
 
   @override
@@ -161,7 +161,8 @@ class _ReminderListState extends State<ReminderList> {
               key: ValueKey(actionId),
               reminder: data,
               onTap: widget.onReminderTapped,
-              swipeActions: widget.swipeActions,
+              swipeActions: widget.swipeActions +
+                  reminder.action.reminderListSwipeActions,
             ),
           ),
         ),

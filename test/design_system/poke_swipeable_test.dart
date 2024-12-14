@@ -35,9 +35,9 @@ void main() {
         key: swipeableKey,
         value: "foo",
         swipeActions: [
-          (
-            swipeActionCallback,
-            PokeText("swipe-action"),
+          SwipeAction(
+            act: swipeActionCallback.call,
+            widget: PokeText("swipe-action"),
           )
         ],
         child: PokeText('foof'),

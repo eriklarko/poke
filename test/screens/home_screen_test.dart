@@ -6,6 +6,7 @@ import 'package:poke/models/action.dart';
 import 'package:poke/notifications/notification_permission_widget.dart';
 import 'package:poke/notifications/notification_service.dart';
 import 'package:poke/persistence/in_memory_persistence.dart';
+import 'package:poke/screens/action_screen/action_screen.dart';
 import 'package:poke/screens/home_screen.dart';
 
 import '../components/reminder_list/reminder_list_test.dart';
@@ -17,7 +18,8 @@ import 'home_screen_test.mocks.dart';
 void main() {
   registerTestActions();
 
-  testWidgets("tapping a reminder opens the log widget", (tester) async {
+  testWidgets("tapping a reminder navigates to the action screen",
+      (tester) async {
     // create an action so that the reminder list will have one item
     final a = TestAction(id: 'some-action');
     final persistence = InMemoryPersistence();
@@ -35,11 +37,8 @@ void main() {
     await tester.tap(find.byKey(a.getKey('reminder-list-item')));
     await tester.pumpAndSettle();
 
-    // check that the log action widget is rendered
-    expect(
-      find.byKey(a.getKey('log-action')),
-      findsOneWidget,
-    );
+    // check that we navigated to the action screen
+    expect(find.byType(ActionScreen), findsOneWidget);
   });
 
   testWidgets("can add new action", (tester) async {
