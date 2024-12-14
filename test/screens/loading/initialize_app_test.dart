@@ -8,6 +8,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/notifications/awesome_notifications.dart';
@@ -49,6 +50,23 @@ import 'initialize_app_test.mocks.dart';
   return (mockFirebase, userStreamController);
 }
 
+Future doInitializeApp({
+  PokeFirebase? firebase,
+  NavigatorState? nav,
+  AuthClient? gcloudAuthClient,
+}) {
+  if (firebase == null) {
+    final (m, _) = mockFirebase();
+    firebase = m;
+  }
+
+  return initializeApp(
+    firebase: firebase,
+    nav: nav ?? MockNavigatorState(),
+    gcloudAuthClient: gcloudAuthClient ?? MockAuthClient(),
+  );
+}
+
 @GenerateNiceMocks([
   MockSpec<PokeFirebase>(),
   MockSpec<FirebaseAuth>(),
@@ -56,6 +74,7 @@ import 'initialize_app_test.mocks.dart';
   MockSpec<FirebaseCrashlytics>(),
   MockSpec<FirebaseAppCheck>(),
   MockSpec<NavigatorState>(onMissingStub: OnMissingStub.returnDefault),
+  MockSpec<AuthClient>()
 ])
 void main() {
   GetIt.instance.allowReassignment = true;
@@ -65,7 +84,7 @@ void main() {
     final (m, _) = mockFirebase();
     when(m.initializeApp()).thenAnswer((_) => Future.value(null));
 
-    await initializeApp(firebase: m, nav: MockNavigatorState());
+    await doInitializeApp(firebase: m);
 
     verify(m.initializeApp()).called(1);
   });
@@ -74,7 +93,10 @@ void main() {
     final (firebaseMock, userStream) = mockFirebase();
 
     final nav = MockNavigatorState();
-    await initializeApp(firebase: firebaseMock, nav: nav);
+    await doInitializeApp(
+      firebase: firebaseMock,
+      nav: nav,
+    );
 
     userStream.add(null);
     // wait until listeners have had a chance to react
@@ -89,7 +111,10 @@ void main() {
     final (firebaseMock, userStream) = mockFirebase();
 
     final nav = MockNavigatorState();
-    await initializeApp(firebase: firebaseMock, nav: nav);
+    await doInitializeApp(
+      firebase: firebaseMock,
+      nav: nav,
+    );
 
     userStream.add(MockUser());
     // wait until listeners have had a chance to react
@@ -124,7 +149,7 @@ void main() {
 
     // register crash handlers
     final (firebaseMock, _) = mockFirebase();
-    await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+    await doInitializeApp(firebase: firebaseMock);
 
     // cause error
     await tester.tap(find.byKey(const Key('1')));
@@ -146,7 +171,7 @@ void main() {
   test('FlutterError.onError records crashlytics error', () async {
     final (firebaseMock, _) = mockFirebase();
 
-    await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+    await doInitializeApp(firebase: firebaseMock);
 
     final errorDetails = FlutterErrorDetails(exception: Exception('hello'));
     FlutterError.onError?.call(errorDetails);
@@ -158,7 +183,7 @@ void main() {
   test('PlatformDispatcher forwards errors to crashlytics', () async {
     final (firebaseMock, _) = mockFirebase();
 
-    await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+    await doInitializeApp(firebase: firebaseMock);
 
     final error = Exception('hello');
     PlatformDispatcher.instance.onError?.call(error, StackTrace.empty);
@@ -193,7 +218,7 @@ void main() {
     await notificationService.initialize();
     await notificationService.decidePermissionsToSendNotifications();
 
-    await initializeApp(firebase: firebaseMock, nav: MockNavigatorState());
+    await doInitializeApp(firebase: firebaseMock);
     // wait until listeners have had a chance to react
     await Future.delayed(Duration.zero);
 
@@ -210,10 +235,9 @@ void main() {
 
   test('can be retried', () async {
     final (firebaseMock, _) = mockFirebase();
-    final nav = MockNavigatorState();
 
-    await initializeApp(firebase: firebaseMock, nav: nav);
-    await initializeApp(firebase: firebaseMock, nav: nav);
+    await doInitializeApp(firebase: firebaseMock);
+    await doInitializeApp(firebase: firebaseMock);
   });
 }
 

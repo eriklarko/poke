@@ -182,8 +182,8 @@ class InMemoryNotificationPlatform extends AwesomeNotificationsPlatform {
   }
 
   @override
-  Future<void> dismiss(int id) {
-    throw UnimplementedError();
+  Future<void> dismiss(int id) async {
+    _activeNotifications.remove(id);
   }
 
   @override

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
 import 'package:poke/design_system/poke_loading_indicator.dart';
-import 'package:poke/models/watering_plants/widgets/details_screen/editable_text_field.dart';
+import 'package:poke/models/watering_plants/widgets/action_screen/editable_text_field.dart';
 
 import '../../../../mock_callback.dart';
 import '../../../../test_app.dart';

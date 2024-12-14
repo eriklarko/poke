@@ -75,6 +75,8 @@ class AwesomeNotificationsService extends NotificationService {
             await cancelScheduledNotificationForAction(
               reminder.action.equalityKey,
             );
+            // remove any active notification for this action
+            await _i.dismiss(_getNotificationId(reminder.action));
             return;
           }
 
@@ -164,6 +166,8 @@ class AwesomeNotificationsService extends NotificationService {
 
   @override
   FutureOr<void> scheduleReminder(Action action, DateTime dueDate) async {
+    await _i.dismiss(_getNotificationId(action));
+
     final existingReminder = await getScheduledNotificationForAction(
       action.equalityKey,
     );

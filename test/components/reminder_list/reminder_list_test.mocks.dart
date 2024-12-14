@@ -62,6 +62,16 @@ class MockReminderService extends _i1.Mock implements _i4.ReminderService {
       ) as _i5.Future<void>);
 
   @override
+  _i5.Future<void> syncWithPersistence() => (super.noSuchMethod(
+        Invocation.method(
+          #syncWithPersistence,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
   _i5.Future<void> dispose() => (super.noSuchMethod(
         Invocation.method(
           #dispose,

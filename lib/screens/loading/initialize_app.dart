@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide Persistence;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:get_it/get_it.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:logger/logger.dart';
 import 'package:poke/logger/combined_logger.dart';
 import 'package:poke/logger/google_cloud_logger.dart';
@@ -29,6 +30,7 @@ import 'package:uuid/uuid.dart';
 
 Future initializeApp({
   PokeFirebase firebase = const PokeFirebase(),
+  AuthClient? gcloudAuthClient,
   NavigatorState? nav,
 }) async {
   await firebase.initializeApp();
@@ -39,7 +41,7 @@ Future initializeApp({
 
   await registerAppCheck(firebase);
 
-  final gcloudLogger = await setUpGoogleCloudLogger();
+  final gcloudLogger = await setUpGoogleCloudLogger(gcloudAuthClient);
   registerServices(firebase, gcloudLogger);
 
   registerFirebaseAuthListener(
@@ -55,11 +57,11 @@ Future<void> registerAppCheck(PokeFirebase firebase) async {
       );
 }
 
-Future<GoogleCloudLogger> setUpGoogleCloudLogger() async {
+Future<GoogleCloudLogger> setUpGoogleCloudLogger(AuthClient? authClient) async {
   final gcloudLogger = GoogleCloudLogger(
     levels: [Level.debug, Level.info, Level.warning, Level.error, Level.fatal],
   );
-  await gcloudLogger.initialize();
+  await gcloudLogger.initialize(authClient: authClient);
   return gcloudLogger;
 }
 

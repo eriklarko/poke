@@ -4,6 +4,8 @@ class PokeLoadingIndicator extends StatelessWidget {
   final double width;
   final double height;
   final Color? color;
+
+  // progress as a number [0, 1], set to null for indeterminate
   final double? value;
 
   const PokeLoadingIndicator._({

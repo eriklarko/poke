@@ -33,7 +33,7 @@ class GoogleCloudLogger extends PokeLogger {
     this.levels = const [Level.warning, Level.error, Level.fatal],
   });
 
-  Future<void> initialize() async {
+  Future<void> initialize({AuthClient? authClient}) async {
     if (_isSetup) return;
 
     // Authenticate using ServiceAccountCredentials and obtain an
