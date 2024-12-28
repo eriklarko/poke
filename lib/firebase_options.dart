@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCiTrb9EFwZPxsem-HRPfz-LI_bjl0mYDw',
+    apiKey: 'AIzaSyCo2Jlq9WdIpchjg2MxyNfP7CKUFPtvMEw',
     appId: '1:201274280583:android:4e1807ba30673f5095c622',
     messagingSenderId: '201274280583',
     projectId: 'plant-reminder-90745',
