@@ -5,5 +5,5 @@ part 'environment_variables.g.dart';
 @envied
 abstract class Env {
   @EnviedField(varName: 'GCLOUD_API_KEY', obfuscate: true)
-  static const String gcloudApiKey = _Env.gcloudApiKey;
+  static final String gcloudApiKey = _Env.gcloudApiKey;
 }
