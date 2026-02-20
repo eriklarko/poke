@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "201274280583",
+    "firebase_url": "https://plant-reminder-90745-default-rtdb.firebaseio.com",
+    "project_id": "plant-reminder-90745",
+    "storage_bucket": "plant-reminder-90745.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201274280583:android:4e1807ba30673f5095c622",
+        "android_client_info": {
+          "package_name": "com.example.poke"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201274280583-cl3efjp78ft81i242r9j5vh1bvh8s5va.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.poke",
+            "certificate_hash": "0e75848631cdad19d5a483b0a9424ca8dee18e0f"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo2Jlq9WdIpchjg2MxyNfP7CKUFPtvMEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201274280583:android:c68801f78d70265395c622",
+        "android_client_info": {
+          "package_name": "com.plantreminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo2Jlq9WdIpchjg2MxyNfP7CKUFPtvMEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

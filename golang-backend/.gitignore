@@ -1,0 +1,29 @@
+# Credentials - NEVER COMMIT THESE
+serviceAccountKey.json
+.env
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+/bin/
+/dist/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Air (live reload tool)
+tmp/
