@@ -85,6 +85,7 @@ func initializeFirebase(cfg *config.Config) *firebase.FirebaseClient {
 		return fbClient
 	}
 
+	// TODO: replace with cli version in src/cli
 	switch promptForAuthMethod() {
 	case "google":
 		if cfg.GoogleClientID == "" || cfg.GoogleClientSecret == "" {
