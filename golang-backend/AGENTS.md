@@ -24,6 +24,7 @@
 3.  **Interface-First**: Services define interfaces in `/internal/core/ports`. Repositories implement interfaces defined by the Domain.
 4.  **Consumer-Side Interfaces**: Following the Dependency Inversion Principle, the consumer (e.g., Service) should declare the interface it needs, not the provider (Repository). This keeps dependencies pointing inward toward the domain.
 5.  **Firebase Isolation**: Do not import `firebase.google.com/go` in `/internal/core`. The core domain must be agnostic of the storage technology. Isolate Firebase code to `/internal/repository`.
+6.  **Never ignore errors**: Never ever ever ignore errors! Return them for as long as you can, wrapping them with good context. At the last layer possible, we log the error.
 
 ## @CodingStandards
 

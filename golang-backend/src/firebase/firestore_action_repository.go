@@ -71,6 +71,10 @@ func (r *FirestoreActionRepository) GetByID(ctx context.Context, userID string, 
 		return nil, fmt.Errorf("failed to parse action: %w", err)
 	}
 
+	if isDeleted(action) {
+		return nil, nil // Treat soft-deleted actions as not found
+	}
+
 	return action, nil
 }
 
@@ -89,6 +93,9 @@ func (r *FirestoreActionRepository) List(ctx context.Context, userID string) ([]
 		if err != nil {
 			// Log and skip documents that can't be parsed
 			slog.Warn("skipping unparseable action document", "id", doc.ID, "error", err)
+			continue
+		}
+		if isDeleted(action) {
 			continue
 		}
 		actions = append(actions, action)
@@ -123,16 +130,42 @@ func (r *FirestoreActionRepository) Update(ctx context.Context, userID string, a
 	return nil
 }
 
-// Delete deletes an action
+// Delete soft-deletes an action by setting a "deleted" field to true.
+// The document is retained in Firestore to preserve event history and to avoid
+// eventual-consistency issues with reminders.
 func (r *FirestoreActionRepository) Delete(ctx context.Context, userID string, actionID string) error {
+	action, err := r.GetByID(ctx, userID, actionID)
+	if err != nil {
+		return fmt.Errorf("failed to get action for deletion: %w", err)
+	}
+	if action == nil {
+		return nil // Already deleted or does not exist — idempotent
+	}
+
+	action.Metadata()["deleted"] = true
+
 	fullPath := fmt.Sprintf("projects/%s/databases/(default)/documents/%s/%s/%s/%s",
 		r.client.ProjectID, usersCollection, userID, actionsCollection, actionID)
 
-	if err := r.client.DeleteDocument(ctx, fullPath); err != nil {
-		return fmt.Errorf("failed to delete action: %w", err)
+	actionMap, err := domain.ActionToMap(action)
+	if err != nil {
+		return fmt.Errorf("failed to convert action to map for soft delete: %w", err)
+	}
+	if err := r.client.UpdateDocument(ctx, fullPath, actionMap); err != nil {
+		return fmt.Errorf("failed to soft-delete action: %w", err)
 	}
 
 	return nil
+}
+
+// isDeleted reports whether an action has been soft-deleted.
+func isDeleted(action *domain.Action) bool {
+	v, ok := action.Metadata()["deleted"]
+	if !ok {
+		return false
+	}
+	deleted, ok := v.(bool)
+	return ok && deleted
 }
 
 // AddEvent adds an event to an action

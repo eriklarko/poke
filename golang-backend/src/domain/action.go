@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"sort"
 	"time"
 )
 
@@ -75,7 +76,21 @@ func MarshalAction(a *Action) ([]byte, error) {
 	if sk := a.SerializationKey(); sk != "" {
 		m["serializationKey"] = sk
 	}
-	m["events"] = a.Events()
+	// Serialize events as array format (Flutter canonical format).
+	// Each entry is {"when": "<RFC3339Nano>", "data": {...}} where data is omitted when nil.
+	eventsMap := a.Events()
+	eventsArray := make([]map[string]interface{}, 0, len(eventsMap))
+	for when, data := range eventsMap {
+		entry := map[string]interface{}{"when": when}
+		if data != nil {
+			entry["data"] = data
+		}
+		eventsArray = append(eventsArray, entry)
+	}
+	sort.Slice(eventsArray, func(i, j int) bool {
+		return eventsArray[i]["when"].(string) < eventsArray[j]["when"].(string)
+	})
+	m["events"] = eventsArray
 	return json.Marshal(m)
 }
 
@@ -122,58 +137,68 @@ func actionFromJSON(data []byte, id string) (*Action, error) {
 	metadata := make(map[string]interface{})
 
 	if v, ok := raw["actionId"]; ok {
-		_ = json.Unmarshal(v, &actionID)
+		if err := json.Unmarshal(v, &actionID); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal actionId: %w", err)
+		}
 	}
 	if id != "" {
 		actionID = id
 	}
 	if v, ok := raw["serializationKey"]; ok {
-		_ = json.Unmarshal(v, &serializationKey)
+		if err := json.Unmarshal(v, &serializationKey); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal serializationKey: %w", err)
+		}
 	}
 
 	var events map[string]interface{}
 	if v, ok := raw["events"]; ok {
-		events = parseEvents(v, actionID)
+		var err error
+		events, err = parseEvents(v, actionID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse events for action %q: %w", actionID, err)
+		}
 	}
 
 	reserved := map[string]bool{"actionId": true, "serializationKey": true, "events": true}
 	for k, v := range raw {
 		if !reserved[k] {
 			var val interface{}
-			if err := json.Unmarshal(v, &val); err == nil {
-				metadata[k] = val
+			if err := json.Unmarshal(v, &val); err != nil {
+				slog.Warn("failed to unmarshal metadata field; skipping",
+					"actionID", actionID, "field", k, "error", err)
+				continue
 			}
+			metadata[k] = val
 		}
 	}
 
 	return NewAction(actionID, serializationKey, events, metadata), nil
 }
 
-// parseEvents handles both map format (Go API) and array format (Flutter app).
-func parseEvents(raw json.RawMessage, actionID string) map[string]interface{} {
+// parseEvents handles both array format (Flutter / Go API canonical) and the
+// legacy map format written by older Go API versions.
+func parseEvents(raw json.RawMessage, actionID string) (map[string]interface{}, error) {
 	events := make(map[string]interface{})
 	if len(raw) == 0 || string(raw) == "null" {
-		return events
+		return events, nil
 	}
 
-	// Try map format first (from Go API)
-	var eventsMap map[string]interface{}
-	if err := json.Unmarshal(raw, &eventsMap); err == nil {
-		return eventsMap
-	}
-
-	// Try array format (from Flutter app — canonical source)
+	// Try array format first (canonical format used by both Flutter and Go API).
 	var eventsArray []struct {
 		When string                 `json:"when"`
 		Data map[string]interface{} `json:"data,omitempty"`
 	}
-	if err := json.Unmarshal(raw, &eventsArray); err != nil {
-		slog.Warn("failed to parse events in either map or array format",
-			"actionID", actionID, "error", err)
-		return events
+	if err := json.Unmarshal(raw, &eventsArray); err == nil {
+		for _, event := range eventsArray {
+			events[event.When] = event.Data
+		}
+		return events, nil
 	}
-	for _, event := range eventsArray {
-		events[event.When] = event.Data
+
+	// Fall back to legacy map format (Go API before array migration).
+	var eventsMap map[string]interface{}
+	if err := json.Unmarshal(raw, &eventsMap); err != nil {
+		return nil, fmt.Errorf("events field for action %q is neither an array nor a map: %w", actionID, err)
 	}
-	return events
+	return eventsMap, nil
 }
