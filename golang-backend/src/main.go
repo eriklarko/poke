@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/term"
@@ -28,7 +29,21 @@ func main() {
 
 	gin.SetMode(cfg.GinMode)
 
+	// Top-level context that drives background tasks (e.g. token refresh).
+	// It is cancelled when the server shuts down so all goroutines exit cleanly.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	fbClient := initializeFirebase(cfg)
+
+	// Keep the ID token fresh for the lifetime of the server when a refresh
+	// token is available. Firebase ID tokens expire after 1 hour; refresh 5
+	// minutes before that to provide a comfortable margin.
+	if fbClient.GetRefreshToken() != "" {
+		fbClient.StartAutomaticTokenRefresh(ctx, 55*time.Minute)
+		log.Println("✓ Automatic token refresh started (interval: 55m)")
+	}
+
 	firestore := firebase.NewFirestoreClient(fbClient)
 	firestoreRepo := firebase.NewFirestoreActionRepository(firestore)
 

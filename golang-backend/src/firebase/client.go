@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -26,7 +27,10 @@ type FirebaseClient struct {
 	RefreshToken string
 	UserID       string
 
-	client *http.Client
+	// tokenRefreshURL is the base URL for the token-refresh endpoint.
+	// It defaults to the Firebase production URL and can be overridden in tests.
+	tokenRefreshURL string
+	client          *http.Client
 }
 
 // FirebaseAuthResponse is the common response shape returned by the Firebase
@@ -45,8 +49,9 @@ type FirebaseAuthResponse struct {
 // ExchangeRefreshToken afterwards.
 func NewFirebaseClient(projectID, apiKey string) *FirebaseClient {
 	return &FirebaseClient{
-		ProjectID: projectID,
-		APIKey:    apiKey,
+		ProjectID:       projectID,
+		APIKey:          apiKey,
+		tokenRefreshURL: "https://securetoken.googleapis.com/v1/token",
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -107,7 +112,7 @@ func JWTSubject(token string) (string, error) {
 // token. The refresh token is also rotated and stored on the client.
 // This is the recommended authentication path for non-interactive environments.
 func (c *FirebaseClient) ExchangeRefreshToken(ctx context.Context, refreshToken string) error {
-	endpoint := fmt.Sprintf("https://securetoken.googleapis.com/v1/token?key=%s", c.APIKey)
+	endpoint := fmt.Sprintf("%s?key=%s", c.tokenRefreshURL, c.APIKey)
 
 	form := url.Values{}
 	form.Set("grant_type", "refresh_token")
@@ -264,6 +269,37 @@ func (c *FirebaseClient) signInWithGoogleIDToken(ctx context.Context, googleIDTo
 		"returnIdpCredential": true,
 		"returnSecureToken":   true,
 	})
+}
+
+// StartAutomaticTokenRefresh starts a background goroutine that periodically refreshes the ID token using the refresh token.
+// This is useful for long-running processes that need to maintain authentication without manual intervention.
+//
+// Usage:
+//
+//	cancel := fbClient.StartAutomaticTokenRefresh(ctx, 30*time.Minute)
+//	...
+//	cancel() // Call this when you want to stop the background refresh goroutine.
+func (c *FirebaseClient) StartAutomaticTokenRefresh(ctx context.Context, interval time.Duration) context.CancelFunc {
+	innerCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				if c.RefreshToken != "" {
+					if err := c.ExchangeRefreshToken(innerCtx, c.RefreshToken); err != nil {
+						log.Printf("Failed to refresh token: %v", err)
+					} else {
+						log.Println("ID token refreshed successfully")
+					}
+				}
+			case <-innerCtx.Done():
+				return
+			}
+		}
+	}()
+	return cancel
 }
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
