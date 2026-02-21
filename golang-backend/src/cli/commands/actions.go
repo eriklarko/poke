@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/huh"
@@ -102,10 +103,20 @@ func newActionsGetCmd(deps *Deps) *cobra.Command {
 				ui.Separator()
 				fmt.Printf("Events (%s):\n\n", ui.FormatEventCount(len(a.Events())))
 				var eventRows [][]string
-				for tsStr := range a.Events() {
-					eventRows = append(eventRows, []string{tsStr})
+				for tsStr, rawData := range a.Events() {
+					dataStr := ""
+					if rawData != nil {
+						if b, err := json.Marshal(rawData); err == nil {
+							dataStr = string(b)
+						}
+					}
+					eventRows = append(eventRows, []string{tsStr, dataStr})
 				}
-				ui.PrintTable([]string{"Timestamp"}, eventRows)
+				// Sort by timestamp for stable output.
+				sort.Slice(eventRows, func(i, j int) bool {
+					return eventRows[i][0] < eventRows[j][0]
+				})
+				ui.PrintTable([]string{"Timestamp", "Data"}, eventRows)
 			}
 			return nil
 		},
@@ -156,7 +167,9 @@ func newActionsCreateCmd(deps *Deps) *cobra.Command {
 				),
 				huh.NewGroup(
 					huh.NewConfirm().
-						Title(fmt.Sprintf("Create action with serializationKey %q?", serializationKey)).
+						TitleFunc(func() string {
+							return fmt.Sprintf("Create action with serializationKey %q?", serializationKey)
+						}, &serializationKey).
 						Value(&confirm),
 				),
 			)

@@ -357,13 +357,13 @@ func unwrapValue(value interface{}) interface{} {
 		}
 	}
 	if arrayVal, ok := valueMap["arrayValue"].(map[string]interface{}); ok {
-		if values, ok := arrayVal["values"].([]interface{}); ok {
-			result := make([]interface{}, len(values))
-			for i, v := range values {
-				result[i] = unwrapValue(v)
-			}
-			return result
+		// Firestore omits the "values" key for empty arrays.
+		values, _ := arrayVal["values"].([]interface{})
+		result := make([]interface{}, len(values))
+		for i, v := range values {
+			result[i] = unwrapValue(v)
 		}
+		return result
 	}
 
 	return value

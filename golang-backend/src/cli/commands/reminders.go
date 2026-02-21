@@ -53,7 +53,7 @@ Actions are sorted with overdue/due items first, then by due date.`,
 				})
 			}
 
-			ui.PrintTable([]string{"", "ID", "Due", "Events"}, rows)
+			ui.PrintTable([]string{"", "Action", "Due", "Events"}, rows)
 			return nil
 		},
 	}
