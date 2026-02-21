@@ -1,6 +1,7 @@
 package predictor
 
 import (
+	"fmt"
 	"math"
 	"testing"
 	"time"
@@ -19,7 +20,11 @@ func makeAction(timestamps ...string) *domain.Action {
 	for _, ts := range timestamps {
 		events[ts] = true
 	}
-	return domain.NewAction("test-action", "test", events, nil)
+	a, err := domain.NewAction("test-action", "test", events, nil)
+	if err != nil {
+		panic(fmt.Sprintf("failed to create action: %v", err))
+	}
+	return a
 }
 
 // mustParse parses an RFC3339 string and panics on failure.

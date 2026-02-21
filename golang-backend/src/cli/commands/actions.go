@@ -2,10 +2,12 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/huh"
+	"github.com/segmentio/ksuid"
 	"github.com/spf13/cobra"
 	"larko.se/poke/src/cli/ui"
 	"larko.se/poke/src/domain"
@@ -82,6 +84,7 @@ func newActionsGetCmd(deps *Deps) *cobra.Command {
 
 			pairs := [][]string{
 				{"ID", a.ID()},
+				{"Serialization Key", a.SerializationKey()},
 				{"Events", ui.FormatEventCount(len(a.Events()))},
 			}
 			if last := ui.LastEventTime(a); last != nil {
@@ -116,31 +119,44 @@ func newActionsCreateCmd(deps *Deps) *cobra.Command {
 		Use:   "create",
 		Short: "Create a new action (interactive)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var name, intervalDays string
+			var id, serializationKey, metadataStr string
 			var confirm bool
 
-			// TODO: good try, but needs to be replanned. I'll provide more info.
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewInput().
-						Title("Action name").
-						Placeholder("e.g. Water the fern").
-						Value(&name).
+						Title("Action ID").
+						Description("Optional — leave blank to auto-generate").
+						Value(&id),
+					huh.NewInput().
+						Title("Serialization key").
+						Description("Required — used to deserialize the action into its specific subtype (like water-plant)").
+						Value(&serializationKey).
 						Validate(func(s string) error {
 							if strings.TrimSpace(s) == "" {
-								return fmt.Errorf("name is required")
+								return fmt.Errorf("serializationKey is required")
 							}
 							return nil
 						}),
-					huh.NewInput().
-						Title("Typical interval (days)").
-						Description("Optional — used to predict the next due date").
-						Placeholder("e.g. 7").
-						Value(&intervalDays),
+					huh.NewText().
+						Title("Metadata (JSON)").
+						Description(`Optional — arbitrary JSON object, e.g. {"Plant": {"id": "foo", "name": "Fern"}}`).
+						Placeholder("{}").
+						Value(&metadataStr).
+						Validate(func(s string) error {
+							if strings.TrimSpace(s) == "" {
+								return nil
+							}
+							var m map[string]interface{}
+							if err := json.Unmarshal([]byte(strings.TrimSpace(s)), &m); err != nil {
+								return fmt.Errorf("invalid JSON: %w", err)
+							}
+							return nil
+						}),
 				),
 				huh.NewGroup(
 					huh.NewConfirm().
-						Title(fmt.Sprintf("Create action %q?", name)).
+						Title(fmt.Sprintf("Create action with serializationKey %q?", serializationKey)).
 						Value(&confirm),
 				),
 			)
@@ -153,18 +169,24 @@ func newActionsCreateCmd(deps *Deps) *cobra.Command {
 				return nil
 			}
 
-			metadata := map[string]interface{}{
-				"name": strings.TrimSpace(name),
-			}
-			if d := strings.TrimSpace(intervalDays); d != "" {
-				metadata["intervalDays"] = d
+			if strings.TrimSpace(id) == "" {
+				id = ksuid.New().String()
 			}
 
-			id := generateKSUID()
-			action := domain.NewAction(id, "", nil, metadata)
+			var metadata map[string]interface{}
+			if s := strings.TrimSpace(metadataStr); s != "" {
+				if err := json.Unmarshal([]byte(s), &metadata); err != nil {
+					return fmt.Errorf("parsing metadata: %w", err)
+				}
+			}
+
+			action, err := domain.NewAction(id, strings.TrimSpace(serializationKey), nil, metadata)
+			if err != nil {
+				return fmt.Errorf("building action: %w", err)
+			}
 
 			var createdID string
-			err := ui.RunWithSpinner("Creating action…", func() error {
+			err = ui.RunWithSpinner("Creating action…", func() error {
 				if e := deps.ActionService.CreateAction(context.Background(), deps.UserID, id, action); e != nil {
 					return e
 				}

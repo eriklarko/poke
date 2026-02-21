@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -224,15 +225,17 @@ func (tc *testContext) unauthedRequest(method, path string, body interface{}) *h
 
 // arbitraryAction creates a generic action for tests that don't care about specific fields
 func arbitraryAction() *domain.Action {
-	return domain.NewAction("", "test", nil, nil)
+	a, err := domain.NewAction("", "test", nil, nil)
+	if err != nil {
+		panic(fmt.Sprintf("failed to create action: %v", err))
+	}
+	return a
 }
 
-// newWaterPlantAction creates a water-plant action with specific plant fields
-func newWaterPlantAction(plantID, plantName string) *domain.Action {
-	return domain.NewAction("", "water-plant", nil, map[string]interface{}{
-		"plant": map[string]interface{}{
-			"id":   plantID,
-			"name": plantName,
-		},
-	})
+func mustNewAction(id, serializationKey string, events, metadata map[string]interface{}) *domain.Action {
+	a, err := domain.NewAction(id, serializationKey, events, metadata)
+	if err != nil {
+		panic(fmt.Sprintf("failed to create action: %v", err))
+	}
+	return a
 }

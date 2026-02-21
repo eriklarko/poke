@@ -24,7 +24,7 @@ func TestCreateAction(t *testing.T) {
 		{
 			testName: "Success",
 			userID:   "test-user-123",
-			action:   newWaterPlantAction("plant-123", "Monstera"),
+			action:   mustNewAction("plant-123", "water-plant", nil, nil),
 			setupMock: func(m *MockActionService) {
 				m.On("CreateAction", mock.Anything, "test-user-123", mock.AnythingOfType("string"), mock.Anything).Return(nil)
 			},
@@ -85,10 +85,11 @@ func TestListActions(t *testing.T) {
 			name:   "Success",
 			userID: "test-user-123",
 			setupMock: func(m *MockActionService) {
-				expectedActions := []*domain.Action{
-					domain.NewAction("plant-1", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-1", "name": "Monstera"}}),
-					domain.NewAction("plant-2", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-2", "name": "Pothos"}}),
-				}
+				a1, err := domain.NewAction("plant-1", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-1", "name": "Monstera"}})
+				assert.NoError(t, err)
+				a2, err := domain.NewAction("plant-2", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-2", "name": "Pothos"}})
+				assert.NoError(t, err)
+				expectedActions := []*domain.Action{a1, a2}
 				m.On("ListActions", mock.Anything, "test-user-123").Return(expectedActions, nil)
 			},
 			expectedStatus: http.StatusOK,
@@ -146,9 +147,10 @@ func TestGetAction(t *testing.T) {
 			userID:   "test-user-123",
 			actionID: "water-plant-123",
 			setupMock: func(m *MockActionService) {
-				expectedAction := domain.NewAction("water-plant-123", "water-plant", nil, map[string]interface{}{
+				expectedAction, err := domain.NewAction("water-plant-123", "water-plant", nil, map[string]interface{}{
 					"plant": map[string]interface{}{"id": "plant-123", "name": "Monstera"},
 				})
+				assert.NoError(t, err)
 				m.On("GetAction", mock.Anything, "test-user-123", "water-plant-123").
 					Return(expectedAction, nil)
 			},
@@ -210,7 +212,7 @@ func TestUpdateAction(t *testing.T) {
 			name:     "Success",
 			userID:   "test-user-123",
 			actionID: "water-plant-123",
-			action:   newWaterPlantAction("plant-123", "Updated Monstera"),
+			action:   mustNewAction("water-plant-123", "water-plant", nil, nil),
 			setupMock: func(m *MockActionService) {
 				m.On("UpdateAction", mock.Anything, "test-user-123", "water-plant-123", mock.Anything).Return(nil)
 			},

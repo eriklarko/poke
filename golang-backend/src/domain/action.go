@@ -45,7 +45,11 @@ func (a *Action) Metadata() map[string]interface{} { return a.metadata }
 func (a *Action) MarshalJSON() ([]byte, error) { return MarshalAction(a) }
 
 // NewAction creates a new generic action.
-func NewAction(id string, serializationKey string, events map[string]interface{}, metadata map[string]interface{}) *Action {
+func NewAction(id string, serializationKey string, events map[string]interface{}, metadata map[string]interface{}) (*Action, error) {
+	if serializationKey == "" {
+		return nil, fmt.Errorf("serializationKey is required")
+	}
+
 	if events == nil {
 		events = make(map[string]interface{})
 	}
@@ -57,7 +61,7 @@ func NewAction(id string, serializationKey string, events map[string]interface{}
 		serializationKey: serializationKey,
 		events:           events,
 		metadata:         metadata,
-	}
+	}, nil
 }
 
 // ── Serialization ──────────────────────────────────────────────────────────────
@@ -172,7 +176,7 @@ func actionFromJSON(data []byte, id string) (*Action, error) {
 		}
 	}
 
-	return NewAction(actionID, serializationKey, events, metadata), nil
+	return NewAction(actionID, serializationKey, events, metadata)
 }
 
 // parseEvents handles both array format (Flutter / Go API canonical) and the
