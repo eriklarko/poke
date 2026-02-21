@@ -2,6 +2,7 @@ package http_api
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -46,31 +47,25 @@ func (h *ActionHandler) CreateAction(c *gin.Context) {
 		return
 	}
 
-	var action domain.Action
-	if err := c.ShouldBindJSON(&action); err != nil {
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		Error(c, http.StatusBadRequest, "INVALID_REQUEST", "Failed to read request body")
+		return
+	}
+
+	action, err := domain.UnmarshalAction(body)
+	if err != nil {
 		Error(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid action data: "+err.Error())
 		return
 	}
 
-	// Validate required fields
-	if action.SerializationKey == "" {
-		Error(c, http.StatusBadRequest, "MISSING_SERIALIZATION_KEY", "serializationKey is required")
-		return
-	}
-
-	// Derive action ID from the action data
-	actionID := deriveActionID(&action)
+	// Use the action's ID if set (deterministic or from payload), otherwise generate a ksuid
+	actionID := action.ID()
 	if actionID == "" {
-		Error(c, http.StatusBadRequest, "INVALID_ACTION", "Could not derive action ID from action data")
-		return
+		actionID = ksuid.New().String()
 	}
 
-	// Initialize events if nil
-	if action.Events == nil {
-		action.Events = make(map[string]interface{})
-	}
-
-	if err := h.service.CreateAction(c.Request.Context(), userID, actionID, &action); err != nil {
+	if err := h.service.CreateAction(c.Request.Context(), userID, actionID, action); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
 			Error(c, http.StatusConflict, "ACTION_EXISTS", "Action with this ID already exists")
 			return
@@ -149,13 +144,22 @@ func (h *ActionHandler) UpdateAction(c *gin.Context) {
 		return
 	}
 
-	var action domain.Action
-	if err := c.ShouldBindJSON(&action); err != nil {
-		Error(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid action data: "+err.Error())
-		return
+	var action *domain.Action
+	{
+		body, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			Error(c, http.StatusBadRequest, "INVALID_REQUEST", "Failed to read request body")
+			return
+		}
+		var unmarshalErr error
+		action, unmarshalErr = domain.UnmarshalAction(body)
+		if unmarshalErr != nil {
+			Error(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid action data: "+unmarshalErr.Error())
+			return
+		}
 	}
 
-	if err := h.service.UpdateAction(c.Request.Context(), userID, actionID, &action); err != nil {
+	if err := h.service.UpdateAction(c.Request.Context(), userID, actionID, action); err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			Error(c, http.StatusNotFound, "ACTION_NOT_FOUND", "Action not found")
 			return
@@ -281,16 +285,4 @@ func (h *ActionHandler) DeleteEvent(c *gin.Context) {
 	Success(c, http.StatusOK, gin.H{
 		"success": true,
 	})
-}
-
-// deriveActionID derives the action ID from the action data
-// For water-plant actions, it's "water-{plantId}"
-// For other actions, generate a random ksuid
-func deriveActionID(action *domain.Action) string {
-	if action.SerializationKey == "water-plant" && action.Plant != nil {
-		return "water-" + action.Plant.ID
-	}
-
-	// Generate a random ksuid for other action types
-	return ksuid.New().String()
 }

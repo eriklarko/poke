@@ -19,11 +19,7 @@ func makeAction(timestamps ...string) *domain.Action {
 	for _, ts := range timestamps {
 		events[ts] = true
 	}
-	return &domain.Action{
-		ID:               "test-action",
-		SerializationKey: "water-plant",
-		Events:           events,
-	}
+	return domain.NewAction("test-action", "test", events, nil)
 }
 
 // mustParse parses an RFC3339 string and panics on failure.

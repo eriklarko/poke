@@ -95,7 +95,7 @@ func (s *ActionService) ListReminders(ctx context.Context, userID string) ([]*do
 	for _, action := range actions {
 		dueDate := predictor.PredictNext(action, now)
 		reminders = append(reminders, &domain.Reminder{
-			Action:  *action,
+			Action: action,
 			DueDate: dueDate,
 			IsDue:   dueDate != nil && !dueDate.After(now),
 		})

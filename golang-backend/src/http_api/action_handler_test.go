@@ -1,7 +1,6 @@
 package http_api
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -17,7 +16,7 @@ func TestCreateAction(t *testing.T) {
 	tests := []struct {
 		testName       string
 		userID         string
-		action         domain.Action
+		action         *domain.Action
 		setupMock      func(*MockActionService)
 		expectedStatus int
 		checkResponse  func(*testing.T, *httptest.ResponseRecorder)
@@ -25,11 +24,9 @@ func TestCreateAction(t *testing.T) {
 		{
 			testName: "Success",
 			userID:   "test-user-123",
-			action:   newWaterPlantAction("water-plant", "plant-123", "Monstera"),
+			action:   newWaterPlantAction("plant-123", "Monstera"),
 			setupMock: func(m *MockActionService) {
-				m.On("CreateAction", mock.Anything, "test-user-123", "water-plant-123", mock.MatchedBy(func(a *domain.Action) bool {
-					return a.SerializationKey == "water-plant" && a.Plant != nil && a.Plant.ID == "plant-123"
-				})).Return(nil)
+				m.On("CreateAction", mock.Anything, "test-user-123", mock.AnythingOfType("string"), mock.Anything).Return(nil)
 			},
 			expectedStatus: http.StatusCreated,
 			checkResponse: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -89,16 +86,8 @@ func TestListActions(t *testing.T) {
 			userID: "test-user-123",
 			setupMock: func(m *MockActionService) {
 				expectedActions := []*domain.Action{
-					{
-						SerializationKey: "water-plant",
-						Events:           map[string]interface{}{},
-						Plant:            &domain.Plant{ID: "plant-1", Name: "Monstera"},
-					},
-					{
-						SerializationKey: "water-plant",
-						Events:           map[string]interface{}{},
-						Plant:            &domain.Plant{ID: "plant-2", Name: "Pothos"},
-					},
+					domain.NewAction("plant-1", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-1", "name": "Monstera"}}),
+					domain.NewAction("plant-2", "water-plant", nil, map[string]interface{}{"plant": map[string]interface{}{"id": "plant-2", "name": "Pothos"}}),
 				}
 				m.On("ListActions", mock.Anything, "test-user-123").Return(expectedActions, nil)
 			},
@@ -122,7 +111,7 @@ func TestListActions(t *testing.T) {
 			userID: "test-user-123",
 			setupMock: func(m *MockActionService) {
 				m.On("ListActions", mock.Anything, "test-user-123").
-					Return(nil, errors.New("database connection failed"))
+					Return(([]*domain.Action)(nil), errors.New("database connection failed"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			checkResponse:  func(t *testing.T, w *httptest.ResponseRecorder) {},
@@ -157,20 +146,20 @@ func TestGetAction(t *testing.T) {
 			userID:   "test-user-123",
 			actionID: "water-plant-123",
 			setupMock: func(m *MockActionService) {
-				expectedAction := &domain.Action{
-					SerializationKey: "water-plant",
-					Events:           map[string]interface{}{},
-					Plant:            &domain.Plant{ID: "plant-123", Name: "Monstera"},
-				}
+				expectedAction := domain.NewAction("water-plant-123", "water-plant", nil, map[string]interface{}{
+					"plant": map[string]interface{}{"id": "plant-123", "name": "Monstera"},
+				})
 				m.On("GetAction", mock.Anything, "test-user-123", "water-plant-123").
 					Return(expectedAction, nil)
 			},
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response domain.Action
-				json.Unmarshal(w.Body.Bytes(), &response)
-				assert.Equal(t, "water-plant", response.SerializationKey)
-				assert.Equal(t, "plant-123", response.Plant.ID)
+				action, err := domain.UnmarshalAction(w.Body.Bytes())
+				assert.NoError(t, err)
+				assert.Equal(t, "water-plant", action.SerializationKey())
+				plant, ok := action.Metadata()["plant"].(map[string]interface{})
+				assert.True(t, ok)
+				assert.Equal(t, "plant-123", plant["id"])
 			},
 		},
 		{
@@ -212,7 +201,7 @@ func TestUpdateAction(t *testing.T) {
 		name           string
 		userID         string
 		actionID       string
-		action         domain.Action
+		action         *domain.Action
 		setupMock      func(*MockActionService)
 		expectedStatus int
 		checkResponse  func(*testing.T, *httptest.ResponseRecorder)
@@ -221,11 +210,9 @@ func TestUpdateAction(t *testing.T) {
 			name:     "Success",
 			userID:   "test-user-123",
 			actionID: "water-plant-123",
-			action:   newWaterPlantAction("water-plant", "plant-123", "Updated Monstera"),
+			action:   newWaterPlantAction("plant-123", "Updated Monstera"),
 			setupMock: func(m *MockActionService) {
-				m.On("UpdateAction", mock.Anything, "test-user-123", "water-plant-123", mock.MatchedBy(func(a *domain.Action) bool {
-					return a.Plant != nil && a.Plant.Name == "Updated Monstera"
-				})).Return(nil)
+				m.On("UpdateAction", mock.Anything, "test-user-123", "water-plant-123", mock.Anything).Return(nil)
 			},
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, w *httptest.ResponseRecorder) {

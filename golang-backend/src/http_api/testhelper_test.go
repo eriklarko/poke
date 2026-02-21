@@ -223,21 +223,16 @@ func (tc *testContext) unauthedRequest(method, path string, body interface{}) *h
 }
 
 // arbitraryAction creates a generic action for tests that don't care about specific fields
-func arbitraryAction() domain.Action {
-	return domain.Action{
-		SerializationKey: "water-plant",
-		Events:           map[string]interface{}{},
-	}
+func arbitraryAction() *domain.Action {
+	return domain.NewAction("", "test", nil, nil)
 }
 
-// newWaterPlantAction creates an action with specific fields for tests that need customization
-func newWaterPlantAction(serializationKey, plantID, plantName string) domain.Action {
-	return domain.Action{
-		SerializationKey: serializationKey,
-		Events:           map[string]interface{}{},
-		Plant: &domain.Plant{
-			ID:   plantID,
-			Name: plantName,
+// newWaterPlantAction creates a water-plant action with specific plant fields
+func newWaterPlantAction(plantID, plantName string) *domain.Action {
+	return domain.NewAction("", "water-plant", nil, map[string]interface{}{
+		"plant": map[string]interface{}{
+			"id":   plantID,
+			"name": plantName,
 		},
-	}
+	})
 }

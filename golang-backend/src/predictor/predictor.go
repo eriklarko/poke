@@ -127,7 +127,7 @@ func weightedMostCommonTimeOfDay(timestamps []time.Time, now time.Time) time.Dur
 // Keys may be RFC3339Nano, RFC3339, or bare ISO-8601 (no offset, treated as UTC).
 func eventTimestamps(action *domain.Action) []time.Time {
 	var times []time.Time
-	for k := range action.Events {
+	for k := range action.Events() {
 		if t, err := utils.ParseTimestamp(k); err == nil {
 			times = append(times, t)
 		}
