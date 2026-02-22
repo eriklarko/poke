@@ -14,6 +14,14 @@ import (
 	"larko.se/poke/src/service"
 )
 
+// Injected at build time via -ldflags "-X main.version=... -X main.commit=... -X main.date=..."
+// Falls back to "dev" when running locally with `go run`.
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -74,6 +82,7 @@ Use "poke help <command>" for more information about a specific command.`,
 	remindersCmd := commands.NewRemindersCmd(deps)
 	remindersCmd.PersistentPreRunE = authRequired
 
+	cmd.AddCommand(commands.NewVersionCmd(version, commit, date))
 	cmd.AddCommand(commands.NewAuthCmd())
 	cmd.AddCommand(actionsCmd)
 	cmd.AddCommand(eventsCmd)
