@@ -61,12 +61,20 @@ func newAuthStatusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Show current auth status",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			token, err := cliauth.LoadSavedToken()
-			if err != nil || token == "" {
+			creds, err := cliauth.LoadSavedCredentials()
+			if err != nil || creds.RefreshToken == "" {
 				fmt.Println("Not logged in.")
 				return nil
 			}
-			fmt.Println("Saved credentials found. Run \"poke auth login\" to refresh.")
+			fmt.Println("Logged in.")
+			if creds.UserID != "" {
+				fmt.Printf("  User ID : %s\n", creds.UserID)
+			}
+			if creds.Email != "" {
+				fmt.Printf("  Email   : %s\n", creds.Email)
+			} else {
+				fmt.Println("  Email   : (anonymous or not stored — run \"poke auth login\" to refresh)")
+			}
 			return nil
 		},
 	}

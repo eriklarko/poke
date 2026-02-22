@@ -44,12 +44,12 @@ func Initialize(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClie
 	}
 
 	// 2. Saved refresh token from credential store.
-	savedToken, err := LoadSavedToken()
+	savedCreds, err := LoadSavedCredentials()
 	if err != nil && !errors.Is(err, ErrNoCredentials) {
 		return nil, fmt.Errorf("reading credential store: %w", err)
 	}
-	if savedToken != "" {
-		if err := fbClient.ExchangeRefreshToken(ctx, savedToken); err != nil {
+	if err == nil && savedCreds.RefreshToken != "" {
+		if err := fbClient.ExchangeRefreshToken(ctx, savedCreds.RefreshToken); err != nil {
 			// Saved token may have been revoked — fall through to interactive login.
 			fmt.Fprintf(os.Stderr, "⚠ Saved credentials are invalid, please log in again.\n")
 		} else {
@@ -64,7 +64,7 @@ func Initialize(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClie
 
 	// Persist the refresh token so the user doesn't have to log in next time.
 	if rt := fbClient.GetRefreshToken(); rt != "" {
-		if saveErr := SaveToken(rt); saveErr != nil {
+		if saveErr := SaveCredentials(rt, fbClient.GetUserID(), fbClient.GetEmail()); saveErr != nil {
 			fmt.Fprintf(os.Stderr, "⚠ Could not save credentials: %v\n", saveErr)
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/spf13/cobra"
 	cliauth "larko.se/poke/src/cli/auth"
@@ -26,18 +27,29 @@ func run() error {
 		return fmt.Errorf("loading config: %w", err)
 	}
 
-	fbClient, err := cliauth.Initialize(context.Background(), cfg)
-	if err != nil {
-		return fmt.Errorf("authentication: %w", err)
-	}
+	// deps starts empty; it is populated lazily the first time a command that
+	// requires authentication actually runs (via PersistentPreRunE below).
+	deps := &commands.Deps{}
 
-	firestoreClient := firebase.NewFirestoreClient(fbClient)
-	firestoreRepo := firebase.NewFirestoreActionRepository(firestoreClient)
-	actionService := service.NewActionService(firestoreRepo)
-
-	deps := &commands.Deps{
-		ActionService: actionService,
-		UserID:        fbClient.GetUserID(),
+	var (
+		once    sync.Once
+		authErr error
+	)
+	initAuth := func() error {
+		once.Do(func() {
+			var fbClient *firebase.FirebaseClient
+			fbClient, authErr = cliauth.Initialize(context.Background(), cfg)
+			if authErr != nil {
+				authErr = fmt.Errorf("authentication: %w", authErr)
+				return
+			}
+			firestoreClient := firebase.NewFirestoreClient(fbClient)
+			firestoreRepo := firebase.NewFirestoreActionRepository(firestoreClient)
+			actionService := service.NewActionService(firestoreRepo)
+			deps.ActionService = actionService
+			deps.UserID = fbClient.GetUserID()
+		})
+		return authErr
 	}
 
 	cmd := &cobra.Command{
@@ -48,10 +60,24 @@ func run() error {
 Use "poke help <command>" for more information about a specific command.`,
 		SilenceUsage: true,
 	}
+
+	authRequired := func(cmd *cobra.Command, args []string) error {
+		return initAuth()
+	}
+
+	actionsCmd := commands.NewActionsCmd(deps)
+	actionsCmd.PersistentPreRunE = authRequired
+
+	eventsCmd := commands.NewEventsCmd(deps)
+	eventsCmd.PersistentPreRunE = authRequired
+
+	remindersCmd := commands.NewRemindersCmd(deps)
+	remindersCmd.PersistentPreRunE = authRequired
+
 	cmd.AddCommand(commands.NewAuthCmd())
-	cmd.AddCommand(commands.NewActionsCmd(deps))
-	cmd.AddCommand(commands.NewEventsCmd(deps))
-	cmd.AddCommand(commands.NewRemindersCmd(deps))
+	cmd.AddCommand(actionsCmd)
+	cmd.AddCommand(eventsCmd)
+	cmd.AddCommand(remindersCmd)
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)

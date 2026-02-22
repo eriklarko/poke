@@ -26,6 +26,7 @@ type FirebaseClient struct {
 	IDToken      string
 	RefreshToken string
 	UserID       string
+	Email        string
 
 	// tokenRefreshURL is the base URL for the token-refresh endpoint.
 	// It defaults to the Firebase production URL and can be overridden in tests.
@@ -68,6 +69,10 @@ func (c *FirebaseClient) GetRefreshToken() string { return c.RefreshToken }
 
 // GetUserID returns the Firebase user ID (UID) for the authenticated user.
 func (c *FirebaseClient) GetUserID() string { return c.UserID }
+
+// GetEmail returns the email address for the authenticated user, if available.
+// Anonymous sign-ins will return an empty string.
+func (c *FirebaseClient) GetEmail() string { return c.Email }
 
 // IsAuthenticated reports whether the client holds a non-empty ID token and user ID.
 func (c *FirebaseClient) IsAuthenticated() bool {
@@ -340,6 +345,7 @@ func (c *FirebaseClient) doAuthRequest(ctx context.Context, endpoint string, pay
 	c.IDToken = authResp.IDToken
 	c.RefreshToken = authResp.RefreshToken
 	c.UserID = authResp.LocalID
+	c.Email = authResp.Email
 	return nil
 }
 

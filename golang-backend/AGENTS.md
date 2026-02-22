@@ -35,6 +35,7 @@
 > ```
 > Violating this makes the server completely undebuggable in production and will be rejected in code review.
 
+* **No Deprecation**: Never leave deprecated or backwards-compatible shim code. Delete the old function/type and update all call sites immediately. A build failure is preferable to accumulating dead weight.
 * **Error Handling**: Use `errors.Is` and `errors.As`. Wrap errors with context: `fmt.Errorf("failed to create reminder: %w", err)`. NEVER just return `err` if context can be added.
 * **Never Ignore Errors**: NEVER swallow errors silently. If you can't return an error, at least log it with `log/slog`. We'd much rather have errors in logs than have them disappear into the void.
 * **Always Log Errors**: When returning generic error messages to users (for security/UX), always log the actual error details server-side first using structured logging (`log/slog`).

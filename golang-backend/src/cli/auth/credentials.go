@@ -8,12 +8,14 @@ import (
 	"path/filepath"
 )
 
-// ErrNoCredentials is returned by LoadSavedToken when no credentials file exists.
+// ErrNoCredentials is returned by LoadSavedCredentials when no credentials file exists.
 var ErrNoCredentials = errors.New("no saved credentials")
 
 // credentials holds the persisted auth state.
 type credentials struct {
 	RefreshToken string `json:"refreshToken"`
+	UserID       string `json:"userID,omitempty"`
+	Email        string `json:"email,omitempty"`
 }
 
 // credentialsPath returns the path to the credentials file.
@@ -30,8 +32,8 @@ func credentialsPath() (string, error) {
 	return filepath.Join(base, "poke", "credentials.json"), nil
 }
 
-// SaveToken writes the given Firebase refresh token to the credential store.
-func SaveToken(refreshToken string) error {
+// SaveCredentials writes the refresh token, user ID, and email to the credential store.
+func SaveCredentials(refreshToken, userID, email string) error {
 	path, err := credentialsPath()
 	if err != nil {
 		return err
@@ -41,7 +43,7 @@ func SaveToken(refreshToken string) error {
 		return fmt.Errorf("creating config directory: %w", err)
 	}
 
-	data, err := json.Marshal(credentials{RefreshToken: refreshToken})
+	data, err := json.Marshal(credentials{RefreshToken: refreshToken, UserID: userID, Email: email})
 	if err != nil {
 		return fmt.Errorf("marshalling credentials: %w", err)
 	}
@@ -53,28 +55,39 @@ func SaveToken(refreshToken string) error {
 	return nil
 }
 
-// LoadSavedToken reads the saved refresh token from the credential store.
+// SavedCredentials is the publicly visible form of the persisted auth state.
+type SavedCredentials struct {
+	RefreshToken string
+	UserID       string
+	Email        string
+}
+
+// LoadSavedCredentials reads all saved credentials from the credential store.
 // Returns ErrNoCredentials if no credentials file exists.
-func LoadSavedToken() (string, error) {
+func LoadSavedCredentials() (*SavedCredentials, error) {
 	path, err := credentialsPath()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return "", ErrNoCredentials
+		return nil, ErrNoCredentials
 	}
 	if err != nil {
-		return "", fmt.Errorf("reading credentials file: %w", err)
+		return nil, fmt.Errorf("reading credentials file: %w", err)
 	}
 
 	var creds credentials
 	if err := json.Unmarshal(data, &creds); err != nil {
-		return "", fmt.Errorf("parsing credentials file: %w", err)
+		return nil, fmt.Errorf("parsing credentials file: %w", err)
 	}
 
-	return creds.RefreshToken, nil
+	return &SavedCredentials{
+		RefreshToken: creds.RefreshToken,
+		UserID:       creds.UserID,
+		Email:        creds.Email,
+	}, nil
 }
 
 // DeleteSavedToken removes the credential store file.
