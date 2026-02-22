@@ -1,0 +1,52 @@
+version: 2
+
+project_name: poke
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: poke-cli
+    main: ./cmd/cli
+    binary: poke
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Produce a clean static binary with version info baked in
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: poke-cli
+    builds:
+      - poke-cli
+    # e.g. poke_1.2.3_linux_amd64.tar.gz  /  poke_1.2.3_windows_amd64.zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch

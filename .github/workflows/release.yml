@@ -1,0 +1,36 @@
+name: Release CLI
+
+# Trigger: push a tag like v1.0.0 or v1.2.3
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write  # required to create GitHub Releases and upload assets
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # GoReleaser needs full history for changelog
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: golang-backend/go.mod
+          cache-dependency-path: golang-backend/go.sum
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          workdir: golang-backend
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
