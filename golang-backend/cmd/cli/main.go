@@ -83,7 +83,7 @@ Use "poke help <command>" for more information about a specific command.`,
 	remindersCmd.PersistentPreRunE = authRequired
 
 	cmd.AddCommand(commands.NewVersionCmd(version, commit, date))
-	cmd.AddCommand(commands.NewAuthCmd())
+	cmd.AddCommand(commands.NewAuthCmd(cfg))
 	cmd.AddCommand(actionsCmd)
 	cmd.AddCommand(eventsCmd)
 	cmd.AddCommand(remindersCmd)

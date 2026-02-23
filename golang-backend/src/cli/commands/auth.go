@@ -10,29 +10,29 @@ import (
 	"larko.se/poke/src/config"
 )
 
-func NewAuthCmd() *cobra.Command {
+// NewAuthCmd returns the `auth` command subtree. cfg is the shared config
+// instance already populated with env vars and root-level persistent flags,
+// so auth login inherits --firebase-project-id / --firebase-api-key /
+// --fb-auth-token / --fb-refresh-token without re-declaring them.
+func NewAuthCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "auth",
 		Short: "Manage authentication",
 	}
-	cmd.AddCommand(newAuthLoginCmd())
+	cmd.AddCommand(newAuthLoginCmd(cfg))
 	cmd.AddCommand(newAuthLogoutCmd())
 	cmd.AddCommand(newAuthStatusCmd())
 	return cmd
 }
 
-func newAuthLoginCmd() *cobra.Command {
-	return &cobra.Command{
+func newAuthLoginCmd(cfg *config.Config) *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "login",
 		Short: "Authenticate with Firebase",
 		Long:  `Authenticate with Firebase and save credentials to ~/.config/poke/credentials.json.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := config.Load()
-			if err != nil {
-				return fmt.Errorf("loading config: %w", err)
-			}
 			_ = cliauth.DeleteSavedToken()
-			client, err := cliauth.Initialize(context.Background(), cfg)
+			client, err := cliauth.Login(context.Background(), cfg)
 			if err != nil {
 				return err
 			}
@@ -40,6 +40,16 @@ func newAuthLoginCmd() *cobra.Command {
 			return nil
 		},
 	}
+	// Firebase connection flags — allow overriding the project/key used for
+	// this login without needing env vars.
+	cmd.Flags().StringVar(&cfg.FirebaseProjectID, "firebase-project-id", cfg.FirebaseProjectID, "Firebase project ID (env: FIREBASE_PROJECT_ID)")
+	cmd.Flags().StringVar(&cfg.FirebaseAPIKey, "firebase-api-key", cfg.FirebaseAPIKey, "Firebase API key (env: FIREBASE_API_KEY)")
+	cmd.Flags().StringVar(&cfg.FirebaseAuthToken, "fb-auth-token", cfg.FirebaseAuthToken, "Firebase ID token to use directly (env: FB_AUTH_TOKEN)")
+	cmd.Flags().StringVar(&cfg.FirebaseRefreshToken, "fb-refresh-token", cfg.FirebaseRefreshToken, "Firebase refresh token; auto-renews ID token (env: FB_REFRESH_TOKEN)")
+	// Google OAuth — only needed when choosing Google Sign-In interactively.
+	cmd.Flags().StringVar(&cfg.GoogleClientID, "google-client-id", cfg.GoogleClientID, "Google OAuth client ID (env: GOOGLE_CLIENT_ID)")
+	cmd.Flags().StringVar(&cfg.GoogleClientSecret, "google-client-secret", cfg.GoogleClientSecret, "Google OAuth client secret (env: GOOGLE_CLIENT_SECRET)")
+	return cmd
 }
 
 func newAuthLogoutCmd() *cobra.Command {

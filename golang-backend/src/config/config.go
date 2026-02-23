@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -22,16 +23,12 @@ type Config struct {
 	MaxUploadSizeMB      int
 }
 
-// Load loads configuration from environment variables
+// Load loads configuration from environment variables only.
+// No .env file is read. Suitable for the CLI, which uses env vars or flags.
 func Load() (*Config, error) {
-	// Load .env file if it exists (ignore error in production)
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: .env file not found, using environment variables: %v", err)
-	}
-
 	config := &Config{
 		FirebaseProjectID:    getEnv("FIREBASE_PROJECT_ID", "plant-reminder-90745"),
-		FirebaseAPIKey:       getEnv("FIREBASE_API_KEY", "AIzaSyCo2Jlq9WdIpchjg2MxyNfP7CKUFPtvMEw"),
+		FirebaseAPIKey:       getEnv("FIREBASE_API_KEY", ""),
 		FirebaseAuthToken:    getEnv("FB_AUTH_TOKEN", ""),
 		FirebaseRefreshToken: getEnv("FB_REFRESH_TOKEN", ""),
 		GoogleClientID:       getEnv("GOOGLE_CLIENT_ID", ""),
@@ -43,6 +40,26 @@ func Load() (*Config, error) {
 	}
 
 	return config, nil
+}
+
+// LoadWithEnvFile loads configuration from a .env file (required) and then
+// from environment variables. An error is returned if the .env file is absent,
+// cannot be read, or if required fields are not set. Suitable for the HTTP API.
+func LoadWithEnvFile() (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		return nil, fmt.Errorf(".env file required but not found: %w", err)
+	}
+	cfg, err := Load()
+	if err != nil {
+		return nil, err
+	}
+	if cfg.FirebaseProjectID == "" {
+		return nil, fmt.Errorf("FIREBASE_PROJECT_ID is required")
+	}
+	if cfg.FirebaseAPIKey == "" {
+		return nil, fmt.Errorf("FIREBASE_API_KEY is required")
+	}
+	return cfg, nil
 }
 
 func getEnv(key, defaultValue string) string {

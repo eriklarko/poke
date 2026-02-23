@@ -16,6 +16,7 @@ type credentials struct {
 	RefreshToken string `json:"refreshToken"`
 	UserID       string `json:"userID,omitempty"`
 	Email        string `json:"email,omitempty"`
+	APIKey       string `json:"apiKey,omitempty"`
 }
 
 // credentialsPath returns the path to the credentials file.
@@ -32,8 +33,8 @@ func credentialsPath() (string, error) {
 	return filepath.Join(base, "poke", "credentials.json"), nil
 }
 
-// SaveCredentials writes the refresh token, user ID, and email to the credential store.
-func SaveCredentials(refreshToken, userID, email string) error {
+// SaveCredentials writes the refresh token, user ID, email, and API key to the credential store.
+func SaveCredentials(refreshToken, userID, email, apiKey string) error {
 	path, err := credentialsPath()
 	if err != nil {
 		return err
@@ -43,7 +44,7 @@ func SaveCredentials(refreshToken, userID, email string) error {
 		return fmt.Errorf("creating config directory: %w", err)
 	}
 
-	data, err := json.Marshal(credentials{RefreshToken: refreshToken, UserID: userID, Email: email})
+	data, err := json.Marshal(credentials{RefreshToken: refreshToken, UserID: userID, Email: email, APIKey: apiKey})
 	if err != nil {
 		return fmt.Errorf("marshalling credentials: %w", err)
 	}
@@ -60,6 +61,7 @@ type SavedCredentials struct {
 	RefreshToken string
 	UserID       string
 	Email        string
+	APIKey       string
 }
 
 // LoadSavedCredentials reads all saved credentials from the credential store.
@@ -87,6 +89,7 @@ func LoadSavedCredentials() (*SavedCredentials, error) {
 		RefreshToken: creds.RefreshToken,
 		UserID:       creds.UserID,
 		Email:        creds.Email,
+		APIKey:       creds.APIKey,
 	}, nil
 }
 

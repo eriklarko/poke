@@ -17,17 +17,14 @@ import (
 
 // Initialize returns an authenticated FirebaseClient for the CLI.
 // Priority:
-//  1. FB_REFRESH_TOKEN / FB_AUTH_TOKEN env vars (same as the HTTP server)
-//  2. Saved refresh token from the credential store (~/.config/poke/credentials.json)
-//  3. Interactive login via Huh form
-//
-// When a new refresh token is obtained interactively, it is saved to the
-// credential store automatically.
+//  1. FB_REFRESH_TOKEN / FB_AUTH_TOKEN from cfg (env var or flag)
+//  2. Saved credentials from ~/.config/poke/credentials.json — the API key
+//     stored at login time is used automatically; no flags needed.
+// Returns an error if not logged in, directing the user to run "poke auth login".
 func Initialize(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClient, error) {
-	fbClient := firebase.NewFirebaseClient(cfg.FirebaseProjectID, cfg.FirebaseAPIKey)
-
-	// 1. Env-var tokens take precedence (matches server behaviour).
+	// 1. Explicit env-var / flag tokens take precedence.
 	if cfg.FirebaseRefreshToken != "" {
+		fbClient := firebase.NewFirebaseClient(cfg.FirebaseProjectID, cfg.FirebaseAPIKey)
 		if err := fbClient.ExchangeRefreshToken(ctx, cfg.FirebaseRefreshToken); err != nil {
 			return nil, fmt.Errorf("FB_REFRESH_TOKEN exchange failed: %w", err)
 		}
@@ -35,6 +32,7 @@ func Initialize(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClie
 	}
 
 	if cfg.FirebaseAuthToken != "" {
+		fbClient := firebase.NewFirebaseClient(cfg.FirebaseProjectID, cfg.FirebaseAPIKey)
 		userID, err := firebase.JWTSubject(cfg.FirebaseAuthToken)
 		if err != nil {
 			return nil, fmt.Errorf("FB_AUTH_TOKEN could not be decoded: %w", err)
@@ -43,32 +41,44 @@ func Initialize(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClie
 		return fbClient, nil
 	}
 
-	// 2. Saved refresh token from credential store.
+	// 2. Saved credentials — use the API key stored at login time so data
+	// commands (actions/events/reminders) need zero flags or env vars.
 	savedCreds, err := LoadSavedCredentials()
 	if err != nil && !errors.Is(err, ErrNoCredentials) {
 		return nil, fmt.Errorf("reading credential store: %w", err)
 	}
 	if err == nil && savedCreds.RefreshToken != "" {
-		if err := fbClient.ExchangeRefreshToken(ctx, savedCreds.RefreshToken); err != nil {
-			// Saved token may have been revoked — fall through to interactive login.
-			fmt.Fprintf(os.Stderr, "⚠ Saved credentials are invalid, please log in again.\n")
-		} else {
-			return fbClient, nil
+		// An explicit flag/env var overrides the stored API key.
+		apiKey := savedCreds.APIKey
+		if cfg.FirebaseAPIKey != "" {
+			apiKey = cfg.FirebaseAPIKey
 		}
+		fbClient := firebase.NewFirebaseClient(cfg.FirebaseProjectID, apiKey)
+		if err := fbClient.ExchangeRefreshToken(ctx, savedCreds.RefreshToken); err != nil {
+			return nil, fmt.Errorf("saved credentials are invalid — run \"poke auth login\" to re-authenticate: %w", err)
+		}
+		return fbClient, nil
 	}
 
-	// 3. Interactive login.
+	return nil, fmt.Errorf("not logged in — run \"poke auth login --firebase-api-key=<key>\" first")
+}
+
+// Login performs a fresh interactive sign-in, ignoring any saved credentials.
+// It requires an API key (via cfg.FirebaseAPIKey or --firebase-api-key).
+// On success the refresh token and API key are saved to the credential store.
+func Login(ctx context.Context, cfg *config.Config) (*firebase.FirebaseClient, error) {
+	if cfg.FirebaseAPIKey == "" {
+		return nil, fmt.Errorf("--firebase-api-key (or FIREBASE_API_KEY) is required to log in")
+	}
+	fbClient := firebase.NewFirebaseClient(cfg.FirebaseProjectID, cfg.FirebaseAPIKey)
 	if err := runInteractiveLogin(ctx, cfg, fbClient); err != nil {
 		return nil, err
 	}
-
-	// Persist the refresh token so the user doesn't have to log in next time.
 	if rt := fbClient.GetRefreshToken(); rt != "" {
-		if saveErr := SaveCredentials(rt, fbClient.GetUserID(), fbClient.GetEmail()); saveErr != nil {
+		if saveErr := SaveCredentials(rt, fbClient.GetUserID(), fbClient.GetEmail(), cfg.FirebaseAPIKey); saveErr != nil {
 			fmt.Fprintf(os.Stderr, "⚠ Could not save credentials: %v\n", saveErr)
 		}
 	}
-
 	return fbClient, nil
 }
 
